@@ -13,7 +13,7 @@ export function Button({
   size = "default",
   ...props
 }: ButtonProps) {
-  const { foreground, background, primary, primaryForeground, border } =
+  const { foreground, background, primary, primaryForeground, muted, mutedForeground, border } =
     getThemedColors();
 
   return (
@@ -33,6 +33,8 @@ export function Button({
             variant === "ghost" && { padding: 0 },
 
             pressed && { transform: [{ scale: 0.98 }] },
+
+            props.disabled && { backgroundColor: muted },
           ]}
         >
           <Text
@@ -43,6 +45,8 @@ export function Button({
                 color: foreground,
               },
               variant === "default" && { color: primaryForeground },
+
+              props.disabled && { color: mutedForeground },
             ]}
           >
             {children}

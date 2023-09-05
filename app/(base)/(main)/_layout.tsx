@@ -33,13 +33,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="post"
-        options={{
-          title: "Post",
-          tabBarIcon: ({ color, focused }) => <Icons.add color={color} filled={focused}/>,
-        }}
-      />
-      <Tabs.Screen
         name="message"
         options={{
           title: "Message",

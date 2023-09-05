@@ -9,7 +9,7 @@ import React, {
 import LoadingScreen from "@/components/loading";
 import { FIREBASE_AUTH } from "@/firebase/config";
 import { User } from "@/types";
-import { getUserProfile } from "@/firebase/docs/user";
+import { getUserProfile } from "@/firebase/database";
 
 interface UserContextType {
   user: User | null;
@@ -39,7 +39,7 @@ export function UserContextProvider({ children }: Props) {
     const run = async () => {
       const authUser = FIREBASE_AUTH.currentUser;
       setUser(
-        authUser && authUser.email ? await getUserProfile(authUser.email) : null
+        authUser && authUser.email ? await getUserProfile(authUser.uid) : null
       );
       setInitializing(false);
     };

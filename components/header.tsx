@@ -13,7 +13,7 @@ export const HEADER_HEIGHT =
 
 export function Header({ scrollY, children, ...props }: HeaderProps) {
   const { border, background } = getThemedColors();
-  const { borderWidth } = getStyles();
+  const { borderWidthSmall: borderWidth } = getStyles();
 
   const diffClampScrollY = Animated.diffClamp(scrollY, 0, HEADER_HEIGHT);
   const headerY = diffClampScrollY.interpolate({

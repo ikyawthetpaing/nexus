@@ -29,7 +29,7 @@ export const uploadFileToFirebase = async ({
     await uploadBytes(storageRef, blob);
 
     const fileUrl = await getDownloadURL(storageRef);
-    return { path: remotePath, url: fileUrl } as FirebaseUploadedFile;
+    return { path: remotePath, uri: fileUrl } as FirebaseUploadedFile;
   } catch (error) {
     throw error;
   }

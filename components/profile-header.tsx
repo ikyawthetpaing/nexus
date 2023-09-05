@@ -30,7 +30,7 @@ export function ProfileHeader({
   getHeight,
 }: ProfileHeaderProps) {
   const { background, mutedForeground, accent, border } = getThemedColors();
-  const { padding, borderWidth } = getStyles();
+  const { padding, borderWidthSmall: borderWidth } = getStyles();
 
   const pathname = usePathname();
   const [headerHeight, setHeaderHeight] = useState(0);
@@ -72,9 +72,10 @@ export function ProfileHeader({
           flexDirection: "row",
           justifyContent: "space-between",
           padding: padding,
+          gap: padding
         }}
       >
-        <View style={{ gap: padding }}>
+        <View style={{ gap: padding, flex: 1 }}>
           <View>
             <Text style={{ fontSize: 24, fontWeight: "bold" }}>
               {user.name}
@@ -107,7 +108,7 @@ export function ProfileHeader({
         >
           {user.avatar && (
             <Image
-              source={{ uri: user.avatar.url }}
+              source={{ uri: user.avatar.uri }}
               style={{
                 flex: 1,
                 width: "100%",

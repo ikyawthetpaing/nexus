@@ -31,7 +31,6 @@ export function ViewWithHeader({
         showsVerticalScrollIndicator={false}
         onScroll={handleScroll}
         scrollEventThrottle={16}
-        // style={{ backgroundColor: "red" }}
       >
         <View style={{ marginTop: HEADER_HEIGHT }}>{children}</View>
       </Animated.ScrollView>

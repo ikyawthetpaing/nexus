@@ -47,7 +47,7 @@ function useProtectedRoute(user: AuthUser | null) {
   useEffect(() => {
     if (shouldRedirect) {
       if (!user) {
-        router.replace("/login");
+        router.replace("/signin");
       } else if (user && !user.emailVerified) {
         router.replace("/signup");
       } else if (user && inAuthGroup) {

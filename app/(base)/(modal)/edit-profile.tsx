@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { Image, ImageSourcePropType, SafeAreaView } from "react-native";
+import { Image, SafeAreaView } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Text, View } from "@/components/themed";
 import { ViewWithHeader } from "@/components/view-with-header";
@@ -17,9 +17,9 @@ import {
   deleteFileFromFirebase,
   uploadFileToFirebase,
 } from "@/firebase/storage";
-import { updateUserProfile } from "@/firebase/docs/user";
 import LoadingScreen from "@/components/loading";
 import { StoragePath } from "@/firebase/config";
+import { updateUserProfile } from "@/firebase/database";
 
 function hasDataChanged(original: EditableUser, newFormData: EditableUser): boolean {
   return (
@@ -49,7 +49,7 @@ export default function EditProfile() {
   useEffect(() => {
     setOriginalData(user);
     setFormData(user);
-    setPreviewImage(user.avatar?.url);
+    setPreviewImage(user.avatar?.uri);
     setSelectedImage(undefined);
   }, [user]);
 
@@ -97,7 +97,7 @@ export default function EditProfile() {
             ...formData,
             avatar: uploadedFile,
           };
-          await updateUserProfile(uploadData, user.email);
+          await updateUserProfile(uploadData, user.id);
         } else {
           alert("Unauthrouzed.");
         }

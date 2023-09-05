@@ -14,10 +14,21 @@ export type NavItem = {
 
 export type FirebaseUploadedFile = {
   path: string;
-  url: string;
+  uri: string;
 };
 
+export type LocalImage = Omit<FirebaseUploadedFile, "path"> & {
+  width: number,
+  height: number
+}
+
+export type UploadedImage = FirebaseUploadedFile & {
+  width: number,
+  height: number
+}
+
 export interface User {
+  id: string;
   name: string;
   username: string;
   bio: string | null;
@@ -26,26 +37,19 @@ export interface User {
   email: string;
 }
 
-export type EditableUser = Omit<User, "verified" | "email">;
-
-// development
-export interface Reply {
-  id: string;
-  author: User;
-  content: string;
-  likes: number;
-  createdAt: string;
-}
+export type EditableUser = Omit<User, "verified" | "email" | "id">;
 
 export type Post = {
   id: string;
-  author: User;
-  content: string;
-  image?: string;
-  replies?: Reply[];
+  authorId: string;
+  content: string | null;
+  images: UploadedImage[] | null;
   repliesCount: number;
   likesCount: number;
-  mention?: boolean;
-  mentionUser: User;
+  repostsCount: number,
   createdAt: string;
 };
+
+export type Reply = Post & {
+  replyTo: string
+}

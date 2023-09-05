@@ -27,14 +27,7 @@ const userConverter = {
 export const createUserProfile = async (user: User) => {
   try {
     const docRef = collection(FIREBASE_DB, DocumentCollection.Users);
-    await setDoc(doc(docRef, user.email).withConverter(userConverter), {
-      name: user.name,
-      username: user.username,
-      bio: user.bio,
-      verified: user.verified,
-      avatar: user.avatar,
-      email: user.email,
-    });
+    await setDoc(doc(docRef, user.id).withConverter(userConverter), user);
   } catch (error) {
     console.error("Error creating user profile:", error);
     throw error;

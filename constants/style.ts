@@ -1,15 +1,12 @@
-type Styles = {
-  padding: number;
-  radius: number;
-  borderWidth: number
-};
-
-const styles: Styles = {
+const styles = {
   padding: 12,
-  radius: 8,
-  borderWidth: 0.5,
+  borderRadius: 8,
+  borderWidthSmall: 0.5,
+  borderWidthLarge: 2,
+  avatarSizeSmall: 40,
+  avatarSizeLarge: 80,
 };
 
-export function getStyles(): Styles {
+export function getStyles() {
   return styles;
 }

@@ -57,7 +57,7 @@ export default function ProfileLayout() {
             </Pressable>
           </View>
           <View style={{ flexDirection: "row", gap: padding }}>
-            <Pressable>
+            <Pressable onPress={() => router.push("/post")}>
               {({ pressed }) => (
                 <Icons.add color={pressed ? primary : mutedForeground} />
               )}

@@ -15,7 +15,7 @@ import { Icons } from "@/components/icons";
 
 export default function TabTwoScreen() {
   const { background, accent, foreground } = getThemedColors();
-  const { padding, radius } = getStyles();
+  const { padding, borderRadius: radius } = getStyles();
 
   const scrollY = new Animated.Value(0);
 

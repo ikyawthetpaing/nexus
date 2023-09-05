@@ -1,6 +1,7 @@
 import { StyleSheet, TextInput, TextInputProps } from "react-native";
 import { getThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
+import { forwardRef } from "react";
 
 type Variant = "default" | "underline";
 
@@ -8,24 +9,28 @@ interface Props extends TextInputProps {
   variant?: Variant;
 }
 
-export function Input({ variant = "default", style, ...props }: Props) {
-  const { padding } = getStyles();
+export const Input = forwardRef<TextInput, Props>(
+  ({ style, variant = "default", ...props }, ref) => {
+    // export function Input({ variant = "default", style, ...props }: Props) {
+    const { padding } = getStyles();
 
-  const themedStyles = getThemedStyles({ variant });
-  return (
-    <TextInput
-      style={[
-        themedStyles,
-        props.multiline && {
-          textAlignVertical: "top",
-          paddingTop: padding / 2,
-        },
-        style,
-      ]}
-      {...props}
-    />
-  );
-}
+    const themedStyles = getThemedStyles({ variant });
+    return (
+      <TextInput
+        ref={ref}
+        style={[
+          themedStyles,
+          props.multiline && {
+            textAlignVertical: "top",
+            paddingTop: padding / 2,
+          },
+          style,
+        ]}
+        {...props}
+      />
+    );
+  }
+);
 
 const getThemedStyles = ({ variant }: { variant: Variant }) => {
   const { foreground, accent, background, border } = getThemedColors();

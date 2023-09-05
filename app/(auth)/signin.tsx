@@ -1,8 +1,4 @@
-import React, { useState } from "react";
-import {
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-
+import { useState } from "react";
 import { Icons } from "@/components/icons";
 import { getThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
@@ -13,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/spinner";
 import { View } from "@/components/themed";
 import { handleFirebaseError } from "@/firebase/error-handler";
-import { FIREBASE_AUTH } from "@/firebase/config";
+import { signIn } from "@/firebase/authentication";
 
 export default function LoginPage() {
   const { foreground } = getThemedColors();
@@ -27,8 +23,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await signInWithEmailAndPassword(
-        FIREBASE_AUTH,
+      await signIn(
         email,
         password
       );
@@ -65,7 +60,6 @@ export default function LoginPage() {
             autoCapitalize="none"
             keyboardType="email-address"
             textContentType="emailAddress"
-            autoFocus={true}
             value={email}
             onChangeText={(text) => setEmail(text)}
           />

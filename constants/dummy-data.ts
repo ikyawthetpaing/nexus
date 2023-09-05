@@ -2,100 +2,193 @@ import { Post, Reply, User } from "@/types";
 
 const users: User[] = [
   {
-    id: "user1",
+    id: "flkajd",
     name: "John Doe",
     username: "johndoe",
     bio: "Exploring new design trends...",
     verified: true,
-    avatar: require("../assets/images/icon.png"),
-    bio: "Web Developer",
-    link: "https://example.com/johndoe",
-    followers: [],
+    avatar: {
+      uri: "https://images.unsplash.com/photo-1692606742912-b4f9c7102869?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2080&q=80",
+      path: "fkadjkl",
+    },
+    email: "some",
   },
   {
-    id: "user2",
+    id: "aklfjldjla",
     name: "Jane Smith",
     username: "janesmith",
     bio: "Hello, world!",
     verified: false,
-    avatar: require("../assets/images/icon.png"),
-    bio: "Designer",
-    link: "https://example.com/janesmith",
-    followers: [],
+    avatar: {
+      uri: "https://images.unsplash.com/photo-1693116379354-46cc79d728e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80",
+      path: "kflajdl",
+    },
+    email: "some",
   },
-  // Add more users...
-];
-
-const replies: Reply[] = [
-  {
-    id: "reply1",
-    author: users[0], // John Doe
-    content: "Great post!",
-    likes: 10,
-    createdAt: "2023-07-27T12:00:00Z",
-  },
-  {
-    id: "reply2",
-    author: users[1], // Jane Smith
-    content: "I agree with you!",
-    likes: 5,
-    createdAt: "2023-07-27T13:30:00Z",
-  },
-  // Add more replies...
 ];
 
 const posts: Post[] = [
   {
     id: "post1",
-    author: users[0], // John Doe
+    authorId: users[0].id,
     content: "Hello, world!",
-    image: require("../assets/images/icon.png"),
-    replies: [replies[0], replies[1]],
-    repliesCount: 2,
+    images: [
+      {
+        uri: "https://plus.unsplash.com/premium_photo-1671650124341-1f62adedf78f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=100",
+        path: "lkfald",
+        width: 412,
+        height: 274,
+      },
+      {
+        uri: "https://images.unsplash.com/photo-1692316647214-f8dc224626b4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1932&q=100",
+        path: "lkfald",
+        width: 412,
+        height: 231,
+      },
+      {
+        uri: "https://plus.unsplash.com/premium_photo-1671650124341-1f62adedf78f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=100",
+        path: "lkfald",
+        width: 412,
+        height: 274,
+      },
+      {
+        uri: "https://images.unsplash.com/photo-1692316647214-f8dc224626b4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1932&q=100",
+        path: "lkfald",
+        width: 412,
+        height: 231,
+      },
+    ],
+    repliesCount: 5,
     likesCount: 15,
-    mention: true,
-    mentionUser: users[1], // Jane Smith
+    repostsCount: 3,
     createdAt: "2023-07-27T10:00:00Z",
   },
   {
     id: "post2",
-    author: users[1], // Jane Smith
-    content: "Coding is fun!",
-    likesCount: 8,
+    authorId: users[1].id,
+    content: "The amazing wallpaper",
+    images: [
+      {
+        uri: "https://images.unsplash.com/photo-1692316647214-f8dc224626b4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1932&q=100",
+        path: "lkfald",
+        width: 412,
+        height: 231,
+      },
+      {
+        uri: "https://plus.unsplash.com/premium_photo-1675014768031-7bf2773a0b75?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1964&q=80",
+        path: "lkfald",
+        width: 1964,
+        height: 2455,
+      },
+    ],
     repliesCount: 0,
-    createdAt: "2023-07-27T11:30:00Z",
-    mentionUser: users[1], // Jane Smith
+    likesCount: 1500,
+    repostsCount: 6,
+    createdAt: "2023-07-27T10:00:00Z",
   },
   {
     id: "post3",
-    author: users[0], // Another user
-    content: "Just had a great time at the beach!",
-    image: require("../assets/images/icon.png"),
-    replies: [],
+    authorId: users[0].id,
+    content: "The amazing wallpaper",
+    images: [
+      {
+        uri: "https://plus.unsplash.com/premium_photo-1675014768031-7bf2773a0b75?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1964&q=80",
+        path: "lkfald",
+        width: 1964,
+        height: 2455,
+      },
+    ],
     repliesCount: 0,
-    likesCount: 12,
-    createdAt: "2023-07-28T14:00:00Z",
-    mentionUser: users[1], // Jane Smith
+    likesCount: 2500,
+    repostsCount: 300,
+    createdAt: "2023-07-27T10:00:00Z",
   },
   {
     id: "post4",
-    author: users[0], // John Doe
-    content: "New coding project in the works!",
-    likesCount: 20,
-    repliesCount: 3,
-    createdAt: "2023-07-29T09:30:00Z",
-    mentionUser: users[1], // Jane Smith
+    authorId: users[0].id,
+    content: null,
+    images: [
+      {
+        uri: "https://images.unsplash.com/photo-1693223679931-2bbf8bbe9105?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1892&q=80",
+        path: "lkfald",
+        width: 412,
+        height: 732,
+      },
+      {
+        uri: "https://plus.unsplash.com/premium_photo-1671650124341-1f62adedf78f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=100",
+        path: "lkfald",
+        width: 412,
+        height: 274,
+      },
+      {
+        uri: "https://plus.unsplash.com/premium_photo-1675014768031-7bf2773a0b75?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1964&q=80",
+        path: "lkfald",
+        width: 1964,
+        height: 2455,
+      },
+    ],
+    repliesCount: 0,
+    likesCount: 2500,
+    repostsCount: 1400,
+    createdAt: "2023-07-27T10:00:00Z",
+  },
+];
+
+const replies: Reply[] = [
+  {
+    id: "klfjal",
+    replyTo: "post1",
+    authorId: users[0].id,
+    content: "Amazing!",
+    images: null,
+    repliesCount: 12,
+    likesCount: 45,
+    repostsCount: 1,
+    createdAt: "2023-07-27T10:00:00Z",
   },
   {
-    id: "post5",
-    author: users[1], // Jane Smith
-    content: "Exploring new design trends...",
-    image: require("../assets/images/icon.png"),
-    replies: [replies[0]],
-    repliesCount: 1,
-    likesCount: 6,
-    createdAt: "2023-07-30T16:45:00Z",
-    mentionUser: users[1], // Jane Smith
+    id: "fkadlj",
+    replyTo: "post1",
+    authorId: users[0].id,
+    content: "What?",
+    images: null,
+    repliesCount: 12,
+    likesCount: 45,
+    repostsCount: 1,
+    createdAt: "2023-07-27T10:00:00Z",
+  },
+  {
+    id: "afklaj",
+    replyTo: "post1",
+    authorId: users[0].id,
+    content: "OMG",
+    images: null,
+    repliesCount: 12,
+    likesCount: 45,
+    repostsCount: 1,
+    createdAt: "2023-07-27T10:00:00Z",
+  },
+  {
+    id: "fkjla",
+    replyTo: "post1",
+    authorId: users[0].id,
+    content: "LOL",
+    images: null,
+    repliesCount: 12,
+    likesCount: 45,
+    repostsCount: 1,
+    createdAt: "2023-07-27T10:00:00Z",
+  },
+  {
+    id: "fklja",
+    replyTo: "post1",
+    authorId: users[0].id,
+    content: "(*_*)",
+    images: null,
+    repliesCount: 12,
+    likesCount: 45,
+    repostsCount: 1,
+    createdAt: "2023-07-27T10:00:00Z",
   },
 ];
 
