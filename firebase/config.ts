@@ -5,12 +5,12 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: 'YOUR_API_KEY',
-  authDomain: 'YOUR_AUTH_DOMAIN',
-  projectId: 'YOUR_PROJECT_ID',
-  storageBucket: 'YOUR_STORAGE_BUCKET',
-  messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-  appId: 'YOUR_APP_ID',
+  apiKey: "AIzaSyBSsTKxR8VYfdi4AjM0XAVqzD2XCu-1dWA",
+  authDomain: "nexus-72a43.firebaseapp.com",
+  projectId: "nexus-72a43",
+  storageBucket: "nexus-72a43.appspot.com",
+  messagingSenderId: "960790622497",
+  appId: "1:960790622497:web:8b797da279417bbc8ece60",
 };
 
 export const FIREBASE_APP = initializeApp(firebaseConfig);

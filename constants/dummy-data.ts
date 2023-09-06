@@ -138,7 +138,7 @@ const replies: Reply[] = [
   {
     id: "klfjal",
     replyTo: "post1",
-    authorId: users[0].id,
+    authorId: users[1].id,
     content: "Amazing!",
     images: null,
     repliesCount: 12,
@@ -160,7 +160,7 @@ const replies: Reply[] = [
   {
     id: "afklaj",
     replyTo: "post1",
-    authorId: users[0].id,
+    authorId: users[1].id,
     content: "OMG",
     images: null,
     repliesCount: 12,
@@ -182,7 +182,7 @@ const replies: Reply[] = [
   {
     id: "fklja",
     replyTo: "post1",
-    authorId: users[0].id,
+    authorId: users[1].id,
     content: "(*_*)",
     images: null,
     repliesCount: 12,
