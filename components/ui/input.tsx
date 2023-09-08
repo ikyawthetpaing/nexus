@@ -11,7 +11,7 @@ interface Props extends TextInputProps {
 
 export const Input = forwardRef<TextInput, Props>(
   ({ style, variant = "default", ...props }, ref) => {
-    // export function Input({ variant = "default", style, ...props }: Props) {
+    const {mutedForeground} = getThemedColors();
     const { padding } = getStyles();
 
     const themedStyles = getThemedStyles({ variant });
@@ -26,6 +26,7 @@ export const Input = forwardRef<TextInput, Props>(
           },
           style,
         ]}
+        placeholderTextColor={mutedForeground}
         {...props}
       />
     );

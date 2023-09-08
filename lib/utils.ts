@@ -1,8 +1,10 @@
+import { Platform } from "react-native";
+
 export function timeAgo(date: string): string {
   const now = new Date();
   const targetDate = new Date(date);
   const elapsedMs = now.getTime() - targetDate.getTime();
-  
+
   const seconds = Math.floor(elapsedMs / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
@@ -23,6 +25,29 @@ export function timeAgo(date: string): string {
   } else {
     return seconds <= 1 ? "just now" : `${seconds} seconds ago`;
   }
+}
+
+export function formatDate(inputDate: string): string {
+  const date = new Date(inputDate);
+
+  const day = date.getDate();
+  const month = date.toLocaleString("default", { month: "short" });
+  const year = date.getFullYear().toString().slice(-2);
+
+  return `${day} ${month} ${year}`;
+}
+
+export function formatHour(inputDate: string): string {
+  const date = new Date(inputDate);
+
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+
+  const amPm = hours >= 12 ? "PM" : "AM";
+  const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
+  const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+
+  return `${formattedHours}:${formattedMinutes} ${amPm}`;
 }
 
 export function formatCount(count: number) {
@@ -46,15 +71,36 @@ export function isValidUsername(username: string): boolean {
 }
 
 export function isValidPassword(password: string): boolean {
-  const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  const passwordRegex =
+    /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
   return passwordRegex.test(password);
+}
+
+export function isImageUrlValid(url: string) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = function () {
+      resolve(true);
+    };
+    img.onerror = function () {
+      resolve(false);
+    };
+    img.src = url;
+  });
+}
+
+export function canUseDom() {
+  if (typeof window !== 'undefined' || Platform.OS !== 'web') {
+    return true;
+  }
+  return false;
 }
 
 export const calColor = (color: string, transparent: number) => {
   // Parse the HSL values from the input color string
   const hslValues = color.match(/\d+/g);
   if (!hslValues || hslValues.length !== 3) {
-    throw new Error('Invalid HSL color string');
+    throw new Error("Invalid HSL color string");
   }
 
   const [hue, saturation, lightness] = hslValues;
@@ -63,4 +109,3 @@ export const calColor = (color: string, transparent: number) => {
   const hslaColor = `hsla(${hue}, ${saturation}%, ${lightness}%, ${transparent})`;
   return hslaColor;
 };
-

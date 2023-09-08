@@ -36,11 +36,16 @@ export interface User {
   avatar: FirebaseUploadedFile | null;
   email: string;
 }
-
 export type EditableUser = Omit<User, "verified" | "email" | "id">;
+
+export type AddPostType = {
+  content: string;
+  images: LocalImage[];
+};
 
 export type Post = {
   id: string;
+  replyToId: string | null;
   authorId: string;
   content: string | null;
   images: UploadedImage[] | null;
@@ -49,7 +54,4 @@ export type Post = {
   repostsCount: number,
   createdAt: string;
 };
-
-export type Reply = Post & {
-  replyTo: string
-}
+export type EditablePost = Pick<Post, "content" | "images">;

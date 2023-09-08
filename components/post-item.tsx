@@ -1,42 +1,43 @@
-import { Dimensions, Pressable, ScrollView, ViewProps } from "react-native";
-import { Image } from "expo-image";
-import { Feather, AntDesign } from "@expo/vector-icons";
+import { Dimensions, Pressable, ViewProps } from "react-native";
+import { Feather } from "@expo/vector-icons";
 import { Post } from "@/types";
 import { formatCount, timeAgo } from "@/lib/utils";
 import { Icons } from "@/components/icons";
 import { getStyles } from "@/constants/style";
 import { getThemedColors } from "@/constants/colors";
-import { replies, users } from "@/constants/dummy-data";
+import { replies as dmReplies, users } from "@/constants/dummy-data";
 import { Text } from "@/components/themed";
 import { View } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ImageView from "react-native-image-viewing";
-import { Link, router } from "expo-router";
-import { UserLink } from "./user-link";
+import { router } from "expo-router";
+import { UserLink } from "@/components/user-link";
+import { AvatarImage } from "@/components/ui/avatar-image";
+import { Separator } from "@/components/ui/separator";
+import { ImagesList } from "@/components/images-list";
 
 interface PostItemProps extends ViewProps {
   post: Post;
 }
 
 export default function PostItem({ post, style }: PostItemProps): JSX.Element {
-  const { border, foreground, accent, mutedForeground } = getThemedColors();
-  const {
-    padding,
-    borderRadius,
-    borderWidthSmall,
-    borderWidthLarge,
-    avatarSizeSmall,
-  } = getStyles();
+  const { border, accent, mutedForeground, background } = getThemedColors();
+  const { padding, borderWidthSmall, borderWidthLarge, avatarSizeSmall } =
+    getStyles();
 
   const author = users.find(({ id }) => id === post.authorId);
-  const reples = replies.filter(({ replyTo }) => replyTo === post.id);
+  const replies = dmReplies.filter(({ replyToId }) => replyToId === post.id);
 
   const [imageViewingVisible, setImageViewingVisible] = useState(false);
   const [viewImage, setViewImage] = useState(0);
 
   return (
     <>
-      <Pressable onPress={() => router.push(`/(base)/(modal)/user/${post.authorId}/${post.id}`)}>
+      <Pressable
+        onPress={() =>
+          router.push(`/(base)/(modal)/user/${post.authorId}/${post.id}`)
+        }
+      >
         {({ pressed }) => (
           <View
             style={[
@@ -52,34 +53,19 @@ export default function PostItem({ post, style }: PostItemProps): JSX.Element {
             {/* left */}
             <View
               style={{
-                padding: padding,
+                paddingHorizontal: padding,
                 paddingBottom: 0,
                 position: "absolute",
-                top: 0,
-                bottom: 0,
+                top: padding,
+                bottom: padding,
+                gap: padding,
               }}
             >
               <UserLink userId={post.authorId}>
-                <View
-                  style={{
-                    width: avatarSizeSmall,
-                    height: avatarSizeSmall,
-                    borderRadius: avatarSizeSmall / 2,
-                    backgroundColor: accent,
-                    overflow: "hidden",
-                  }}
-                >
-                  {author?.avatar && (
-                    <Image
-                      source={{ uri: author.avatar.uri }}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                      }}
-                      contentFit="cover"
-                    />
-                  )}
-                </View>
+                <AvatarImage
+                  size={avatarSizeSmall}
+                  uri={author?.avatar?.uri || ""}
+                />
               </UserLink>
               {post.repliesCount > 0 && (
                 <>
@@ -87,40 +73,31 @@ export default function PostItem({ post, style }: PostItemProps): JSX.Element {
                     style={{
                       flex: 1,
                       alignItems: "center",
-                      marginTop: padding / 2,
                     }}
                   >
-                    <View
-                      style={{
-                        flex: 1,
-                        width: borderWidthLarge,
-                        backgroundColor: border,
-                        borderRadius: borderWidthLarge / 2,
-                      }}
-                    />
+                    <Separator size={borderWidthLarge} orientation="vertical" />
                   </View>
-                  <View style={{ padding: padding, paddingTop: padding / 2 }}>
-                    <View
+                  <RepliesReference replies={replies} />
+                  {/* <View
                       style={{
-                        width: 20,
-                        height: 20,
-                        borderRadius: 20 / 2,
-                        backgroundColor: accent,
-                        overflow: "hidden",
+                        flexDirection: "row",
+                        justifyContent: "center"
                       }}
                     >
-                      {author?.avatar && (
-                        <Image
-                          source={{ uri: author.avatar.uri }}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                          }}
-                          contentFit="cover"
-                        />
-                      )}
-                    </View>
-                  </View>
+                      <AvatarImage
+                        size={20}
+                        uri={author?.avatar?.uri || ""}
+                        style={{ borderWidth: borderWidthLarge }}
+                      />
+                      <AvatarImage
+                        size={20}
+                        uri={author?.avatar?.uri || ""}
+                        style={{
+                          marginLeft: -10,
+                          borderWidth: borderWidthLarge,
+                        }}
+                      />
+                    </View> */}
                 </>
               )}
             </View>
@@ -179,58 +156,23 @@ export default function PostItem({ post, style }: PostItemProps): JSX.Element {
             )}
 
             {/* post images */}
-            {post.images && post.images.length > 0 && (
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{
-                  flexDirection: "row",
-                  gap: padding,
+            {post.images && (
+              <ImagesList
+                images={post.images}
+                style={{
                   paddingLeft: avatarSizeSmall + padding * 2,
                   paddingRight: padding,
-                  maxHeight:
-                    post.images[0].height < 600 ? post.images[0].height : 600,
                   marginTop: padding,
                 }}
-              >
-                {post.images.map((value, index) => (
-                  <Pressable
-                    key={value.uri + index}
-                    style={[
-                      {
-                        aspectRatio: value.width / value.height,
-                        borderRadius: borderRadius,
-                        overflow: "hidden",
-                      },
-                      index === 0 && {
-                        width:
-                          Dimensions.get("screen").width -
-                          (avatarSizeSmall +
-                            padding *
-                              (post.images?.length && post.images.length > 1
-                                ? 4
-                                : 3)),
-                      },
-                    ]}
-                    onPress={() => {
-                      setImageViewingVisible(true);
-                      setViewImage(index);
-                    }}
-                  >
-                    {({ pressed }) => (
-                      <Image
-                        source={{ uri: value.uri }}
-                        style={[
-                          {
-                            flex: 1,
-                          },
-                          pressed && { opacity: 0.75 },
-                        ]}
-                      />
-                    )}
-                  </Pressable>
-                ))}
-              </ScrollView>
+                width={
+                  Dimensions.get("screen").width -
+                  (avatarSizeSmall + padding * 2)
+                }
+                onClickImage={(i) => {
+                  setImageViewingVisible(true);
+                  setViewImage(i);
+                }}
+              />
             )}
 
             {/* footer */}
@@ -261,7 +203,14 @@ export default function PostItem({ post, style }: PostItemProps): JSX.Element {
                   {formatCount(post.repliesCount)}
                 </Text>
               </Pressable>
-              <AntDesign name="retweet" size={18} color={mutedForeground} />
+              <Pressable
+                style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+              >
+                <Icons.squareShare size={18} color={mutedForeground} />
+                <Text style={{ color: "gray" }}>
+                  {formatCount(post.repliesCount)}
+                </Text>
+              </Pressable>
               <Pressable>
                 <Icons.share size={18} color={mutedForeground} />
               </Pressable>
@@ -280,5 +229,54 @@ export default function PostItem({ post, style }: PostItemProps): JSX.Element {
         />
       )}
     </>
+  );
+}
+
+interface RepliesReferenceProps {
+  replies: Post[];
+}
+
+function RepliesReference({ replies }: RepliesReferenceProps) {
+  const { borderWidthLarge } = getStyles();
+
+  const [repliersImage, setRepliersImage] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchedImages: string[] = [];
+
+    replies.slice(0, 3).map((reply) => {
+      const userImage = getUserImage(reply.authorId);
+      if (userImage) {
+        fetchedImages.push(userImage);
+      }
+    });
+
+    setRepliersImage(fetchedImages);
+  }, [replies]);
+
+  function getUserImage(userId: string) {
+    const user = users.find(({ id }) => id === userId);
+    return user?.avatar?.uri;
+  }
+
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        justifyContent: "center",
+      }}
+    >
+      {repliersImage.map((uri, i) => (
+        <AvatarImage
+          key={i}
+          size={20}
+          uri={uri}
+          style={[
+            { borderWidth: borderWidthLarge },
+            i !== 0 && { marginLeft: -10 },
+          ]}
+        />
+      ))}
+    </View>
   );
 }

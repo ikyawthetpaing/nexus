@@ -4,7 +4,7 @@ import { getThemedColors } from "@/constants/colors";
 interface ButtonProps extends PressableProps {
   children: React.ReactNode;
   variant?: "default" | "outline" | "ghost";
-  size?: "default" | "sm";
+  size?: "default" | "sm" | "xs";
 }
 
 export function Button({
@@ -24,7 +24,7 @@ export function Button({
             {
               backgroundColor: background,
               alignItems: "center",
-              padding: size === "default" ? 12 : 4,
+              padding: size === "default" ? 12 : size === "sm" ? 4 : 2,
               paddingHorizontal: 16,
               borderRadius: 100,
             },

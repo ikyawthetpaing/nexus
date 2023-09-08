@@ -1,4 +1,4 @@
-import { Post, Reply, User } from "@/types";
+import { Post, User } from "@/types";
 
 const users: User[] = [
   {
@@ -30,6 +30,7 @@ const users: User[] = [
 const posts: Post[] = [
   {
     id: "post1",
+    replyToId: null,
     authorId: users[0].id,
     content: "Hello, world!",
     images: [
@@ -65,6 +66,7 @@ const posts: Post[] = [
   },
   {
     id: "post2",
+    replyToId: null,
     authorId: users[1].id,
     content: "The amazing wallpaper",
     images: [
@@ -88,6 +90,7 @@ const posts: Post[] = [
   },
   {
     id: "post3",
+    replyToId: null,
     authorId: users[0].id,
     content: "The amazing wallpaper",
     images: [
@@ -105,6 +108,7 @@ const posts: Post[] = [
   },
   {
     id: "post4",
+    replyToId: null,
     authorId: users[0].id,
     content: null,
     images: [
@@ -134,10 +138,10 @@ const posts: Post[] = [
   },
 ];
 
-const replies: Reply[] = [
+const replies: Post[] = [
   {
     id: "klfjal",
-    replyTo: "post1",
+    replyToId: "post1",
     authorId: users[1].id,
     content: "Amazing!",
     images: null,
@@ -148,7 +152,7 @@ const replies: Reply[] = [
   },
   {
     id: "fkadlj",
-    replyTo: "post1",
+    replyToId: "post1",
     authorId: users[0].id,
     content: "What?",
     images: null,
@@ -159,7 +163,7 @@ const replies: Reply[] = [
   },
   {
     id: "afklaj",
-    replyTo: "post1",
+    replyToId: "post1",
     authorId: users[1].id,
     content: "OMG",
     images: null,
@@ -170,7 +174,7 @@ const replies: Reply[] = [
   },
   {
     id: "fkjla",
-    replyTo: "post1",
+    replyToId: "post1",
     authorId: users[0].id,
     content: "LOL",
     images: null,
@@ -181,7 +185,7 @@ const replies: Reply[] = [
   },
   {
     id: "fklja",
-    replyTo: "post1",
+    replyToId: "post1",
     authorId: users[1].id,
     content: "(*_*)",
     images: null,
