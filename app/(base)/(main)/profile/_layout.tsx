@@ -1,24 +1,31 @@
 import {
   Animated,
+  Dimensions,
   NativeScrollEvent,
   NativeSyntheticEvent,
-  Pressable,
+  RefreshControl,
   SafeAreaView,
   StatusBar,
 } from "react-native";
 
-import { Header } from "@/components/header";
+import { HEADER_HEIGHT, Header } from "@/components/header";
 import { getThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
 import { View } from "@/components/themed";
-import { Icons } from "@/components/icons";
 import { Slot, router } from "expo-router";
 import { useState } from "react";
 import { ProfileHeader } from "@/components/profile-header";
 import { useCurrentUser } from "@/context/user";
+import { IconButton } from "@/components/ui/icon-button";
 
 export default function ProfileLayout() {
-  const { background, mutedForeground, primary } = getThemedColors();
+  const { user, loading, setRefresh } = useCurrentUser();
+
+  if (!user) {
+    return null;
+  }
+
+  const { background } = getThemedColors();
   const { padding } = getStyles();
 
   const [profileHeaderHeight, setProfileHeaderHeight] = useState(0);
@@ -29,12 +36,6 @@ export default function ProfileLayout() {
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
     { useNativeDriver: false }
   );
-
-  const { user } = useCurrentUser();
-
-  if (!user) {
-    return null;
-  }
 
   return (
     <SafeAreaView>
@@ -49,44 +50,37 @@ export default function ProfileLayout() {
             paddingHorizontal: padding,
           }}
         >
-          <View>
-            <Pressable>
-              {({ pressed }) => (
-                <Icons.world color={pressed ? primary : mutedForeground} />
-              )}
-            </Pressable>
-          </View>
+          <IconButton icon="world" />
           <View style={{ flexDirection: "row", gap: padding }}>
-            <Pressable onPress={() => router.push("/post")}>
-              {({ pressed }) => (
-                <Icons.add color={pressed ? primary : mutedForeground} />
-              )}
-            </Pressable>
-            <Pressable onPress={() => router.push("/settings")}>
-              {({ pressed }) => (
-                <Icons.menu color={pressed ? primary : mutedForeground} />
-              )}
-            </Pressable>
+            <IconButton icon="add" onPress={() => router.push("/post")} />
+            <IconButton icon="menu" onPress={() => router.push("/settings")} />
           </View>
         </View>
       </Header>
       <ProfileHeader
         user={user}
         scrollY={scrollY}
-        getHeight={(e) => setProfileHeaderHeight(e)}
+        getHeight={(h) => setProfileHeaderHeight(h)}
       />
       <Animated.ScrollView
         bounces={false}
         showsVerticalScrollIndicator={false}
         onScroll={handleScroll}
         scrollEventThrottle={16}
-        style={{
-          backgroundColor: background
+        contentContainerStyle={{
+          backgroundColor: background,
+          paddingTop: profileHeaderHeight,
+          minHeight: Dimensions.get("screen").height + profileHeaderHeight
         }}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={() => setRefresh(true)}
+            progressViewOffset={profileHeaderHeight}
+          />
+        }
       >
-        <View style={{ marginTop: profileHeaderHeight }}>
           <Slot />
-        </View>
       </Animated.ScrollView>
     </SafeAreaView>
   );

@@ -1,8 +1,9 @@
+import { Timestamp } from "firebase/firestore";
 import { Platform } from "react-native";
 
-export function timeAgo(date: string): string {
+export function timeAgo(createdAt: Timestamp): string {
   const now = new Date();
-  const targetDate = new Date(date);
+  const targetDate = new Date(createdAt.seconds * 1000);
   const elapsedMs = now.getTime() - targetDate.getTime();
 
   const seconds = Math.floor(elapsedMs / 1000);
@@ -10,10 +11,13 @@ export function timeAgo(date: string): string {
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
   const weeks = Math.floor(days / 7);
+  const months = Math.floor(days / 30); // Rough estimation
   const years = Math.floor(days / 365);
 
   if (years >= 1) {
     return years === 1 ? "1 year ago" : `${years} years ago`;
+  } else if (months >= 1) {
+    return months === 1 ? "1 month ago" : `${months} months ago`;
   } else if (weeks >= 1) {
     return weeks === 1 ? "1 week ago" : `${weeks} weeks ago`;
   } else if (days >= 1) {

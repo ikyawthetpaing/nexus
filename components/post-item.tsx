@@ -1,6 +1,6 @@
 import { Dimensions, Pressable, ViewProps } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { Post } from "@/types";
+import { Post, User } from "@/types";
 import { formatCount, timeAgo } from "@/lib/utils";
 import { Icons } from "@/components/icons";
 import { getStyles } from "@/constants/style";
@@ -15,6 +15,7 @@ import { UserLink } from "@/components/user-link";
 import { AvatarImage } from "@/components/ui/avatar-image";
 import { Separator } from "@/components/ui/separator";
 import { ImagesList } from "@/components/images-list";
+import { getUserProfile } from "@/firebase/database";
 
 interface PostItemProps extends ViewProps {
   post: Post;
@@ -25,7 +26,16 @@ export default function PostItem({ post, style }: PostItemProps): JSX.Element {
   const { padding, borderWidthSmall, borderWidthLarge, avatarSizeSmall } =
     getStyles();
 
-  const author = users.find(({ id }) => id === post.authorId);
+  const [author, setAuthor] = useState<User | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const user = await getUserProfile(post.authorId);
+      setAuthor(user);
+    };
+    fetchData();
+  }, []);
+  
   const replies = dmReplies.filter(({ replyToId }) => replyToId === post.id);
 
   const [imageViewingVisible, setImageViewingVisible] = useState(false);
@@ -78,26 +88,6 @@ export default function PostItem({ post, style }: PostItemProps): JSX.Element {
                     <Separator size={borderWidthLarge} orientation="vertical" />
                   </View>
                   <RepliesReference replies={replies} />
-                  {/* <View
-                      style={{
-                        flexDirection: "row",
-                        justifyContent: "center"
-                      }}
-                    >
-                      <AvatarImage
-                        size={20}
-                        uri={author?.avatar?.uri || ""}
-                        style={{ borderWidth: borderWidthLarge }}
-                      />
-                      <AvatarImage
-                        size={20}
-                        uri={author?.avatar?.uri || ""}
-                        style={{
-                          marginLeft: -10,
-                          borderWidth: borderWidthLarge,
-                        }}
-                      />
-                    </View> */}
                 </>
               )}
             </View>
@@ -237,7 +227,10 @@ interface RepliesReferenceProps {
 }
 
 function RepliesReference({ replies }: RepliesReferenceProps) {
+  const { background } = getThemedColors();
   const { borderWidthLarge } = getStyles();
+
+  const avatarSize = 20;
 
   const [repliersImage, setRepliersImage] = useState<string[]>([]);
 
@@ -269,11 +262,11 @@ function RepliesReference({ replies }: RepliesReferenceProps) {
       {repliersImage.map((uri, i) => (
         <AvatarImage
           key={i}
-          size={20}
+          size={avatarSize}
           uri={uri}
           style={[
-            { borderWidth: borderWidthLarge },
-            i !== 0 && { marginLeft: -10 },
+            { borderWidth: borderWidthLarge, borderColor: background },
+            i !== 0 && { marginLeft: -(avatarSize / 2) },
           ]}
         />
       ))}

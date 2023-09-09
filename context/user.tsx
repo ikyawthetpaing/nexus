@@ -8,16 +8,20 @@ import React, {
 } from "react";
 import LoadingScreen from "@/components/loading";
 import { FIREBASE_AUTH } from "@/firebase/config";
-import { User } from "@/types";
-import { getUserProfile } from "@/firebase/database";
+import { Post, User } from "@/types";
+import { getUserPosts, getUserProfile } from "@/firebase/database";
 
 interface UserContextType {
   user: User | null;
+  posts: Post[];
+  loading: boolean;
   setRefresh: Dispatch<SetStateAction<boolean>>;
 }
 
 const UserContext = createContext<UserContextType>({
   user: null,
+  posts: [],
+  loading: false,
   setRefresh: () => {},
 });
 
@@ -31,26 +35,38 @@ interface Props {
 
 export function UserContextProvider({ children }: Props) {
   const [user, setUser] = useState<User | null>(null);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [refresh, setRefresh] = useState(true);
 
   const [initializing, setInitializing] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const run = async () => {
+    const fetchData = async () => {
       const authUser = FIREBASE_AUTH.currentUser;
-      setUser(
-        authUser && authUser.email ? await getUserProfile(authUser.uid) : null
-      );
+
+      if (authUser) {
+        const userProfile = await getUserProfile(authUser.uid)
+        const userPosts = await getUserPosts(authUser.uid);
+
+        setUser(userProfile);
+        setPosts(userPosts);
+      }
       setInitializing(false);
     };
     if (refresh) {
-      run();
+      setLoading(true);
+      console.log("fetch user data");
+      fetchData();
       setRefresh(false);
+      setLoading(false);
     }
   }, [refresh]);
 
   const userContext: UserContextType = {
     user,
+    posts,
+    loading,
     setRefresh,
   };
 

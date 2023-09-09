@@ -23,5 +23,5 @@ export default function PostReplyScreen() {
     }
   ]);
 
-  return <PostEditor posts={posts} setPosts={setPosts} action="reply" replyTo={[replyToPost]} />;
+  return <PostEditor posts={posts} setPosts={setPosts} action="reply" replyToPosts={[replyToPost]} />;
 }

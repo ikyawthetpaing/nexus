@@ -1,4 +1,5 @@
 import { Href } from "expo-router";
+import { typeTimestamp } from "firebase/firestore";
 
 export type AppConfig = {
   name: string;
@@ -52,6 +53,7 @@ export type Post = {
   repliesCount: number;
   likesCount: number;
   repostsCount: number,
-  createdAt: string;
+  createdAt: Timestamp;
 };
 export type EditablePost = Pick<Post, "content" | "images">;
+export type CreatePost = Pick<Post, "replyToId" | "content" | "images">;

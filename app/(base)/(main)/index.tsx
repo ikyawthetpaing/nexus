@@ -1,22 +1,25 @@
-import { Pressable, StatusBar } from "react-native";
+import { Dimensions, Pressable, RefreshControl, StatusBar } from "react-native";
 
-import { posts } from "@/constants/dummy-data";
 import PostItem from "@/components/post-item";
 import { getThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
 import { View } from "@/components/themed";
 import { Icons } from "@/components/icons";
 import { router } from "expo-router";
-import { ViewWithHeader } from "@/components/view-with-header";
+import { ScrollViewWithHeader } from "@/components/view-with-header";
+import { useFeed } from "@/context/feed";
+import { HEADER_HEIGHT } from "@/components/header";
 
 export default function HomePage() {
   const { background, mutedForeground, primary } = getThemedColors();
   const { padding } = getStyles();
 
+  const { posts, loading, setRefresh } = useFeed();
+
   return (
     <View>
       <StatusBar backgroundColor={background} />
-      <ViewWithHeader
+      <ScrollViewWithHeader
         headerChildren={
           <View
             style={{
@@ -40,6 +43,14 @@ export default function HomePage() {
             </Pressable>
           </View>
         }
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={() => setRefresh(true)}
+            progressViewOffset={HEADER_HEIGHT}
+          />
+        }
+        contentContainerStyle={{minHeight: Dimensions.get("screen").height + HEADER_HEIGHT}}
       >
         {posts.map((post, i) => (
           <PostItem
@@ -48,7 +59,7 @@ export default function HomePage() {
             style={{ paddingHorizontal: padding }}
           />
         ))}
-      </ViewWithHeader>
+      </ScrollViewWithHeader>
     </View>
   );
 }

@@ -1,7 +1,7 @@
 import { getStyles } from "@/constants/style";
 import { LocalImage } from "@/types";
 import { Image } from "expo-image";
-import { Pressable, ScrollView, ViewProps } from "react-native";
+import { Pressable, ScrollView, ViewProps, useColorScheme } from "react-native";
 import { IconButton } from "@/components/ui/icon-button";
 
 interface Props extends ViewProps {
@@ -21,6 +21,8 @@ export function ImagesList({
 }: Props) {
   const { padding, borderRadius } = getStyles();
   const MAX_HEIGHT = 600;
+
+  const colorScheme = useColorScheme();
 
   if (!images.length) {
     return null;
@@ -77,7 +79,7 @@ export function ImagesList({
                     top: padding,
                     right: padding,
                     padding: 6,
-                    backgroundColor: "rgba(0, 0, 0, 0.25)",
+                    backgroundColor: colorScheme ? "rgba(255, 255, 255, 0.5)" :"rgba(0, 0, 0, 0.5)",
                     borderRadius: 9999,
                   }}
                 />

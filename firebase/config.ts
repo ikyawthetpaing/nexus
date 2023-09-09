@@ -1,22 +1,30 @@
 import { initializeApp } from "firebase/app";
 import { initializeAuth, getReactNativePersistence } from "firebase/auth";
-import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
+import {
+  FIREBASE_API_KEY,
+  FIREBASE_APP_ID,
+  FIREBASE_AUTH_DOMAIN,
+  FIREBASE_MESSAGING_SENDER_ID,
+  FIREBASE_PROJECT_ID,
+  FIREBASE_STORAGE_BUCKET,
+} from "@env";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBSsTKxR8VYfdi4AjM0XAVqzD2XCu-1dWA",
-  authDomain: "nexus-72a43.firebaseapp.com",
-  projectId: "nexus-72a43",
-  storageBucket: "nexus-72a43.appspot.com",
-  messagingSenderId: "960790622497",
-  appId: "1:960790622497:web:8b797da279417bbc8ece60",
+  apiKey: FIREBASE_API_KEY,
+  authDomain: FIREBASE_AUTH_DOMAIN,
+  projectId: FIREBASE_PROJECT_ID,
+  storageBucket: FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
+  appId: FIREBASE_APP_ID,
 };
 
 export const FIREBASE_APP = initializeApp(firebaseConfig);
 
 export const FIREBASE_AUTH = initializeAuth(FIREBASE_APP, {
-  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+  persistence: getReactNativePersistence(ReactNativeAsyncStorage),
 });
 
 export const FIREBASE_DB = getFirestore(FIREBASE_APP);
@@ -29,4 +37,5 @@ export enum StoragePath {
 
 export enum DocumentCollection {
   Users = "users",
+  Posts = "posts"
 }

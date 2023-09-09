@@ -1,16 +1,22 @@
 import { DocumentCollection, FIREBASE_DB } from "@/firebase/config";
-import { EditableUser, User } from "@/types";
+import { CreatePost, EditableUser, Post, User } from "@/types";
 import {
   QueryDocumentSnapshot,
   SnapshotOptions,
+  Timestamp,
   collection,
   doc,
   getDoc,
+  getDocs,
+  query,
   setDoc,
   updateDoc,
+  where,
 } from "firebase/firestore";
+import { getCurrentUser } from "./authentication";
+import cuid from "cuid";
 
-// Define a Firestore data converter for User documents
+// user
 const userConverter = {
   toFirestore: (user: User) => {
     return user;
@@ -24,24 +30,31 @@ const userConverter = {
   },
 };
 
-export const createUserProfile = async (user: User) => {
+export const createUserProfile = async (userData: User) => {
   try {
     const docRef = collection(FIREBASE_DB, DocumentCollection.Users);
-    await setDoc(doc(docRef, user.id).withConverter(userConverter), user);
+    await setDoc(
+      doc(docRef, userData.id).withConverter(userConverter),
+      userData
+    );
   } catch (error) {
     console.error("Error creating user profile:", error);
     throw error;
   }
 };
 
-export const updateUserProfile = async (user: EditableUser, id: string) => {
+export const updateUserProfile = async (userData: EditableUser, id: string) => {
   try {
-    const userRef = doc(FIREBASE_DB, DocumentCollection.Users, id);
+    const userRef = doc(
+      FIREBASE_DB,
+      DocumentCollection.Users,
+      id
+    ).withConverter(userConverter);
     await updateDoc(userRef, {
-      name: user.name,
-      username: user.username,
-      bio: user.bio,
-      avatar: user.avatar,
+      name: userData.name,
+      username: userData.username,
+      bio: userData.bio,
+      avatar: userData.avatar,
     });
   } catch (error) {
     console.error("Error updated user profile:", error);
@@ -66,3 +79,84 @@ export const getUserProfile = async (id: string) => {
     throw error;
   }
 };
+
+// post
+const postConverter = {
+  toFirestore: (postData: Post) => {
+    return postData;
+  },
+  fromFirestore: (
+    snapshot: QueryDocumentSnapshot,
+    options: SnapshotOptions
+  ) => {
+    const postData = snapshot.data(options) as Post;
+    return postData;
+  },
+};
+
+export async function createPost(data: CreatePost) {
+  try {
+    const currentUser = getCurrentUser();
+
+    if (!currentUser) {
+      throw Error("Unauthorized.");
+    }
+
+    const postId = cuid();
+
+    const createPostData: Post = {
+      id: postId,
+      authorId: currentUser.uid,
+      content: data.content,
+      images: data.images,
+      replyToId: data.replyToId,
+      createdAt: Timestamp.fromDate(new Date()),
+      likesCount: 0,
+      repliesCount: 0,
+      repostsCount: 0,
+    };
+
+    const docRef = collection(FIREBASE_DB, DocumentCollection.Posts);
+    await setDoc(
+      doc(docRef, postId).withConverter(postConverter),
+      createPostData
+    );
+
+    return { id: postId };
+  } catch (error) {
+    console.error("Error creating post:", error);
+    throw error;
+  }
+}
+
+export const getUserPosts = async (userId: string) => {
+  try {
+    const postsQuery = query(
+      collection(FIREBASE_DB, DocumentCollection.Posts),
+      where("authorId", "==", userId)
+    ).withConverter(postConverter);
+
+    const querySnapshot = await getDocs(postsQuery);
+    const posts: Post[] = [];
+
+    querySnapshot.forEach((doc) => {
+      const post = doc.data();
+      posts.push(post);
+    });
+
+    return posts;
+  } catch (error) {
+    console.error("Error getting user profile:", error);
+    throw error;
+  }
+};
+
+export async function getAllPosts() {
+  const querySnapshot = await getDocs(
+    collection(FIREBASE_DB, DocumentCollection.Posts).withConverter(
+      postConverter
+    )
+  );
+  const posts = querySnapshot.docs.map((doc) => doc.data());
+  return posts;
+}

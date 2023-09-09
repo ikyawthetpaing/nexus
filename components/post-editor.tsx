@@ -38,18 +38,33 @@ import { Separator } from "./ui/separator";
 import { users } from "@/constants/dummy-data";
 import ImageView from "react-native-image-viewing";
 
+export function isPostsHasEmptyContent(posts: AddPostType[]) {
+  let result = false;
+  for (let post of posts) {
+    if (!post.content && !post.images.length) {
+      result = true;
+      break;
+    }
+  }
+  return result;
+}
+
 interface PostEditorProps {
   posts: AddPostType[];
   setPosts: Dispatch<SetStateAction<AddPostType[]>>;
   action: "post" | "reply";
-  replyTo?: Post[];
+  onCancel: () => void;
+  onSubmit: () => void;
+  replyToPosts?: Post[];
 }
 
 export function PostEditor({
   posts,
   setPosts,
+  onCancel,
+  onSubmit,
   action,
-  replyTo,
+  replyToPosts: replyTo,
 }: PostEditorProps) {
   const { user } = useCurrentUser();
   if (!user) {
@@ -82,21 +97,6 @@ export function PostEditor({
       inputRef.current?.focus();
     }
   }, [currentEditIndex, editingFocus]);
-
-  function isPostsHasEmptyContent() {
-    let result = false;
-    for (let post of posts) {
-      if (!post.content && !post.images.length) {
-        result = true;
-        break;
-      }
-    }
-    return result;
-  }
-
-  function onPressPost() {
-    console.log(posts);
-  }
 
   function onPressAddReplies() {
     if (posts.length === 0 || posts[posts.length - 1].content) {
@@ -204,7 +204,7 @@ export function PostEditor({
             alignItems: "center",
           }}
         >
-          <Pressable onPress={() => router.back()}>
+          <Pressable onPress={onCancel}>
             {({ pressed }) => (
               <Icons.close
                 color={pressed ? accentForeground : foreground}
@@ -214,8 +214,8 @@ export function PostEditor({
           </Pressable>
           <Button
             size="sm"
-            disabled={isPostsHasEmptyContent()}
-            onPress={onPressPost}
+            disabled={isPostsHasEmptyContent(posts)}
+            onPress={onSubmit}
           >
             {action === "post" ? "Post" : "Reply"}
           </Button>

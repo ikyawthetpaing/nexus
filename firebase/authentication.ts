@@ -12,3 +12,7 @@ export async function signIn(email: string, password: string) {
     password
   );
 }
+
+export function getCurrentUser() {
+  return FIREBASE_AUTH.currentUser;
+}

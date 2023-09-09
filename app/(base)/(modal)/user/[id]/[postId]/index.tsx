@@ -6,7 +6,7 @@ import { getStyles } from "@/constants/style";
 import { Text, View } from "@/components/themed";
 import { Icons } from "@/components/icons";
 import { router, useLocalSearchParams } from "expo-router";
-import { ViewWithHeader } from "@/components/view-with-header";
+import { ScrollViewWithHeader } from "@/components/view-with-header";
 import { IconButton } from "@/components/ui/icon-button";
 import { UserLink } from "@/components/user-link";
 import { Image } from "expo-image";
