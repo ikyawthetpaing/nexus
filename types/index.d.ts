@@ -28,7 +28,7 @@ export type UploadedImage = FirebaseUploadedFile & {
   height: number
 }
 
-export interface User {
+export type User = {
   id: string;
   name: string;
   username: string;
@@ -38,6 +38,7 @@ export interface User {
   email: string;
 }
 export type EditableUser = Omit<User, "verified" | "email" | "id">;
+export type Author = User;
 
 export type AddPostType = {
   content: string;

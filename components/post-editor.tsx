@@ -8,7 +8,6 @@ import {
 } from "react";
 import {
   Dimensions,
-  Image,
   Pressable,
   ScrollView,
   TextInput,
@@ -16,7 +15,6 @@ import {
 } from "react-native";
 import { Text } from "@/components/themed";
 import { Icons } from "@/components/icons";
-import { router } from "expo-router";
 import { getThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
 import { Button } from "@/components/ui/button";
@@ -32,22 +30,12 @@ import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/typ
 import { IconButton } from "@/components/ui/icon-button";
 import * as ImagePicker from "expo-image-picker";
 import { AddPostType, LocalImage, Post, User } from "@/types";
-import { ImagesList } from "./images-list";
-import { AvatarImage } from "./ui/avatar-image";
-import { Separator } from "./ui/separator";
-import { users } from "@/constants/dummy-data";
+import { ImagesList } from "@/components/images-list";
+import { AvatarImage } from "@/components/ui/avatar-image";
+import { Separator } from "@/components/ui/separator";
 import ImageView from "react-native-image-viewing";
-
-export function isPostsHasEmptyContent(posts: AddPostType[]) {
-  let result = false;
-  for (let post of posts) {
-    if (!post.content && !post.images.length) {
-      result = true;
-      break;
-    }
-  }
-  return result;
-}
+import { isPostsHasEmptyContent } from "@/lib/utils";
+import { getPost, getUser } from "@/firebase/database";
 
 interface PostEditorProps {
   posts: AddPostType[];
@@ -55,7 +43,7 @@ interface PostEditorProps {
   action: "post" | "reply";
   onCancel: () => void;
   onSubmit: () => void;
-  replyToPosts?: Post[];
+  replyToPostId?: string;
 }
 
 export function PostEditor({
@@ -64,33 +52,47 @@ export function PostEditor({
   onCancel,
   onSubmit,
   action,
-  replyToPosts: replyTo,
+  replyToPostId,
 }: PostEditorProps) {
-  const { user } = useCurrentUser();
-  if (!user) {
+  const { user: currentUser } = useCurrentUser();
+
+  const { border, accent, background, accentForeground, foreground } =
+    getThemedColors();
+  const { padding } = getStyles();
+  const headerAndFooterHeight = HEADER_HEIGHT - STATUSBAR_HEIGHT;
+  const snapPoints = ["25%", "50%"];
+
+  if (!currentUser) {
     return null;
   }
 
-  const headerAndFooterHeight = HEADER_HEIGHT - STATUSBAR_HEIGHT;
-
-  const snapPoints = ["25%", "50%"];
-
-  const {
-    border,
-    accent,
-    background,
-    accentForeground,
-    mutedForeground,
-    foreground,
-  } = getThemedColors();
-  const { padding } = getStyles();
-
   const [isOpen, setIsOpen] = useState(false);
   const bottomSheetModalRef = useRef<BottomSheetModalMethods>(null);
-
   const [editingFocus, setEditingFocus] = useState(false);
   const inputRef = useRef<TextInput>(null);
   const [currentEditIndex, setCurrentEditIndex] = useState(posts.length - 1);
+  const [replyToPost, setReplyToPost] = useState<{
+    post: Post;
+    author: User;
+  } | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      let post: Post | null = null;
+      let author: User | null = null;
+
+      if (replyToPostId) {
+        post = await getPost(replyToPostId);
+        if (post) {
+          author = await getUser(post.authorId);
+          if (author) {
+            setReplyToPost({ post, author });
+          }
+        }
+      }
+    }
+    fetchData();
+  }, []);
 
   useEffect(() => {
     if (editingFocus) {
@@ -128,26 +130,23 @@ export function PostEditor({
   }
 
   function removeImage(postIndex: number, imageIndex: number) {
-    // Create a copy of the current posts state to avoid mutating it directly
     const updatedPosts = [...posts];
-  
-    // Check if the specified postIndex is valid
     if (postIndex >= 0 && postIndex < updatedPosts.length) {
-      // Check if the specified imageIndex is valid for the specified post
-      if (imageIndex >= 0 && imageIndex < updatedPosts[postIndex].images.length) {
-        // Remove the image at the specified imageIndex for the specified post
+      if (
+        imageIndex >= 0 &&
+        imageIndex < updatedPosts[postIndex].images.length
+      ) {
         updatedPosts[postIndex].images.splice(imageIndex, 1);
-  
-        // Update the state with the updated posts array
         setPosts(updatedPosts);
       } else {
-        console.error(`Invalid imageIndex (${imageIndex}) for postIndex (${postIndex})`);
+        console.error(
+          `Invalid imageIndex (${imageIndex}) for postIndex (${postIndex})`
+        );
       }
     } else {
       console.error(`Invalid postIndex (${postIndex})`);
     }
   }
-  
 
   function handlePresentModal() {
     bottomSheetModalRef.current?.present();
@@ -227,14 +226,15 @@ export function PostEditor({
             flex: 1,
           }}
         >
-          {replyTo &&
-            replyTo.map((post, i) => <ReplyTotem post={post} key={i} />)}
+          {replyToPost && action === "reply" && (
+            <ReplyTotem post={replyToPost.post} author={replyToPost.author} />
+          )}
 
           {/* firt post input */}
           {posts.map((post, i) => (
             <PostEditorItem
               key={i}
-              user={user}
+              user={currentUser}
               post={post}
               firstChild={i === 0}
               lastChild={i === posts.length - 1}
@@ -328,15 +328,10 @@ export function PostEditor({
 
 interface ReplyToItemProps {
   post: Post;
+  author: User;
 }
 
-function ReplyTotem({ post }: ReplyToItemProps) {
-  const user = users.find(({ id }) => id === post.authorId);
-
-  if (!user) {
-    return null;
-  }
-
+function ReplyTotem({ post, author }: ReplyToItemProps) {
   const { padding, avatarSizeSmall } = getStyles();
   const paddingLeft = avatarSizeSmall + padding * 2;
 
@@ -354,7 +349,7 @@ function ReplyTotem({ post }: ReplyToItemProps) {
         }}
       >
         <View style={{ padding: padding }}>
-          <AvatarImage size={avatarSizeSmall} uri={user.avatar?.uri ?? ""} />
+          <AvatarImage size={avatarSizeSmall} uri={author.avatar?.uri ?? ""} />
         </View>
         <View style={{ flex: 1, alignItems: "center" }}>
           <Separator orientation="vertical" size={2} />
@@ -368,7 +363,7 @@ function ReplyTotem({ post }: ReplyToItemProps) {
         }}
       >
         <View style={{ flex: 1, paddingTop: padding, gap: 4 }}>
-          <Text style={{ fontWeight: "500" }}>@{user.username}</Text>
+          <Text style={{ fontWeight: "500" }}>@{author.username}</Text>
           <Text>{post.content}</Text>
         </View>
       </View>
@@ -406,12 +401,21 @@ interface PostEditorItemProps {
   onChangeText: (text: string) => void;
   onFocus: () => void;
   removePost: () => void;
-  removeImage: (i: number) => void
+  removeImage: (i: number) => void;
 }
 
 const PostEditorItem = forwardRef<TextInput, PostEditorItemProps>(
   (
-    { user, post, firstChild, lastChild, onChangeText, onFocus, removePost, removeImage },
+    {
+      user,
+      post,
+      firstChild,
+      lastChild,
+      onChangeText,
+      onFocus,
+      removePost,
+      removeImage,
+    },
     ref
   ) => {
     const { padding, avatarSizeSmall, borderWidthLarge } = getStyles();

@@ -19,7 +19,7 @@ import {
 import { useAuth } from "@/context/auth";
 import { handleFirebaseError } from "@/firebase/error-handler";
 import { FIREBASE_AUTH } from "@/firebase/config";
-import { createUserProfile } from "@/firebase/database";
+import { createUser } from "@/firebase/database";
 
 interface FormStep {
   title: string;
@@ -202,7 +202,7 @@ export default function SignUpPage() {
               displayName: formData.fullName,
             });
 
-            await createUserProfile({
+            await createUser({
               id: newUser.uid,
               name: formData.fullName,
               username: formData.username,

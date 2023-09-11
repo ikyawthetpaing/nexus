@@ -1,12 +1,16 @@
-import { Dimensions, Pressable, ScrollView, StatusBar } from "react-native";
+import {
+  Dimensions,
+  Pressable,
+  ScrollView,
+  StatusBar,
+  View,
+} from "react-native";
 
-import { posts, replies as dmReplies, users } from "@/constants/dummy-data";
+import { replies as dmReplies } from "@/constants/dummy-data";
 import { getThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
-import { Text, View } from "@/components/themed";
-import { Icons } from "@/components/icons";
+import { Text } from "@/components/themed";
 import { router, useLocalSearchParams } from "expo-router";
-import { ScrollViewWithHeader } from "@/components/view-with-header";
 import { IconButton } from "@/components/ui/icon-button";
 import { UserLink } from "@/components/user-link";
 import { Image } from "expo-image";
@@ -15,34 +19,54 @@ import { formatCount, formatDate, formatHour } from "@/lib/utils";
 import { HEADER_HEIGHT, STATUSBAR_HEIGHT } from "@/components/header";
 import { useCurrentUser } from "@/context/user";
 import ImageView from "react-native-image-viewing";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PostItem from "@/components/post-item";
 import { ImagesList } from "@/components/images-list";
+import { Post, User } from "@/types";
+import { getPost, getUser } from "@/firebase/database";
 
 export default function UserPostPage() {
   const { postId } = useLocalSearchParams();
 
-  const post = posts.find(({ id }) => id === postId);
-  const replies = dmReplies.filter(({ replyToId }) => replyToId === postId);
+  const { background, mutedForeground, accent, muted, border } = getThemedColors();
+  const { padding, avatarSizeSmall, borderWidthSmall } = getStyles();
 
-  const author = users.find(({ id }) => id === post?.authorId);
-  const { user } = useCurrentUser();
-
-  if (!post || !author) {
-    return null; // implement like post not found
-  }
-
-  const { background, mutedForeground, primary, accent, muted, border } =
-    getThemedColors();
-  const { padding, avatarSizeSmall, borderRadius, borderWidthSmall } =
-    getStyles();
   const footerHeight = HEADER_HEIGHT - STATUSBAR_HEIGHT;
 
+
+  const [data, setData] = useState<{post: Post, author: User} | null>(null);
   const [imageViewingVisible, setImageViewingVisible] = useState(false);
   const [viewImage, setViewImage] = useState(0);
 
+  useEffect(() => {
+    async function fetchData() {
+      let post: Post | null = null;
+      let author: User | null = null;
+
+      if (typeof postId === "string") {
+        post = await getPost(postId);
+        if (post) {
+          author = await getUser(post.authorId);
+          if (author) {
+            setData({post, author})
+          }
+        }
+      }
+    }
+    fetchData();
+  }, []);
+
+  const { user: currentUser } = useCurrentUser();
+  
+  if (!data) {
+    return null; // implement like post not found
+  }
+
+  const {post, author} = data;
+  const replies = dmReplies.filter(({ replyToId }) => replyToId === postId);
+
   return (
-    <View style={{ flex: 1, position: "relative" }}>
+    <View style={{ flex: 1, position: "relative", backgroundColor: background }}>
       {/* header */}
       <View>
         <View
@@ -62,7 +86,10 @@ export default function UserPostPage() {
         </View>
       </View>
 
-      <ScrollView style={{ marginBottom: footerHeight }} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={{ marginBottom: footerHeight }}
+        showsVerticalScrollIndicator={false}
+      >
         {/* post item */}
         <View style={{ gap: padding }}>
           {/* post header */}
@@ -266,9 +293,9 @@ export default function UserPostPage() {
                   overflow: "hidden",
                 }}
               >
-                {user?.avatar && (
+                {currentUser?.avatar && (
                   <Image
-                    source={{ uri: user.avatar.uri }}
+                    source={{ uri: currentUser.avatar.uri }}
                     style={{
                       width: "100%",
                       height: "100%",

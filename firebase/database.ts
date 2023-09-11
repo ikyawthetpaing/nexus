@@ -30,7 +30,7 @@ const userConverter = {
   },
 };
 
-export const createUserProfile = async (userData: User) => {
+export const createUser = async (userData: User) => {
   try {
     const docRef = collection(FIREBASE_DB, DocumentCollection.Users);
     await setDoc(
@@ -43,12 +43,12 @@ export const createUserProfile = async (userData: User) => {
   }
 };
 
-export const updateUserProfile = async (userData: EditableUser, id: string) => {
+export const updateUser = async (userData: EditableUser, userId: string) => {
   try {
     const userRef = doc(
       FIREBASE_DB,
       DocumentCollection.Users,
-      id
+      userId
     ).withConverter(userConverter);
     await updateDoc(userRef, {
       name: userData.name,
@@ -62,9 +62,9 @@ export const updateUserProfile = async (userData: EditableUser, id: string) => {
   }
 };
 
-export const getUserProfile = async (id: string) => {
+export const getUser = async (userId: string) => {
   try {
-    const docRef = doc(FIREBASE_DB, DocumentCollection.Users, id).withConverter(
+    const docRef = doc(FIREBASE_DB, DocumentCollection.Users, userId).withConverter(
       userConverter
     );
     const docSnap = await getDoc(docRef);
@@ -125,6 +125,24 @@ export async function createPost(data: CreatePost) {
     return { id: postId };
   } catch (error) {
     console.error("Error creating post:", error);
+    throw error;
+  }
+}
+
+export async function getPost(postId: string) {
+  try {
+    const docRef = doc(FIREBASE_DB, DocumentCollection.Posts, postId).withConverter(
+      postConverter
+    );
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      return docSnap.data();
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error getting user profile:", error);
     throw error;
   }
 }

@@ -16,7 +16,7 @@ import {
 } from "@/firebase/storage";
 import LoadingScreen from "@/components/loading";
 import { StoragePath } from "@/firebase/config";
-import { updateUserProfile } from "@/firebase/database";
+import { updateUser } from "@/firebase/database";
 import { HEADER_HEIGHT, Header } from "@/components/header";
 import { IconButton } from "@/components/ui/icon-button";
 import {
@@ -114,7 +114,7 @@ export default function EditProfile() {
             ...formData,
             avatar: uploadedFile,
           };
-          await updateUserProfile(uploadData, user.id);
+          await updateUser(uploadData, user.id);
         } else {
           alert("Unauthrouzed.");
         }

@@ -1,3 +1,4 @@
+import { AddPostType } from "@/types";
 import { Timestamp } from "firebase/firestore";
 import { Platform } from "react-native";
 
@@ -93,23 +94,10 @@ export function isImageUrlValid(url: string) {
   });
 }
 
-export function canUseDom() {
-  if (typeof window !== 'undefined' || Platform.OS !== 'web') {
-    return true;
+export function isPostsHasEmptyContent(posts: AddPostType[]): boolean {
+  const isEmptyPost = (post: AddPostType): boolean =>  {
+    return !post.content && post.images.length === 0;
   }
-  return false;
+
+  return posts.some((post) => isEmptyPost(post));
 }
-
-export const calColor = (color: string, transparent: number) => {
-  // Parse the HSL values from the input color string
-  const hslValues = color.match(/\d+/g);
-  if (!hslValues || hslValues.length !== 3) {
-    throw new Error("Invalid HSL color string");
-  }
-
-  const [hue, saturation, lightness] = hslValues;
-
-  // Calculate the HSLA color string with the provided transparency
-  const hslaColor = `hsla(${hue}, ${saturation}%, ${lightness}%, ${transparent})`;
-  return hslaColor;
-};

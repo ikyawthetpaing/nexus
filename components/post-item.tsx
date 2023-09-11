@@ -15,7 +15,7 @@ import { UserLink } from "@/components/user-link";
 import { AvatarImage } from "@/components/ui/avatar-image";
 import { Separator } from "@/components/ui/separator";
 import { ImagesList } from "@/components/images-list";
-import { getUserProfile } from "@/firebase/database";
+import { getUser } from "@/firebase/database";
 
 interface PostItemProps extends ViewProps {
   post: Post;
@@ -30,7 +30,7 @@ export default function PostItem({ post, style }: PostItemProps): JSX.Element {
 
   useEffect(() => {
     const fetchData = async () => {
-      const user = await getUserProfile(post.authorId);
+      const user = await getUser(post.authorId);
       setAuthor(user);
     };
     fetchData();
