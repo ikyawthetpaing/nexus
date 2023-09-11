@@ -1,13 +1,6 @@
-import React, {
-  Dispatch,
-  SetStateAction,
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { createContext, useContext, useState } from "react";
 import LoadingScreen from "@/components/loading";
-import { AddPostType, CreatePost, Post, UploadedImage } from "@/types";
+import { AddPost, CreatePost, UploadedImage } from "@/types";
 import { uploadFileToFirebase } from "@/firebase/storage";
 import { StoragePath } from "@/firebase/config";
 import { createPost } from "@/firebase/database";
@@ -16,13 +9,12 @@ import { useCurrentUser } from "./current-user";
 
 interface UploaderContextType {
   loading: boolean;
-  setUploadPosts: Dispatch<SetStateAction<AddPostType[]>>;
+  upload: (posts: AddPost[], replyToId?: string | null) => Promise<void>;
 }
 
-const UploaderContext = createContext<UploaderContextType>({
-  loading: false,
-  setUploadPosts: () => {},
-});
+const UploaderContext = createContext<UploaderContextType | undefined>(
+  undefined
+);
 
 export function useUploader() {
   const context = useContext(UploaderContext);
@@ -41,13 +33,10 @@ interface Props {
 export function UploaderContextProvider({ children }: Props) {
   const { setRefresh } = useCurrentUser();
   const [loading, setLoading] = useState(false);
-  const [uploadPosts, setUploadPosts] = useState<AddPostType[]>([]);
 
-  async function upload(posts: AddPostType[]) {
+  async function upload(posts: AddPost[], replyToId?: string | null) {
     setLoading(true);
     try {
-      let previousPostId: string | null = null;
-
       for (const post of posts) {
         const uploadedImages: UploadedImage[] = await Promise.all(
           post.images.map(async (image) => {
@@ -60,33 +49,26 @@ export function UploaderContextProvider({ children }: Props) {
         );
 
         const createPostData: CreatePost = {
-          replyToId: previousPostId,
+          replyToId: replyToId || null,
           content: post.content,
           images: uploadedImages,
         };
 
         const res = await createPost(createPostData);
-        previousPostId = res.id;
+        replyToId = res.id;
       }
     } catch (error) {
       console.error("Error during upload:", error);
       handleFirebaseError(error);
     } finally {
-      setUploadPosts([]);
       setLoading(false);
       setRefresh(true);
     }
   }
 
-  useEffect(() => {
-    if (uploadPosts.length > 0) {
-      upload(uploadPosts);
-    }
-  }, [uploadPosts]);
-
   const uploaderContext: UploaderContextType = {
     loading,
-    setUploadPosts,
+    upload,
   };
 
   return (

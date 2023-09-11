@@ -7,6 +7,7 @@ import {
 import { FIREBASE_STORAGE, StoragePath } from "@/firebase/config";
 import { FirebaseUploadedFile } from "@/types";
 import { appConfig } from "@/config/app";
+import cuid from "cuid";
 
 type UploadFileToFirebaseType = {
   localFilePath: string;
@@ -17,7 +18,7 @@ export const uploadFileToFirebase = async ({
   localFilePath,
   storagePath,
 }: UploadFileToFirebaseType) => {
-  const uniqueFileName = `${appConfig.name.toUpperCase()}_IMG_${Date.now()}.jpg`;
+  const uniqueFileName = `${appConfig.name.toUpperCase()}_IMG_${cuid()}.jpg`;
   const remotePath = `${storagePath}/${uniqueFileName}`;
 
   const storageRef = ref(FIREBASE_STORAGE, remotePath);

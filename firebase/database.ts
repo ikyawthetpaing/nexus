@@ -4,6 +4,7 @@ import {
   QueryDocumentSnapshot,
   SnapshotOptions,
   Timestamp,
+  and,
   collection,
   doc,
   getDoc,
@@ -64,9 +65,11 @@ export const updateUser = async (userData: EditableUser, userId: string) => {
 
 export const getUser = async (userId: string) => {
   try {
-    const docRef = doc(FIREBASE_DB, DocumentCollection.Users, userId).withConverter(
-      userConverter
-    );
+    const docRef = doc(
+      FIREBASE_DB,
+      DocumentCollection.Users,
+      userId
+    ).withConverter(userConverter);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -131,9 +134,11 @@ export async function createPost(data: CreatePost) {
 
 export async function getPost(postId: string) {
   try {
-    const docRef = doc(FIREBASE_DB, DocumentCollection.Posts, postId).withConverter(
-      postConverter
-    );
+    const docRef = doc(
+      FIREBASE_DB,
+      DocumentCollection.Posts,
+      postId
+    ).withConverter(postConverter);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -151,7 +156,7 @@ export const getUserPosts = async (userId: string) => {
   try {
     const postsQuery = query(
       collection(FIREBASE_DB, DocumentCollection.Posts),
-      where("authorId", "==", userId)
+      and(where("authorId", "==", userId), where("replyToId", "==", null))
     ).withConverter(postConverter);
 
     const querySnapshot = await getDocs(postsQuery);

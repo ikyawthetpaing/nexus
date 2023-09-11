@@ -15,14 +15,14 @@ interface FeedContextType {
   setRefresh: Dispatch<SetStateAction<boolean>>;
 }
 
-const FeedContext = createContext<FeedContextType>({
-  posts: [],
-  loading: false,
-  setRefresh: () => {},
-});
+const FeedContext = createContext<FeedContextType | undefined>(undefined);
 
 export function useFeed() {
-  return useContext(FeedContext);
+  const context = useContext(FeedContext);
+  if (!context) {
+    throw new Error("useFeed must be used within an FeedContextProvider");
+  }
+  return context;
 }
 
 interface Props {

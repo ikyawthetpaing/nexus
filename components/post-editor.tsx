@@ -28,7 +28,7 @@ import {
 import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { IconButton } from "@/components/ui/icon-button";
 import * as ImagePicker from "expo-image-picker";
-import { AddPostType, LocalImage, Post, User } from "@/types";
+import { AddPost, LocalImage, Post, User } from "@/types";
 import { ImagesList } from "@/components/images-list";
 import { AvatarImage } from "@/components/ui/avatar-image";
 import { Separator } from "@/components/ui/separator";
@@ -38,8 +38,8 @@ import { getPost, getUser } from "@/firebase/database";
 import { useCurrentUser } from "@/context/current-user";
 
 interface PostEditorProps {
-  posts: AddPostType[];
-  setPosts: Dispatch<SetStateAction<AddPostType[]>>;
+  posts: AddPost[];
+  setPosts: Dispatch<SetStateAction<AddPost[]>>;
   action: "post" | "reply";
   onCancel: () => void;
   onSubmit: () => void;
@@ -176,7 +176,7 @@ export function PostEditor({
 
       const newValues = [...posts];
 
-      const newValue: AddPostType = {
+      const newValue: AddPost = {
         content: newValues[currentEditIndex].content,
         images: [...newValues[currentEditIndex].images, ...newImages],
       };
@@ -242,7 +242,7 @@ export function PostEditor({
               ref={currentEditIndex === i ? inputRef : undefined}
               onChangeText={(text) => {
                 const newValues = [...posts];
-                const newValue: AddPostType = {
+                const newValue: AddPost = {
                   content: text,
                   images: newValues[i].images,
                 };
@@ -395,7 +395,7 @@ function ReplyTotem({ post, author }: ReplyToItemProps) {
 
 interface PostEditorItemProps {
   user: Pick<User, "avatar" | "username">;
-  post: AddPostType;
+  post: AddPost;
   firstChild: boolean;
   lastChild: boolean;
   onChangeText: (text: string) => void;

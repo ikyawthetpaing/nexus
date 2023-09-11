@@ -8,10 +8,14 @@ interface AuthContextType {
   authUser: AuthUser | null;
 }
 
-const AuthContext = createContext<AuthContextType>({ authUser: null });
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function useAuth() {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 }
 
 // Custom hook to handle protected routes
@@ -86,11 +90,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   return (
     <AuthContext.Provider value={authContext}>
-      {authInitializing ? (
-        <LoadingScreen />
-      ) : (
-        children
-      )}
+      {authInitializing ? <LoadingScreen /> : children}
     </AuthContext.Provider>
   );
 }

@@ -1,10 +1,6 @@
 import { useState } from "react";
 import { PostEditor } from "@/components/post-editor";
-import { AddPostType, UploadedImage } from "@/types";
-import { handleFirebaseError } from "@/firebase/error-handler";
-import { uploadFileToFirebase } from "@/firebase/storage";
-import { StoragePath } from "@/firebase/config";
-import { createPost } from "@/firebase/database";
+import { AddPost } from "@/types";
 import { router } from "expo-router";
 import {
   Dialog,
@@ -16,55 +12,38 @@ import {
 import { View } from "react-native";
 import { isPostsHasEmptyContent } from "@/lib/utils";
 import { useCurrentUser } from "@/context/current-user";
+import { useUploader } from "@/context/uploader";
 
 export default function PostScreen() {
   const { user } = useCurrentUser();
+  const { upload } = useUploader();
   if (!user) {
     return null;
   }
 
   const [dialogVisiable, setDailogVisiable] = useState(false);
-  const [posts, setPosts] = useState<AddPostType[]>([
+  const [posts, setPosts] = useState<AddPost[]>([
     { content: "", images: [] },
   ]);
 
-  async function onSubmit() {
-    try {
-      let previousPostId: string | null = null;
-
-      for (const post of posts) {
-        const uploadedImages: UploadedImage[] = await Promise.all(
-          post.images.map(async (image) => {
-            const res = await uploadFileToFirebase({
-              localFilePath: image.uri,
-              storagePath: StoragePath.Posts,
-            });
-            return { ...res, width: image.width, height: image.height };
-          })
-        );
-
-        const createPostData = {
-          replyToId: previousPostId,
-          content: post.content,
-          images: uploadedImages,
-        };
-
-        const res = await createPost(createPostData);
-        previousPostId = res.id;
-      }
-
-      router.replace("/");
-    } catch (error) {
-      handleFirebaseError(error);
+  function onSubmit() {
+    upload(posts);
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.push("/");
     }
-    console.log(posts);
   }
 
   function onCancel() {
     if (!isPostsHasEmptyContent(posts)) {
       setDailogVisiable(true);
     } else {
-      router.back();
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.push("/");
+      }
     }
   }
 

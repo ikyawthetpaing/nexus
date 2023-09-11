@@ -40,7 +40,7 @@ export type User = {
 export type EditableUser = Omit<User, "verified" | "email" | "id">;
 export type Author = User;
 
-export type AddPostType = {
+export type AddPost = {
   content: string;
   images: LocalImage[];
 };

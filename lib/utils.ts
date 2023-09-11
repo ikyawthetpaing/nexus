@@ -1,4 +1,4 @@
-import { AddPostType } from "@/types";
+import { AddPost } from "@/types";
 import { Timestamp } from "firebase/firestore";
 import { Platform } from "react-native";
 
@@ -94,8 +94,8 @@ export function isValidPassword(password: string): boolean {
 //   });
 // }
 
-export function isPostsHasEmptyContent(posts: AddPostType[]): boolean {
-  const isEmptyPost = (post: AddPostType): boolean =>  {
+export function isPostsHasEmptyContent(posts: AddPost[]): boolean {
+  const isEmptyPost = (post: AddPost): boolean =>  {
     return !post.content && post.images.length === 0;
   }
 

@@ -18,15 +18,18 @@ interface CurrentUserContextType {
   setRefresh: Dispatch<SetStateAction<boolean>>;
 }
 
-const CurrentUserContext = createContext<CurrentUserContextType>({
-  user: null,
-  posts: [],
-  loading: false,
-  setRefresh: () => {},
-});
+const CurrentUserContext = createContext<CurrentUserContextType | undefined>(
+  undefined
+);
 
 export function useCurrentUser() {
-  return useContext(CurrentUserContext);
+  const context = useContext(CurrentUserContext);
+  if (!context) {
+    throw new Error(
+      "useCurrentUser must be used within an CurrentUserContextProvider"
+    );
+  }
+  return context;
 }
 
 interface Props {
@@ -46,7 +49,7 @@ export function CurrentUserContextProvider({ children }: Props) {
       const authUser = FIREBASE_AUTH.currentUser;
 
       if (authUser) {
-        const userProfile = await getUser(authUser.uid)
+        const userProfile = await getUser(authUser.uid);
         const userPosts = await getUserPosts(authUser.uid);
 
         setUser(userProfile);

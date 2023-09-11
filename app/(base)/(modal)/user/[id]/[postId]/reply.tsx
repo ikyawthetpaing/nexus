@@ -1,11 +1,7 @@
 import { useState } from "react";
 import { PostEditor } from "@/components/post-editor";
-import { AddPostType, CreatePost, UploadedImage } from "@/types";
+import { AddPost } from "@/types";
 import { router, useLocalSearchParams } from "expo-router";
-import { uploadFileToFirebase } from "@/firebase/storage";
-import { StoragePath } from "@/firebase/config";
-import { createPost } from "@/firebase/database";
-import { handleFirebaseError } from "@/firebase/error-handler";
 import { isPostsHasEmptyContent } from "@/lib/utils";
 import { View } from "react-native";
 import {
@@ -20,15 +16,16 @@ import { useCurrentUser } from "@/context/current-user";
 
 export default function PostReplyScreen() {
   const { postId } = useLocalSearchParams();
+  const replyToPostId = typeof postId === "string" ? postId : undefined;
   const { user } = useCurrentUser();
-  const {setUploadPosts} = useUploader();
+  const { upload } = useUploader();
 
   if (!user) {
     return null;
   }
 
   const [dialogVisiable, setDailogVisiable] = useState(false);
-  const [posts, setPosts] = useState<AddPostType[]>([
+  const [posts, setPosts] = useState<AddPost[]>([
     {
       content: "",
       images: [],
@@ -36,7 +33,7 @@ export default function PostReplyScreen() {
   ]);
 
   function onSubmit() {
-    setUploadPosts(posts);
+    upload(posts, replyToPostId);
     if (router.canGoBack()) {
       router.back();
     } else {
@@ -58,7 +55,7 @@ export default function PostReplyScreen() {
         posts={posts}
         setPosts={setPosts}
         action="reply"
-        replyToPostId={typeof postId === "string" ? postId : undefined}
+        replyToPostId={replyToPostId}
         onCancel={onCancel}
         onSubmit={onSubmit}
       />
