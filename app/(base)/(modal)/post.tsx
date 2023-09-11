@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useCurrentUser } from "@/context/user";
 import { PostEditor } from "@/components/post-editor";
 import { AddPostType, UploadedImage } from "@/types";
 import { handleFirebaseError } from "@/firebase/error-handler";
@@ -16,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { View } from "react-native";
 import { isPostsHasEmptyContent } from "@/lib/utils";
+import { useCurrentUser } from "@/context/current-user";
 
 export default function PostScreen() {
   const { user } = useCurrentUser();

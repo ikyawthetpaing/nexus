@@ -17,13 +17,13 @@ import { Image } from "expo-image";
 import { Button } from "@/components/ui/button";
 import { formatCount, formatDate, formatHour } from "@/lib/utils";
 import { HEADER_HEIGHT, STATUSBAR_HEIGHT } from "@/components/header";
-import { useCurrentUser } from "@/context/user";
 import ImageView from "react-native-image-viewing";
 import { useEffect, useState } from "react";
 import PostItem from "@/components/post-item";
 import { ImagesList } from "@/components/images-list";
 import { Post, User } from "@/types";
 import { getPost, getUser } from "@/firebase/database";
+import { useCurrentUser } from "@/context/current-user";
 
 export default function UserPostPage() {
   const { postId } = useLocalSearchParams();
@@ -81,7 +81,13 @@ export default function UserPostPage() {
             borderBottomColor: border,
           }}
         >
-          <IconButton icon="arrowLeft" onPress={() => router.back()} />
+          <IconButton icon="arrowLeft" onPress={() => {
+            if (router.canGoBack()) {
+              router.back()
+            } else {
+              router.push("/")
+            }
+          }} />
           <Text style={{ fontSize: 18, fontWeight: "500" }}>Post</Text>
         </View>
       </View>

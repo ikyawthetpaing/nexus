@@ -81,18 +81,18 @@ export function isValidPassword(password: string): boolean {
   return passwordRegex.test(password);
 }
 
-export function isImageUrlValid(url: string) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = function () {
-      resolve(true);
-    };
-    img.onerror = function () {
-      resolve(false);
-    };
-    img.src = url;
-  });
-}
+// export function isImageUrlValid(url: string) {
+//   return new Promise((resolve) => {
+//     const img = new Image();
+//     img.onload = function () {
+//       resolve(true);
+//     };
+//     img.onerror = function () {
+//       resolve(false);
+//     };
+//     img.src = url;
+//   });
+// }
 
 export function isPostsHasEmptyContent(posts: AddPostType[]): boolean {
   const isEmptyPost = (post: AddPostType): boolean =>  {

@@ -15,8 +15,8 @@ import { View } from "@/components/themed";
 import { Slot, router } from "expo-router";
 import { useState } from "react";
 import { ProfileHeader } from "@/components/profile-header";
-import { useCurrentUser } from "@/context/user";
 import { IconButton } from "@/components/ui/icon-button";
+import { useCurrentUser } from "@/context/current-user";
 
 export default function ProfileLayout() {
   const { user, loading, setRefresh } = useCurrentUser();

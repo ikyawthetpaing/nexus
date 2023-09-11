@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useCurrentUser } from "@/context/user";
 import { PostEditor } from "@/components/post-editor";
 import { AddPostType, CreatePost, UploadedImage } from "@/types";
 import { router, useLocalSearchParams } from "expo-router";
@@ -16,10 +15,13 @@ import {
   DialogFooterButton,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useUploader } from "@/context/uploader";
+import { useCurrentUser } from "@/context/current-user";
 
 export default function PostReplyScreen() {
   const { postId } = useLocalSearchParams();
   const { user } = useCurrentUser();
+  const {setUploadPosts} = useUploader();
 
   if (!user) {
     return null;
@@ -33,36 +35,13 @@ export default function PostReplyScreen() {
     },
   ]);
 
-  async function onSubmit() {
-    try {
-      let previousPostId: string | null = null;
-
-      for (const post of posts) {
-        const uploadedImages: UploadedImage[] = await Promise.all(
-          post.images.map(async (image) => {
-            const res = await uploadFileToFirebase({
-              localFilePath: image.uri,
-              storagePath: StoragePath.Posts,
-            });
-            return { ...res, width: image.width, height: image.height };
-          })
-        );
-
-        const createPostData: CreatePost = {
-          replyToId: previousPostId,
-          content: post.content,
-          images: uploadedImages,
-        };
-
-        const res = await createPost(createPostData);
-        previousPostId = res.id;
-      }
-
-      router.replace("/");
-    } catch (error) {
-      handleFirebaseError(error);
+  function onSubmit() {
+    setUploadPosts(posts);
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.push("/");
     }
-    console.log(posts);
   }
 
   function onCancel() {

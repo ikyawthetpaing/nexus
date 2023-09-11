@@ -11,14 +11,14 @@ import { FIREBASE_AUTH } from "@/firebase/config";
 import { Post, User } from "@/types";
 import { getUserPosts, getUser } from "@/firebase/database";
 
-interface UserContextType {
+interface CurrentUserContextType {
   user: User | null;
   posts: Post[];
   loading: boolean;
   setRefresh: Dispatch<SetStateAction<boolean>>;
 }
 
-const UserContext = createContext<UserContextType>({
+const CurrentUserContext = createContext<CurrentUserContextType>({
   user: null,
   posts: [],
   loading: false,
@@ -26,14 +26,14 @@ const UserContext = createContext<UserContextType>({
 });
 
 export function useCurrentUser() {
-  return useContext(UserContext);
+  return useContext(CurrentUserContext);
 }
 
 interface Props {
   children: React.ReactNode;
 }
 
-export function UserContextProvider({ children }: Props) {
+export function CurrentUserContextProvider({ children }: Props) {
   const [user, setUser] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [refresh, setRefresh] = useState(true);
@@ -63,7 +63,7 @@ export function UserContextProvider({ children }: Props) {
     }
   }, [refresh]);
 
-  const userContext: UserContextType = {
+  const userContext: CurrentUserContextType = {
     user,
     posts,
     loading,
@@ -71,8 +71,8 @@ export function UserContextProvider({ children }: Props) {
   };
 
   return (
-    <UserContext.Provider value={userContext}>
+    <CurrentUserContext.Provider value={userContext}>
       {initializing ? <LoadingScreen /> : children}
-    </UserContext.Provider>
+    </CurrentUserContext.Provider>
   );
 }

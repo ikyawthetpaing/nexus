@@ -19,7 +19,6 @@ import { getThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useCurrentUser } from "@/context/user";
 import { HEADER_HEIGHT, STATUSBAR_HEIGHT } from "@/components/header";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
@@ -36,6 +35,7 @@ import { Separator } from "@/components/ui/separator";
 import ImageView from "react-native-image-viewing";
 import { isPostsHasEmptyContent } from "@/lib/utils";
 import { getPost, getUser } from "@/firebase/database";
+import { useCurrentUser } from "@/context/current-user";
 
 interface PostEditorProps {
   posts: AddPostType[];

@@ -1,5 +1,5 @@
 import PostItem from "@/components/post-item";
-import { useCurrentUser } from "@/context/user";
+import { useCurrentUser } from "@/context/current-user";
 
 export default function ProfileIndexPage() {
   const { posts } = useCurrentUser();
