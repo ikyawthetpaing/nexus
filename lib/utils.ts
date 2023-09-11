@@ -32,8 +32,8 @@ export function timeAgo(createdAt: Timestamp): string {
   }
 }
 
-export function formatDate(inputDate: string): string {
-  const date = new Date(inputDate);
+export function formatDate(inputDate: Timestamp): string {
+  const date = new Date(inputDate.seconds * 1000);
 
   const day = date.getDate();
   const month = date.toLocaleString("default", { month: "short" });
@@ -42,8 +42,8 @@ export function formatDate(inputDate: string): string {
   return `${day} ${month} ${year}`;
 }
 
-export function formatHour(inputDate: string): string {
-  const date = new Date(inputDate);
+export function formatHour(inputDate: Timestamp): string {
+  const date = new Date(inputDate.seconds * 1000);
 
   const hours = date.getHours();
   const minutes = date.getMinutes();

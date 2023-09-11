@@ -16,9 +16,9 @@ import { useCurrentUser } from "@/context/current-user";
 
 export default function PostReplyScreen() {
   const { postId } = useLocalSearchParams();
-  const replyToPostId = typeof postId === "string" ? postId : undefined;
+  const replyToId = typeof postId === "string" ? postId : undefined;
   const { user } = useCurrentUser();
-  const { upload } = useUploader();
+  const { setUpload } = useUploader();
 
   if (!user) {
     return null;
@@ -33,7 +33,7 @@ export default function PostReplyScreen() {
   ]);
 
   function onSubmit() {
-    upload(posts, replyToPostId);
+    setUpload({ posts, replyToId });
     if (router.canGoBack()) {
       router.back();
     } else {
@@ -55,7 +55,7 @@ export default function PostReplyScreen() {
         posts={posts}
         setPosts={setPosts}
         action="reply"
-        replyToPostId={replyToPostId}
+        replyToPostId={replyToId}
         onCancel={onCancel}
         onSubmit={onSubmit}
       />

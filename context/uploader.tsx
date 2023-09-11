@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import LoadingScreen from "@/components/loading";
 import { AddPost, CreatePost, UploadedImage } from "@/types";
 import { uploadFileToFirebase } from "@/firebase/storage";
@@ -7,9 +14,14 @@ import { createPost } from "@/firebase/database";
 import { handleFirebaseError } from "@/firebase/error-handler";
 import { useCurrentUser } from "./current-user";
 
+type UploadType = {
+  posts: AddPost[];
+  replyToId?: string;
+};
+
 interface UploaderContextType {
   loading: boolean;
-  upload: (posts: AddPost[], replyToId?: string | null) => Promise<void>;
+  setUpload: Dispatch<SetStateAction<UploadType | null>>;
 }
 
 const UploaderContext = createContext<UploaderContextType | undefined>(
@@ -33,8 +45,9 @@ interface Props {
 export function UploaderContextProvider({ children }: Props) {
   const { setRefresh } = useCurrentUser();
   const [loading, setLoading] = useState(false);
+  const [upload, setUpload] = useState<UploadType | null>(null);
 
-  async function upload(posts: AddPost[], replyToId?: string | null) {
+  async function performUpload(posts: AddPost[], replyToId?: string) {
     setLoading(true);
     try {
       for (const post of posts) {
@@ -63,12 +76,19 @@ export function UploaderContextProvider({ children }: Props) {
     } finally {
       setLoading(false);
       setRefresh(true);
+      setUpload(null);
     }
   }
 
+  useEffect(() => {
+    if (upload) {
+      performUpload(upload.posts, upload.replyToId);
+    }
+  }, [upload]);
+
   const uploaderContext: UploaderContextType = {
     loading,
-    upload,
+    setUpload,
   };
 
   return (

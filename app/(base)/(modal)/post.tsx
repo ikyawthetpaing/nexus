@@ -16,18 +16,16 @@ import { useUploader } from "@/context/uploader";
 
 export default function PostScreen() {
   const { user } = useCurrentUser();
-  const { upload } = useUploader();
+  const { setUpload } = useUploader();
   if (!user) {
     return null;
   }
 
   const [dialogVisiable, setDailogVisiable] = useState(false);
-  const [posts, setPosts] = useState<AddPost[]>([
-    { content: "", images: [] },
-  ]);
+  const [posts, setPosts] = useState<AddPost[]>([{ content: "", images: [] }]);
 
   function onSubmit() {
-    upload(posts);
+    setUpload({ posts });
     if (router.canGoBack()) {
       router.back();
     } else {

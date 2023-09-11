@@ -22,7 +22,7 @@ import { useEffect, useState } from "react";
 import PostItem from "@/components/post-item";
 import { ImagesList } from "@/components/images-list";
 import { Post, User } from "@/types";
-import { getPost, getUser } from "@/firebase/database";
+import { getPost, getReplies, getUser } from "@/firebase/database";
 import { useCurrentUser } from "@/context/current-user";
 
 export default function UserPostPage() {
@@ -34,7 +34,7 @@ export default function UserPostPage() {
   const footerHeight = HEADER_HEIGHT - STATUSBAR_HEIGHT;
 
 
-  const [data, setData] = useState<{post: Post, author: User} | null>(null);
+  const [data, setData] = useState<{post: Post, author: User, replies: Post[]} | null>(null);
   const [imageViewingVisible, setImageViewingVisible] = useState(false);
   const [viewImage, setViewImage] = useState(0);
 
@@ -42,13 +42,15 @@ export default function UserPostPage() {
     async function fetchData() {
       let post: Post | null = null;
       let author: User | null = null;
+      let replies: Post[] = [];
 
       if (typeof postId === "string") {
         post = await getPost(postId);
         if (post) {
           author = await getUser(post.authorId);
           if (author) {
-            setData({post, author})
+            replies = await getReplies(postId);
+            setData({post, author, replies})
           }
         }
       }
@@ -62,8 +64,8 @@ export default function UserPostPage() {
     return null; // implement like post not found
   }
 
-  const {post, author} = data;
-  const replies = dmReplies.filter(({ replyToId }) => replyToId === postId);
+  const {post, author, replies} = data;
+  // const replies = dmReplies.filter(({ replyToId }) => replyToId === postId);
 
   return (
     <View style={{ flex: 1, position: "relative", backgroundColor: background }}>
