@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { getThemedColors } from "@/constants/colors";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
-import { useCurrentUser } from "@/context/user";
 import { EditableUser } from "@/types";
 import { handleFirebaseError } from "@/firebase/error-handler";
 import {
@@ -26,6 +25,7 @@ import {
   DialogFooterButton,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useCurrentUser } from "@/context/current-user";
 
 function hasDataChanged(
   original: EditableUser,
