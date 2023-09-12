@@ -1,4 +1,4 @@
-import { Dimensions, Pressable, ViewProps } from "react-native";
+import { Dimensions, Pressable } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Post, User } from "@/types";
 import { formatCount, timeAgo } from "@/lib/utils";
@@ -15,31 +15,61 @@ import { UserLink } from "@/components/user-link";
 import { AvatarImage } from "@/components/ui/avatar-image";
 import { Separator } from "@/components/ui/separator";
 import { ImagesList } from "@/components/images-list";
-import { getUser } from "@/firebase/database";
+import { getLike, getUser, toggleLike } from "@/firebase/database";
+import { useCurrentUser } from "@/context/current-user";
+import { useAuth } from "@/context/auth";
+import { handleFirebaseError } from "@/firebase/error-handler";
 
-interface PostItemProps extends ViewProps {
+interface PostItemProps {
   post: Post;
+  isReplyTo?: boolean;
 }
 
-export default function PostItem({ post, style }: PostItemProps): JSX.Element {
-  const { border, accent, mutedForeground, background } = getThemedColors();
+export default function PostItem({ post, isReplyTo }: PostItemProps) {
+  const { user } = useAuth();
+
+  const { border, accent, mutedForeground } = getThemedColors();
   const { padding, borderWidthSmall, borderWidthLarge, avatarSizeSmall } =
     getStyles();
 
-  const [author, setAuthor] = useState<User | null>(null);
+  const [data, setData] = useState<{ author: User; liked: boolean } | null>(
+    null
+  );
+  const [imageViewingVisible, setImageViewingVisible] = useState(false);
+  const [viewImage, setViewImage] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
-      const user = await getUser(post.authorId);
-      setAuthor(user);
+      const author = await getUser(post.authorId);
+      if (author) {
+        const like = await getLike({ postId: post.id, userId: user?.uid! });
+        const liked = !!like;
+        setData({ author, liked });
+      }
     };
     fetchData();
   }, []);
-  
-  const replies = dmReplies.filter(({ replyToId }) => replyToId === post.id);
 
-  const [imageViewingVisible, setImageViewingVisible] = useState(false);
-  const [viewImage, setViewImage] = useState(0);
+  async function onLike() {
+    try {
+      await toggleLike({ postId: post.id, userId: user?.uid! });
+
+      if (data) {
+        const newData = data;
+        newData.liked = !data.liked;
+        setData(newData);
+      }
+    } catch (error) {
+      handleFirebaseError(error);
+    }
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  const replies = dmReplies.filter(({ replyToId }) => replyToId === post.id);
+  const { author, liked } = data;
 
   return (
     <>
@@ -54,21 +84,21 @@ export default function PostItem({ post, style }: PostItemProps): JSX.Element {
               {
                 position: "relative",
                 paddingBottom: padding,
+              },
+              pressed && { backgroundColor: accent },
+              !isReplyTo && {
                 borderBottomWidth: borderWidthSmall,
                 borderBottomColor: border,
               },
-              pressed && { backgroundColor: accent },
             ]}
           >
             {/* left */}
             <View
               style={{
                 paddingHorizontal: padding,
-                paddingBottom: 0,
                 position: "absolute",
                 top: padding,
-                bottom: padding,
-                gap: padding,
+                bottom: 0,
               }}
             >
               <UserLink userId={post.authorId}>
@@ -77,19 +107,24 @@ export default function PostItem({ post, style }: PostItemProps): JSX.Element {
                   uri={author?.avatar?.uri || ""}
                 />
               </UserLink>
-              {post.repliesCount > 0 && (
-                <>
-                  <View
-                    style={{
-                      flex: 1,
-                      alignItems: "center",
-                    }}
-                  >
-                    <Separator size={borderWidthLarge} orientation="vertical" />
-                  </View>
-                  <RepliesReference replies={replies} />
-                </>
-              )}
+              {post.repliesCount > 0 ||
+                (isReplyTo && (
+                  <>
+                    <View
+                      style={{
+                        flex: 1,
+                        alignItems: "center",
+                        marginTop: padding,
+                      }}
+                    >
+                      <Separator
+                        size={borderWidthLarge}
+                        orientation="vertical"
+                      />
+                    </View>
+                    <RepliesReference replies={replies} />
+                  </>
+                ))}
             </View>
 
             {/* header */}
@@ -179,14 +214,22 @@ export default function PostItem({ post, style }: PostItemProps): JSX.Element {
             >
               <Pressable
                 style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+                onPress={onLike}
               >
-                <Icons.heart size={18} color={mutedForeground} filled={false} />
+                <Icons.heart
+                  size={18}
+                  color={liked ? "red" : mutedForeground}
+                  filled={liked}
+                />
                 <Text style={{ color: "gray" }}>
                   {formatCount(post.likesCount)}
                 </Text>
               </Pressable>
               <Pressable
                 style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+                onPress={() =>
+                  router.push(`/user/${post.authorId}/${post.id}/reply`)
+                }
               >
                 <Icons.comment size={18} color={mutedForeground} />
                 <Text style={{ color: "gray" }}>

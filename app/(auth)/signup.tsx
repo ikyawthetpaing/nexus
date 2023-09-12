@@ -10,7 +10,7 @@ import { Icons } from "@/components/icons";
 import { STATUSBAR_HEIGHT } from "@/components/header";
 import { isValidEmail, isValidPassword, isValidUsername } from "@/lib/utils";
 import {
-  User,
+  User as FirebaseUser,
   createUserWithEmailAndPassword,
   sendEmailVerification,
   updateEmail,
@@ -20,6 +20,7 @@ import { useAuth } from "@/context/auth";
 import { handleFirebaseError } from "@/firebase/error-handler";
 import { FIREBASE_AUTH } from "@/firebase/config";
 import { createUser } from "@/firebase/database";
+import { User } from "@/types";
 
 interface FormStep {
   title: string;
@@ -29,7 +30,6 @@ interface FormStep {
   input: JSX.Element;
 }
 
-// Define a Step component to simplify rendering each step
 function Step({
   title,
   description,
@@ -63,7 +63,7 @@ function Step({
 }
 
 export default function SignUpPage() {
-  const { authUser: user } = useAuth();
+  const { user: user } = useAuth();
   const { background, foreground, mutedForeground } = getThemedColors();
   const { padding } = getStyles();
 
@@ -160,7 +160,7 @@ export default function SignUpPage() {
     }
   };
 
-  async function verificationEmail(user: User) {
+  async function verificationEmail(user: FirebaseUser) {
     try {
       await sendEmailVerification(user);
       alert(`Verification email sent to ${user.email}`);
@@ -169,7 +169,7 @@ export default function SignUpPage() {
     }
   }
 
-  async function updateVerificationEmail(user: User, email: string) {
+  async function updateVerificationEmail(user: FirebaseUser, email: string) {
     try {
       await updateEmail(user, email);
       await verificationEmail(user);
@@ -198,19 +198,22 @@ export default function SignUpPage() {
 
             const newUser = userCredential.user;
 
+            // Update profile on firebase auth
             await updateProfile(newUser, {
               displayName: formData.fullName,
             });
 
-            await createUser({
+            const createUserData: User = {
               id: newUser.uid,
               name: formData.fullName,
               username: formData.username,
-              verified: false,
               email: formData.email,
+              verified: false,
               bio: null,
               avatar: null,
-            });
+            }
+
+            await createUser(createUserData, newUser.uid);
           }
         } else {
           setStep(step + 1);

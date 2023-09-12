@@ -1,11 +1,12 @@
-import { DocumentCollection, FIREBASE_DB } from "@/firebase/config";
-import { CreatePost, EditableUser, Post, User } from "@/types";
+import { DBCollections, FIREBASE_DB } from "@/firebase/config";
+import { CreatePost, EditableUser, Like, Post, User } from "@/types";
 import {
   QueryDocumentSnapshot,
   SnapshotOptions,
   Timestamp,
   and,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -14,7 +15,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { getCurrentUser } from "./authentication";
+import { getCurrentAuthUser } from "./authentication";
 import cuid from "cuid";
 
 // user
@@ -31,11 +32,11 @@ const userConverter = {
   },
 };
 
-export const createUser = async (userData: User) => {
+export const createUser = async (userData: User, authUserUid: string) => {
   try {
-    const docRef = collection(FIREBASE_DB, DocumentCollection.Users);
+    const docRef = collection(FIREBASE_DB, DBCollections.Users);
     await setDoc(
-      doc(docRef, userData.id).withConverter(userConverter),
+      doc(docRef, authUserUid).withConverter(userConverter),
       userData
     );
   } catch (error) {
@@ -46,11 +47,9 @@ export const createUser = async (userData: User) => {
 
 export const updateUser = async (userData: EditableUser, userId: string) => {
   try {
-    const userRef = doc(
-      FIREBASE_DB,
-      DocumentCollection.Users,
-      userId
-    ).withConverter(userConverter);
+    const userRef = doc(FIREBASE_DB, DBCollections.Users, userId).withConverter(
+      userConverter
+    );
     await updateDoc(userRef, {
       name: userData.name,
       username: userData.username,
@@ -65,11 +64,9 @@ export const updateUser = async (userData: EditableUser, userId: string) => {
 
 export const getUser = async (userId: string) => {
   try {
-    const docRef = doc(
-      FIREBASE_DB,
-      DocumentCollection.Users,
-      userId
-    ).withConverter(userConverter);
+    const docRef = doc(FIREBASE_DB, DBCollections.Users, userId).withConverter(
+      userConverter
+    );
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -99,7 +96,7 @@ const postConverter = {
 
 export async function createPost(data: CreatePost) {
   try {
-    const currentUser = getCurrentUser();
+    const currentUser = getCurrentAuthUser();
 
     if (!currentUser) {
       throw Error("Unauthorized.");
@@ -119,7 +116,7 @@ export async function createPost(data: CreatePost) {
       repostsCount: 0,
     };
 
-    const docRef = collection(FIREBASE_DB, DocumentCollection.Posts);
+    const docRef = collection(FIREBASE_DB, DBCollections.Posts);
     await setDoc(
       doc(docRef, postId).withConverter(postConverter),
       createPostData
@@ -134,11 +131,9 @@ export async function createPost(data: CreatePost) {
 
 export async function getPost(postId: string) {
   try {
-    const docRef = doc(
-      FIREBASE_DB,
-      DocumentCollection.Posts,
-      postId
-    ).withConverter(postConverter);
+    const docRef = doc(FIREBASE_DB, DBCollections.Posts, postId).withConverter(
+      postConverter
+    );
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -155,7 +150,7 @@ export async function getPost(postId: string) {
 export async function getReplies(postId: string) {
   try {
     const postsQuery = query(
-      collection(FIREBASE_DB, DocumentCollection.Posts),
+      collection(FIREBASE_DB, DBCollections.Posts),
       where("replyToId", "==", postId)
     ).withConverter(postConverter);
 
@@ -174,10 +169,27 @@ export async function getReplies(postId: string) {
   }
 }
 
+export async function getRepliesToParent(rootRelpyToId: string | null) {
+  const posts: Post[] = [];
+  let previousReplyToId = rootRelpyToId;
+
+  while (previousReplyToId !== null) {
+    const replyToPost = await getPost(previousReplyToId);
+    if (replyToPost) {
+      posts.unshift(replyToPost);
+      previousReplyToId = replyToPost.replyToId;
+    } else {
+      break;
+    }
+  }
+
+  return posts;
+}
+
 export const getUserPosts = async (userId: string) => {
   try {
     const postsQuery = query(
-      collection(FIREBASE_DB, DocumentCollection.Posts),
+      collection(FIREBASE_DB, DBCollections.Posts),
       and(where("authorId", "==", userId), where("replyToId", "==", null))
     ).withConverter(postConverter);
 
@@ -199,10 +211,68 @@ export const getUserPosts = async (userId: string) => {
 // just for dev
 export async function getAllPosts() {
   const querySnapshot = await getDocs(
-    collection(FIREBASE_DB, DocumentCollection.Posts).withConverter(
-      postConverter
-    )
+    collection(FIREBASE_DB, DBCollections.Posts).withConverter(postConverter)
   );
   const posts = querySnapshot.docs.map((doc) => doc.data());
-  return posts;
+  const filtered = posts.filter((post) => post.replyToId === null);
+  return filtered;
+}
+
+// like
+const likeConverter = {
+  toFirestore: (data: Like) => {
+    return data;
+  },
+  fromFirestore: (
+    snapshot: QueryDocumentSnapshot,
+    options: SnapshotOptions
+  ) => {
+    const data = snapshot.data(options) as Like;
+    return data;
+  },
+};
+
+function mergeLikeId({ postId, userId }: Like) {
+  return `${postId}${userId}`;
+}
+
+async function createLike({ postId, userId }: Like) {
+  const id = mergeLikeId({ postId, userId });
+
+  const docRef = collection(FIREBASE_DB, DBCollections.Likes);
+  await setDoc(doc(docRef, id).withConverter(likeConverter), {
+    postId,
+    userId,
+  });
+
+  return { id };
+}
+
+export async function getLike(like: Like) {
+  const docRef = doc(
+    FIREBASE_DB,
+    DBCollections.Likes,
+    mergeLikeId(like)
+  ).withConverter(likeConverter);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    return docSnap.data();
+  } else {
+    return null;
+  }
+}
+
+async function deleteLike(like: Like) {
+  await deleteDoc(doc(FIREBASE_DB, DBCollections.Likes, mergeLikeId(like)));
+}
+
+export async function toggleLike(like: Like) {
+  const exitingLike = await getLike(like);
+
+  if (exitingLike) {
+    await deleteLike(like);
+  } else {
+    await createLike(like);
+  }
 }

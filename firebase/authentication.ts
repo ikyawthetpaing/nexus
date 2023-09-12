@@ -13,6 +13,6 @@ export async function signIn(email: string, password: string) {
   );
 }
 
-export function getCurrentUser() {
+export function getCurrentAuthUser() {
   return FIREBASE_AUTH.currentUser;
 }

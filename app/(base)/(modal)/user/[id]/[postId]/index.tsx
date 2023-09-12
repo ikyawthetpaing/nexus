@@ -22,19 +22,29 @@ import { useEffect, useState } from "react";
 import PostItem from "@/components/post-item";
 import { ImagesList } from "@/components/images-list";
 import { Post, User } from "@/types";
-import { getPost, getReplies, getUser } from "@/firebase/database";
+import {
+  getPost,
+  getRepliesToParent,
+  getReplies,
+  getUser,
+} from "@/firebase/database";
 import { useCurrentUser } from "@/context/current-user";
 
 export default function UserPostPage() {
   const { postId } = useLocalSearchParams();
 
-  const { background, mutedForeground, accent, muted, border } = getThemedColors();
+  const { background, mutedForeground, accent, muted, border } =
+    getThemedColors();
   const { padding, avatarSizeSmall, borderWidthSmall } = getStyles();
 
   const footerHeight = HEADER_HEIGHT - STATUSBAR_HEIGHT;
 
-
-  const [data, setData] = useState<{post: Post, author: User, replies: Post[]} | null>(null);
+  const [data, setData] = useState<{
+    post: Post;
+    author: User;
+    replies: Post[];
+    repliesTo: Post[];
+  } | null>(null);
   const [imageViewingVisible, setImageViewingVisible] = useState(false);
   const [viewImage, setViewImage] = useState(0);
 
@@ -43,6 +53,7 @@ export default function UserPostPage() {
       let post: Post | null = null;
       let author: User | null = null;
       let replies: Post[] = [];
+      let repliesTo: Post[] = [];
 
       if (typeof postId === "string") {
         post = await getPost(postId);
@@ -50,7 +61,8 @@ export default function UserPostPage() {
           author = await getUser(post.authorId);
           if (author) {
             replies = await getReplies(postId);
-            setData({post, author, replies})
+            repliesTo = await getRepliesToParent(post.replyToId);
+            setData({ post, author, replies, repliesTo });
           }
         }
       }
@@ -59,16 +71,18 @@ export default function UserPostPage() {
   }, []);
 
   const { user: currentUser } = useCurrentUser();
-  
+
   if (!data) {
     return null; // implement like post not found
   }
 
-  const {post, author, replies} = data;
+  const { post, author, replies, repliesTo } = data;
   // const replies = dmReplies.filter(({ replyToId }) => replyToId === postId);
 
   return (
-    <View style={{ flex: 1, position: "relative", backgroundColor: background }}>
+    <View
+      style={{ flex: 1, position: "relative", backgroundColor: background }}
+    >
       {/* header */}
       <View>
         <View
@@ -83,13 +97,16 @@ export default function UserPostPage() {
             borderBottomColor: border,
           }}
         >
-          <IconButton icon="arrowLeft" onPress={() => {
-            if (router.canGoBack()) {
-              router.back()
-            } else {
-              router.push("/")
-            }
-          }} />
+          <IconButton
+            icon="arrowLeft"
+            onPress={() => {
+              if (router.canGoBack()) {
+                router.back();
+              } else {
+                router.push("/");
+              }
+            }}
+          />
           <Text style={{ fontSize: 18, fontWeight: "500" }}>Post</Text>
         </View>
       </View>
@@ -98,7 +115,12 @@ export default function UserPostPage() {
         style={{ marginBottom: footerHeight }}
         showsVerticalScrollIndicator={false}
       >
-        {/* post item */}
+        {/* reply to posts */}
+        {repliesTo.map((post) => (
+          <PostItem post={post} key={post.id} isReplyTo={true} />
+        ))}
+
+        {/* post */}
         <View style={{ gap: padding }}>
           {/* post header */}
           <View
@@ -255,8 +277,8 @@ export default function UserPostPage() {
         </View>
 
         {/* replies */}
-        {replies.map((reply, index) => (
-          <PostItem post={reply} key={index} />
+        {replies.map((reply) => (
+          <PostItem post={reply} key={reply.id} />
         ))}
       </ScrollView>
 

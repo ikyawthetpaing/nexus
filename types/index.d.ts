@@ -58,3 +58,8 @@ export type Post = {
 };
 export type EditablePost = Pick<Post, "content" | "images">;
 export type CreatePost = Pick<Post, "replyToId" | "content" | "images">;
+
+export type Like = {
+  postId: string,
+  userId: string
+}

@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { onAuthStateChanged, User as AuthUser } from "firebase/auth";
+import { onAuthStateChanged, User } from "firebase/auth";
 import { useRootNavigationState, useSegments, router } from "expo-router";
 import LoadingScreen from "@/components/loading";
 import { FIREBASE_AUTH } from "@/firebase/config";
 
 interface AuthContextType {
-  authUser: AuthUser | null;
+  user: User | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -19,7 +19,7 @@ export function useAuth() {
 }
 
 // Custom hook to handle protected routes
-function useProtectedRoute(user: AuthUser | null) {
+function useProtectedRoute(user: User | null) {
   const segments = useSegments();
   const navigationState = useRootNavigationState();
   const [shouldRedirect, setShouldRedirect] = useState(false);
@@ -69,12 +69,12 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [authUser, setAuthUser] = useState<AuthUser | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [authInitializing, setAuthInitializing] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, async (_user) => {
-      setAuthUser(_user);
+      setUser(_user);
       setAuthInitializing(false); // Mark authentication as initialized
     });
 
@@ -82,10 +82,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   // Use the useProtectedRoute hook to handle protected routes, but only when auth is not initializing
-  useProtectedRoute(authInitializing ? null : authUser);
+  useProtectedRoute(authInitializing ? null : user);
 
   const authContext: AuthContextType = {
-    authUser,
+    user: user,
   };
 
   return (
