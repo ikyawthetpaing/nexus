@@ -79,6 +79,6 @@ Mention any libraries, tutorials, or resources you used or were inspired by duri
 
 If you have any questions or suggestions, feel free to contact the project owner:
 
-- [Kyaw Thet Paing](mailto:ikyawthetpaing@gmail.com)
+- [Kyaw Thet Paing](mailto:ikyawthetpaing@outlook.com)
 
 Happy coding!
