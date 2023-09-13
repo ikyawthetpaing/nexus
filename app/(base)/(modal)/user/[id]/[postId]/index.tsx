@@ -2,36 +2,43 @@ import { useEffect, useState } from "react";
 import { Post, User } from "@/types";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
-import {
-  Dimensions,
-  Pressable,
-  ScrollView,
-  StatusBar,
-  View,
-} from "react-native";
+import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
+import { Dimensions, Pressable, ScrollView, View } from "react-native";
 import ImageView from "react-native-image-viewing";
 
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { HEADER_HEIGHT, STATUSBAR_HEIGHT } from "@/components/header";
 import { ImagesList } from "@/components/images-list";
+import LoadingScreen from "@/components/loading";
 import PostItem from "@/components/post-item";
 import { Text } from "@/components/themed";
 import { UserLink } from "@/components/user-link";
 import { getThemedColors } from "@/constants/colors";
-import { replies as dmReplies } from "@/constants/dummy-data";
 import { getStyles } from "@/constants/style";
+import { useAuth } from "@/context/auth";
 import { useCurrentUser } from "@/context/current-user";
+import { DBCollections, FIREBASE_DB } from "@/firebase/config";
 import {
-  getPost,
-  getReplies,
   getRepliesToParent,
-  getUser,
+  likeConverter,
+  mergeLikeId,
+  postConverter,
+  toggleLike,
+  userConverter,
 } from "@/firebase/database";
+import { handleFirebaseError } from "@/firebase/error-handler";
 import { formatCount, formatDate, formatHour } from "@/lib/utils";
 
 export default function UserPostPage() {
-  const { postId } = useLocalSearchParams();
+  const { user } = useCurrentUser();
+  // const {user} = useAuth();
+  // if (!user) {
+  //   return null;
+  // }
+
+  const { postId: _postId } = useLocalSearchParams();
+  const postId = typeof _postId === "string" ? _postId : "";
 
   const { background, mutedForeground, accent, muted, border } =
     getThemedColors();
@@ -39,45 +46,149 @@ export default function UserPostPage() {
 
   const footerHeight = HEADER_HEIGHT - STATUSBAR_HEIGHT;
 
-  const [data, setData] = useState<{
-    post: Post;
-    author: User;
-    replies: Post[];
-    repliesTo: Post[];
-  } | null>(null);
+  const [post, setPost] = useState<Post | null>(null);
+  const [author, setAuthor] = useState<User | null>(null);
+  const [replies, setReplies] = useState<Post[]>([]);
+  const [repliesTo, setRepliesTo] = useState<Post[]>([]);
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [replyCount, setReplyCount] = useState(0);
+
   const [imageViewingVisible, setImageViewingVisible] = useState(false);
   const [viewImage, setViewImage] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchData() {
-      let post: Post | null = null;
-      let author: User | null = null;
-      let replies: Post[] = [];
-      let repliesTo: Post[] = [];
-
-      if (typeof postId === "string") {
-        post = await getPost(postId);
-        if (post) {
-          author = await getUser(post.authorId);
-          if (author) {
-            replies = await getReplies(postId);
-            repliesTo = await getRepliesToParent(post.replyToId);
-            setData({ post, author, replies, repliesTo });
-          }
+    const postUnsubscribe = onSnapshot(
+      doc(FIREBASE_DB, DBCollections.Posts, postId).withConverter(
+        postConverter
+      ),
+      (docSnapshot) => {
+        if (docSnapshot.exists()) {
+          setPost(docSnapshot.data() || null);
+          setLoading(false);
+        } else {
+          setPost(null);
+          setLoading(false);
         }
+      },
+      (error) => {
+        console.error("Error fetching post:", error);
+        setLoading(false);
       }
+    );
+
+    return () => {
+      postUnsubscribe();
+    };
+  }, [postId]);
+
+  useEffect(() => {
+    if (post) {
+      const authorUnsubscribe = onSnapshot(
+        doc(FIREBASE_DB, DBCollections.Users, post.authorId).withConverter(
+          userConverter
+        ),
+        (docSnapshot) => {
+          if (docSnapshot.exists()) {
+            setAuthor(docSnapshot.data() || null);
+          } else {
+            setAuthor(null);
+          }
+        },
+        (error) => {
+          console.error("Error fetching author:", error);
+        }
+      );
+
+      const repliesQuery = query(
+        collection(FIREBASE_DB, DBCollections.Posts),
+        where("replyToId", "==", post.id)
+      ).withConverter(postConverter);
+      const repliesUnsubscribe = onSnapshot(
+        repliesQuery,
+        (querySnapshot) => {
+          const _replies: Post[] = [];
+          querySnapshot.forEach((doc) => {
+            _replies.push(doc.data());
+          });
+
+          setReplies(_replies);
+        },
+        (error) => {
+          console.error("Error fetching replies:", error);
+        }
+      );
+
+      getRepliesToParent(post.replyToId).then((result) => setRepliesTo(result));
+
+      const likeCountQuery = query(
+        collection(FIREBASE_DB, DBCollections.Likes),
+        where("postId", "==", post.id)
+      ).withConverter(likeConverter);
+      const likeCountUnsubscribe = onSnapshot(
+        likeCountQuery,
+        (querySnapshot) => {
+          setLikeCount(querySnapshot.docs.length);
+        },
+        (error) => {
+          console.error("Error fetching like count:", error);
+        }
+      );
+
+      const replyCountQuery = query(
+        collection(FIREBASE_DB, DBCollections.Posts),
+        where("replyToId", "==", post.id)
+      ).withConverter(likeConverter);
+      const replyCountUnsubscribe = onSnapshot(
+        replyCountQuery,
+        (querySnapshot) => {
+          setReplyCount(querySnapshot.docs.length);
+        },
+        (error) => {
+          console.error("Error fetching reply count:", error);
+        }
+      );
+
+      const unsubLiked = onSnapshot(
+        doc(
+          FIREBASE_DB,
+          DBCollections.Likes,
+          mergeLikeId({ postId: post.id, userId: user?.id || "" })
+        ).withConverter(likeConverter),
+        (doc) => {
+          setLiked(!!doc.data() || false);
+        }
+      );
+
+      return () => {
+        authorUnsubscribe();
+        repliesUnsubscribe();
+        likeCountUnsubscribe();
+        replyCountUnsubscribe();
+        unsubLiked();
+      };
     }
-    fetchData();
-  }, []);
+  }, [post]);
 
-  const { user: currentUser } = useCurrentUser();
-
-  if (!data) {
-    return null; // implement like post not found
+  async function onLike() {
+    try {
+      if (post && user) {
+        await toggleLike({ postId: post.id, userId: user.id });
+        setLiked(!liked);
+      }
+    } catch (error) {
+      handleFirebaseError(error);
+    }
   }
 
-  const { post, author, replies, repliesTo } = data;
-  // const replies = dmReplies.filter(({ replyToId }) => replyToId === postId);
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  if (!post || !author) {
+    return null; // not found
+  }
 
   return (
     <View
@@ -116,7 +227,7 @@ export default function UserPostPage() {
         showsVerticalScrollIndicator={false}
       >
         {/* reply to posts */}
-        {repliesTo.map((post) => (
+        {repliesTo?.map((post) => (
           <PostItem post={post} key={post.id} isReplyTo={true} />
         ))}
 
@@ -173,7 +284,7 @@ export default function UserPostPage() {
               }}
             >
               <Button size="sm">Follow</Button>
-              <IconButton icon="menuDots" size={24} />
+              <IconButton icon="menuDots" iconProps={{ size: 24 }} />
             </View>
           </View>
 
@@ -244,13 +355,13 @@ export default function UserPostPage() {
             >
               <View style={{ flexDirection: "row", gap: 4 }}>
                 <Text style={{ fontWeight: "500" }}>
-                  {formatCount(post.likesCount)}
+                  {formatCount(likeCount)}
                 </Text>
                 <Text style={{ color: mutedForeground }}>Likes</Text>
               </View>
               <View style={{ flexDirection: "row", gap: 4 }}>
                 <Text style={{ fontWeight: "500" }}>
-                  {formatCount(post.repliesCount)}
+                  {formatCount(replyCount)}
                 </Text>
                 <Text style={{ color: mutedForeground }}>Replies</Text>
               </View>
@@ -268,10 +379,18 @@ export default function UserPostPage() {
                 padding: padding,
               }}
             >
-              <IconButton size={18} icon="heart" />
-              <IconButton size={18} icon="comment" />
-              <IconButton size={18} icon="squareShare" />
-              <IconButton size={18} icon="share" />
+              <IconButton
+                icon="heart"
+                iconProps={{
+                  size: 18,
+                  filled: liked,
+                  color: liked ? "red" : undefined,
+                }}
+                onPress={onLike}
+              />
+              <IconButton icon="comment" iconProps={{ size: 18 }} />
+              <IconButton icon="squareShare" iconProps={{ size: 18 }} />
+              <IconButton icon="share" iconProps={{ size: 18 }} />
             </View>
           </View>
         </View>
@@ -323,9 +442,9 @@ export default function UserPostPage() {
                   overflow: "hidden",
                 }}
               >
-                {currentUser?.avatar && (
+                {user?.avatar && (
                   <Image
-                    source={{ uri: currentUser.avatar.uri }}
+                    source={{ uri: user.avatar.uri }}
                     style={{
                       width: "100%",
                       height: "100%",

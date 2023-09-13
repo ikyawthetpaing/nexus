@@ -8,14 +8,14 @@ import Svg, {
   SvgProps,
 } from "react-native-svg";
 
-interface IconProps {
+export interface IconProps {
   size?: number;
   strokeWidth?: number;
   color?: string;
   filled?: boolean;
 }
 
-const defaultIconProps: IconProps = {
+export const defaultIconProps: IconProps = {
   size: 28,
   strokeWidth: 2,
   color: "#000000",

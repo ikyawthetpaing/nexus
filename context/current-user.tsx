@@ -1,22 +1,20 @@
-import React, {
-  createContext,
-  Dispatch,
-  SetStateAction,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { Post, User } from "@/types";
+import {
+  and,
+  collection,
+  doc,
+  onSnapshot,
+  query,
+  where,
+} from "firebase/firestore";
 
-import LoadingScreen from "@/components/loading";
-import { FIREBASE_AUTH } from "@/firebase/config";
-import { getUser, getUserPosts } from "@/firebase/database";
+import { DBCollections, FIREBASE_AUTH, FIREBASE_DB } from "@/firebase/config";
+import { postConverter, userConverter } from "@/firebase/database";
 
 interface CurrentUserContextType {
   user: User | null;
   posts: Post[];
-  loading: boolean;
-  setRefresh: Dispatch<SetStateAction<boolean>>;
 }
 
 const CurrentUserContext = createContext<CurrentUserContextType | undefined>(
@@ -40,43 +38,64 @@ interface Props {
 export function CurrentUserContextProvider({ children }: Props) {
   const [user, setUser] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
-  const [refresh, setRefresh] = useState(true);
-
-  const [initializing, setInitializing] = useState(true);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const authUser = FIREBASE_AUTH.currentUser;
+    const authUser = FIREBASE_AUTH.currentUser;
 
-      if (authUser) {
-        const userProfile = await getUser(authUser.uid);
-        const userPosts = await getUserPosts(authUser.uid);
+    if (authUser) {
+      const userUnsubscribe = onSnapshot(
+        doc(FIREBASE_DB, DBCollections.Users, authUser.uid).withConverter(
+          userConverter
+        ),
+        (doc) => {
+          if (doc.exists()) {
+            setUser(doc.data());
+          } else {
+            setUser(null);
+          }
+        }
+      );
 
-        setUser(userProfile);
-        setPosts(userPosts);
-      }
-      setInitializing(false);
-    };
-    if (refresh) {
-      setLoading(true);
-      console.log("fetch user data");
-      fetchData();
-      setRefresh(false);
-      setLoading(false);
+      return () => {
+        userUnsubscribe();
+      };
     }
-  }, [refresh]);
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      const postsQuery = query(
+        collection(FIREBASE_DB, DBCollections.Posts),
+        and(where("authorId", "==", user.id), where("replyToId", "==", null))
+      ).withConverter(postConverter);
+      const postsUnsubscribe = onSnapshot(
+        postsQuery,
+        (querySnapshot) => {
+          const _posts: Post[] = [];
+          querySnapshot.forEach((doc) => {
+            _posts.unshift(doc.data());
+          });
+
+          setPosts(_posts);
+        },
+        (error) => {
+          console.error("Error fetching posts:", error);
+        }
+      );
+      return () => {
+        postsUnsubscribe();
+      };
+    }
+  }, [user]);
 
   const userContext: CurrentUserContextType = {
     user,
     posts,
-    loading,
-    setRefresh,
   };
 
   return (
     <CurrentUserContext.Provider value={userContext}>
-      {initializing ? <LoadingScreen /> : children}
+      {children}
     </CurrentUserContext.Provider>
   );
 }

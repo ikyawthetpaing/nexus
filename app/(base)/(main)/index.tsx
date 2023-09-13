@@ -55,11 +55,7 @@ export default function HomePage() {
         }}
       >
         {posts.map((post, i) => (
-          <PostItem
-            key={i}
-            post={post}
-            style={{ paddingHorizontal: padding }}
-          />
+          <PostItem key={i} post={post} />
         ))}
       </ScrollViewWithHeader>
     </View>

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Post, User } from "@/types";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
 import { Dimensions, Pressable, View } from "react-native";
 import ImageView from "react-native-image-viewing";
 
@@ -14,9 +15,14 @@ import { UserLink } from "@/components/user-link";
 import { getThemedColors } from "@/constants/colors";
 import { replies as dmReplies, users } from "@/constants/dummy-data";
 import { getStyles } from "@/constants/style";
-import { useAuth } from "@/context/auth";
 import { useCurrentUser } from "@/context/current-user";
-import { getLike, getUser, toggleLike } from "@/firebase/database";
+import { DBCollections, FIREBASE_DB } from "@/firebase/config";
+import {
+  likeConverter,
+  mergeLikeId,
+  toggleLike,
+  userConverter,
+} from "@/firebase/database";
 import { handleFirebaseError } from "@/firebase/error-handler";
 import { formatCount, timeAgo } from "@/lib/utils";
 
@@ -26,50 +32,93 @@ interface PostItemProps {
 }
 
 export default function PostItem({ post, isReplyTo }: PostItemProps) {
-  const { user } = useAuth();
+  const { user } = useCurrentUser();
 
-  const { border, accent, mutedForeground } = getThemedColors();
+  const { border, accent, mutedForeground, background } = getThemedColors();
   const { padding, borderWidthSmall, borderWidthLarge, avatarSizeSmall } =
     getStyles();
 
-  const [data, setData] = useState<{ author: User; liked: boolean } | null>(
-    null
-  );
+  const [author, setAuthor] = useState<User | null>(null);
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [replyCount, setReplyCount] = useState(0);
+
   const [imageViewingVisible, setImageViewingVisible] = useState(false);
   const [viewImage, setViewImage] = useState(0);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const author = await getUser(post.authorId);
-      if (author) {
-        const like = await getLike({ postId: post.id, userId: user?.uid! });
-        const liked = !!like;
-        setData({ author, liked });
+    const authorUnsubscribe = onSnapshot(
+      doc(FIREBASE_DB, DBCollections.Users, post.authorId).withConverter(
+        userConverter
+      ),
+      (doc) => {
+        setAuthor(doc.data() || null);
       }
+    );
+
+    const likedUnsubscribe = onSnapshot(
+      doc(
+        FIREBASE_DB,
+        DBCollections.Likes,
+        mergeLikeId({ postId: post.id, userId: user?.id || "" })
+      ).withConverter(likeConverter),
+      (doc) => {
+        if (doc.exists()) {
+          setLiked(true);
+        } else {
+          setLiked(false);
+        }
+      }
+    );
+
+    const likeCountQuery = query(
+      collection(FIREBASE_DB, DBCollections.Likes),
+      where("postId", "==", post.id)
+    ).withConverter(likeConverter);
+
+    const likeCountUnsubscribe = onSnapshot(
+      likeCountQuery,
+      (querySnapshot) => {
+        setLikeCount(querySnapshot.docs.length);
+      },
+      (error) => {
+        console.error("Error fetching like count:", error);
+      }
+    );
+
+    const replyCountQuery = query(
+      collection(FIREBASE_DB, DBCollections.Posts),
+      where("replyToId", "==", post.id)
+    ).withConverter(likeConverter);
+
+    const replyCountUnsubscribe = onSnapshot(
+      replyCountQuery,
+      (querySnapshot) => {
+        setReplyCount(querySnapshot.docs.length);
+      },
+      (error) => {
+        console.error("Error fetching reply count:", error);
+      }
+    );
+
+    return () => {
+      authorUnsubscribe();
+      likedUnsubscribe();
+      likeCountUnsubscribe();
+      replyCountUnsubscribe();
     };
-    fetchData();
   }, []);
 
   async function onLike() {
     try {
-      await toggleLike({ postId: post.id, userId: user?.uid! });
-
-      if (data) {
-        const newData = data;
-        newData.liked = !data.liked;
-        setData(newData);
-      }
+      await toggleLike({ postId: post.id, userId: user?.id! });
+      setLiked(!liked);
     } catch (error) {
       handleFirebaseError(error);
     }
   }
 
-  if (!data) {
-    return null;
-  }
-
   const replies = dmReplies.filter(({ replyToId }) => replyToId === post.id);
-  const { author, liked } = data;
 
   return (
     <>
@@ -84,6 +133,7 @@ export default function PostItem({ post, isReplyTo }: PostItemProps) {
               {
                 position: "relative",
                 paddingBottom: padding,
+                backgroundColor: background,
               },
               pressed && { backgroundColor: accent },
               !isReplyTo && {
@@ -221,9 +271,7 @@ export default function PostItem({ post, isReplyTo }: PostItemProps) {
                   color={liked ? "red" : mutedForeground}
                   filled={liked}
                 />
-                <Text style={{ color: "gray" }}>
-                  {formatCount(post.likesCount)}
-                </Text>
+                <Text style={{ color: "gray" }}>{formatCount(likeCount)}</Text>
               </Pressable>
               <Pressable
                 style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
@@ -232,9 +280,7 @@ export default function PostItem({ post, isReplyTo }: PostItemProps) {
                 }
               >
                 <Icons.comment size={18} color={mutedForeground} />
-                <Text style={{ color: "gray" }}>
-                  {formatCount(post.repliesCount)}
-                </Text>
+                <Text style={{ color: "gray" }}>{formatCount(replyCount)}</Text>
               </Pressable>
               <Pressable
                 style={{ flexDirection: "row", alignItems: "center", gap: 5 }}

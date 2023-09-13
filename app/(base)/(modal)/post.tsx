@@ -27,11 +27,7 @@ export default function PostScreen() {
 
   function onSubmit() {
     setUpload({ posts });
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.push("/");
-    }
+    router.replace("/");
   }
 
   function onCancel() {

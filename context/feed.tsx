@@ -7,8 +7,10 @@ import React, {
   useState,
 } from "react";
 import { Post } from "@/types";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 
-import { getAllPosts } from "@/firebase/database";
+import { DBCollections, FIREBASE_DB } from "@/firebase/config";
+import { postConverter } from "@/firebase/database";
 
 interface FeedContextType {
   posts: Post[];
@@ -32,22 +34,28 @@ interface Props {
 
 export function FeedContextProvider({ children }: Props) {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [refresh, setRefresh] = useState(true);
-
   const [loading, setLoading] = useState(false);
+  const [refresh, setRefresh] = useState(true); // init true for first time
 
   useEffect(() => {
-    const fetchData = async () => {
-      const feedPosts = await getAllPosts();
-      setPosts(feedPosts);
-    };
-    if (refresh) {
-      setLoading(true);
-      console.log("fetch posts data");
-      fetchData();
-      setRefresh(false);
+    setLoading(true);
+    const q = query(
+      collection(FIREBASE_DB, DBCollections.Posts),
+      where("replyToId", "==", null)
+    ).withConverter(postConverter);
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const newPosts: Post[] = [];
+      querySnapshot.forEach((doc) => {
+        newPosts.push(doc.data());
+      });
+      setPosts(newPosts);
       setLoading(false);
-    }
+    });
+
+    return () => {
+      // Unsubscribe from the snapshot listener when the component unmounts
+      unsubscribe();
+    };
   }, [refresh]);
 
   const feedContext: FeedContextType = {

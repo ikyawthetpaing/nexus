@@ -21,7 +21,7 @@ import { DBCollections, FIREBASE_DB } from "@/firebase/config";
 import { getCurrentAuthUser } from "./authentication";
 
 // user
-const userConverter = {
+export const userConverter = {
   toFirestore: (user: User) => {
     return user;
   },
@@ -83,7 +83,7 @@ export const getUser = async (userId: string) => {
 };
 
 // post
-const postConverter = {
+export const postConverter = {
   toFirestore: (postData: Post) => {
     return postData;
   },
@@ -149,28 +149,6 @@ export async function getPost(postId: string) {
   }
 }
 
-export async function getReplies(postId: string) {
-  try {
-    const postsQuery = query(
-      collection(FIREBASE_DB, DBCollections.Posts),
-      where("replyToId", "==", postId)
-    ).withConverter(postConverter);
-
-    const querySnapshot = await getDocs(postsQuery);
-    const posts: Post[] = [];
-
-    querySnapshot.forEach((doc) => {
-      const post = doc.data();
-      posts.push(post);
-    });
-
-    return posts;
-  } catch (error) {
-    console.error("Error getting post replies:", error);
-    throw error;
-  }
-}
-
 export async function getRepliesToParent(rootRelpyToId: string | null) {
   const posts: Post[] = [];
   let previousReplyToId = rootRelpyToId;
@@ -188,40 +166,8 @@ export async function getRepliesToParent(rootRelpyToId: string | null) {
   return posts;
 }
 
-export const getUserPosts = async (userId: string) => {
-  try {
-    const postsQuery = query(
-      collection(FIREBASE_DB, DBCollections.Posts),
-      and(where("authorId", "==", userId), where("replyToId", "==", null))
-    ).withConverter(postConverter);
-
-    const querySnapshot = await getDocs(postsQuery);
-    const posts: Post[] = [];
-
-    querySnapshot.forEach((doc) => {
-      const post = doc.data();
-      posts.push(post);
-    });
-
-    return posts;
-  } catch (error) {
-    console.error("Error getting user posts:", error);
-    throw error;
-  }
-};
-
-// just for dev
-export async function getAllPosts() {
-  const querySnapshot = await getDocs(
-    collection(FIREBASE_DB, DBCollections.Posts).withConverter(postConverter)
-  );
-  const posts = querySnapshot.docs.map((doc) => doc.data());
-  const filtered = posts.filter((post) => post.replyToId === null);
-  return filtered;
-}
-
 // like
-const likeConverter = {
+export const likeConverter = {
   toFirestore: (data: Like) => {
     return data;
   },
@@ -234,7 +180,7 @@ const likeConverter = {
   },
 };
 
-function mergeLikeId({ postId, userId }: Like) {
+export function mergeLikeId({ postId, userId }: Like) {
   return `${postId}${userId}`;
 }
 

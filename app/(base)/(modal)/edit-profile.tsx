@@ -40,7 +40,7 @@ function hasDataChanged(
 }
 
 export default function EditProfile() {
-  const { user, setRefresh } = useCurrentUser();
+  const { user } = useCurrentUser();
 
   if (!user) {
     return null;
@@ -123,7 +123,6 @@ export default function EditProfile() {
         handleFirebaseError(error);
       } finally {
         setUploading(false);
-        setRefresh(true);
       }
     }
   }
@@ -144,7 +143,11 @@ export default function EditProfile() {
             paddingHorizontal: padding,
           }}
         >
-          <IconButton icon="close" onPress={onPressBack} size={24} />
+          <IconButton
+            icon="close"
+            onPress={onPressBack}
+            iconProps={{ size: 24 }}
+          />
           <Button size="sm" onPress={onPressSave} disabled={!isDataChanged}>
             Save
           </Button>

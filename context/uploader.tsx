@@ -14,8 +14,6 @@ import { createPost } from "@/firebase/database";
 import { handleFirebaseError } from "@/firebase/error-handler";
 import { uploadFileToFirebase } from "@/firebase/storage";
 
-import { useCurrentUser } from "./current-user";
-
 type UploadType = {
   posts: AddPost[];
   replyToId?: string;
@@ -45,7 +43,6 @@ interface Props {
 }
 
 export function UploaderContextProvider({ children }: Props) {
-  const { setRefresh } = useCurrentUser();
   const [loading, setLoading] = useState(false);
   const [upload, setUpload] = useState<UploadType | null>(null);
 
@@ -77,7 +74,6 @@ export function UploaderContextProvider({ children }: Props) {
       handleFirebaseError(error);
     } finally {
       setLoading(false);
-      setRefresh(true);
       setUpload(null);
     }
   }

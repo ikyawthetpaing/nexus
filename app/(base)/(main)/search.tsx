@@ -15,7 +15,7 @@ import { getStyles } from "@/constants/style";
 
 export default function TabTwoScreen() {
   const { background, accent, foreground } = getThemedColors();
-  const { padding, borderRadius: radius } = getStyles();
+  const { padding, borderRadius } = getStyles();
 
   const scrollY = new Animated.Value(0);
 
@@ -51,7 +51,7 @@ export default function TabTwoScreen() {
               right: padding,
               bottom: padding,
               position: "absolute",
-              borderRadius: radius,
+              borderRadius: borderRadius,
               paddingLeft: padding * 4,
             }}
           />

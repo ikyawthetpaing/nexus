@@ -3,6 +3,7 @@ import { Image } from "expo-image";
 import { Pressable, ScrollView, useColorScheme, ViewProps } from "react-native";
 
 import { IconButton } from "@/components/ui/icon-button";
+import { getThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
 
 interface Props extends ViewProps {
@@ -20,7 +21,8 @@ export function ImagesList({
   style,
   ...props
 }: Props) {
-  const { padding, borderRadius } = getStyles();
+  const { border } = getThemedColors();
+  const { padding, borderRadius, borderWidthSmall } = getStyles();
   const MAX_HEIGHT = 600;
 
   const colorScheme = useColorScheme();
@@ -53,6 +55,8 @@ export function ImagesList({
               borderRadius: borderRadius,
               overflow: "hidden",
               position: "relative",
+              borderWidth: borderWidthSmall,
+              borderColor: border,
             },
             index === 0 && {
               width:
@@ -74,8 +78,8 @@ export function ImagesList({
               />
               {onRemoveImage && (
                 <IconButton
-                  size={18}
                   icon="close"
+                  iconProps={{ size: 18 }}
                   onPress={() => onRemoveImage(index)}
                   style={{
                     position: "absolute",

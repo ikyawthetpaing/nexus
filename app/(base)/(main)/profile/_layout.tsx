@@ -5,13 +5,12 @@ import {
   Dimensions,
   NativeScrollEvent,
   NativeSyntheticEvent,
-  RefreshControl,
   SafeAreaView,
   StatusBar,
 } from "react-native";
 
 import { IconButton } from "@/components/ui/icon-button";
-import { Header, HEADER_HEIGHT } from "@/components/header";
+import { Header } from "@/components/header";
 import { ProfileHeader } from "@/components/profile-header";
 import { View } from "@/components/themed";
 import { getThemedColors } from "@/constants/colors";
@@ -19,14 +18,14 @@ import { getStyles } from "@/constants/style";
 import { useCurrentUser } from "@/context/current-user";
 
 export default function ProfileLayout() {
-  const { user, loading, setRefresh } = useCurrentUser();
+  const { background } = getThemedColors();
+  const { padding } = getStyles();
+
+  const { user } = useCurrentUser();
 
   if (!user) {
     return null;
   }
-
-  const { background } = getThemedColors();
-  const { padding } = getStyles();
 
   const [profileHeaderHeight, setProfileHeaderHeight] = useState(0);
 
@@ -72,13 +71,6 @@ export default function ProfileLayout() {
           paddingTop: profileHeaderHeight,
           minHeight: Dimensions.get("screen").height + profileHeaderHeight,
         }}
-        refreshControl={
-          <RefreshControl
-            refreshing={loading}
-            onRefresh={() => setRefresh(true)}
-            progressViewOffset={profileHeaderHeight}
-          />
-        }
       >
         <Slot />
       </Animated.ScrollView>
