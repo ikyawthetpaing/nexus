@@ -1,8 +1,9 @@
-import { getStyles } from "@/constants/style";
 import { LocalImage } from "@/types";
 import { Image } from "expo-image";
-import { Pressable, ScrollView, ViewProps, useColorScheme } from "react-native";
+import { Pressable, ScrollView, useColorScheme, ViewProps } from "react-native";
+
 import { IconButton } from "@/components/ui/icon-button";
+import { getStyles } from "@/constants/style";
 
 interface Props extends ViewProps {
   images: LocalImage[];
@@ -54,7 +55,9 @@ export function ImagesList({
               position: "relative",
             },
             index === 0 && {
-              width: width - (index === 0 && images.length > 1 ? padding * 2 : padding),
+              width:
+                width -
+                (index === 0 && images.length > 1 ? padding * 2 : padding),
             },
           ]}
         >
@@ -79,7 +82,9 @@ export function ImagesList({
                     top: padding,
                     right: padding,
                     padding: 6,
-                    backgroundColor: colorScheme ? "rgba(255, 255, 255, 0.5)" :"rgba(0, 0, 0, 0.5)",
+                    backgroundColor: colorScheme
+                      ? "rgba(255, 255, 255, 0.5)"
+                      : "rgba(0, 0, 0, 0.5)",
                     borderRadius: 9999,
                   }}
                 />

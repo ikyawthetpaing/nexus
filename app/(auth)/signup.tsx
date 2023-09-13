@@ -1,26 +1,27 @@
 import { useEffect, useState } from "react";
-import { StatusBar, Pressable } from "react-native";
+import { User } from "@/types";
 import { Link, router } from "expo-router";
-import { Text, View } from "@/components/themed";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { getThemedColors } from "@/constants/colors";
-import { getStyles } from "@/constants/style";
-import { Icons } from "@/components/icons";
-import { STATUSBAR_HEIGHT } from "@/components/header";
-import { isValidEmail, isValidPassword, isValidUsername } from "@/lib/utils";
 import {
-  User as FirebaseUser,
   createUserWithEmailAndPassword,
+  User as FirebaseUser,
   sendEmailVerification,
   updateEmail,
   updateProfile,
 } from "firebase/auth";
+import { Pressable, StatusBar } from "react-native";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { STATUSBAR_HEIGHT } from "@/components/header";
+import { Icons } from "@/components/icons";
+import { Text, View } from "@/components/themed";
+import { getThemedColors } from "@/constants/colors";
+import { getStyles } from "@/constants/style";
 import { useAuth } from "@/context/auth";
-import { handleFirebaseError } from "@/firebase/error-handler";
 import { FIREBASE_AUTH } from "@/firebase/config";
 import { createUser } from "@/firebase/database";
-import { User } from "@/types";
+import { handleFirebaseError } from "@/firebase/error-handler";
+import { isValidEmail, isValidPassword, isValidUsername } from "@/lib/utils";
 
 interface FormStep {
   title: string;
@@ -211,7 +212,7 @@ export default function SignUpPage() {
               verified: false,
               bio: null,
               avatar: null,
-            }
+            };
 
             await createUser(createUserData, newUser.uid);
           }

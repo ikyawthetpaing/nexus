@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { PostEditor } from "@/components/post-editor";
 import { AddPost } from "@/types";
 import { router } from "expo-router";
+import { View } from "react-native";
+
 import {
   Dialog,
   DialogDescription,
@@ -9,10 +10,10 @@ import {
   DialogFooterButton,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { View } from "react-native";
-import { isPostsHasEmptyContent } from "@/lib/utils";
+import { PostEditor } from "@/components/post-editor";
 import { useCurrentUser } from "@/context/current-user";
 import { useUploader } from "@/context/uploader";
+import { isPostsHasEmptyContent } from "@/lib/utils";
 
 export default function PostScreen() {
   const { user } = useCurrentUser();

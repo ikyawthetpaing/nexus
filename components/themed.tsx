@@ -1,5 +1,6 @@
-import { getThemedColors } from "@/constants/colors";
 import * as RN from "react-native";
+
+import { getThemedColors } from "@/constants/colors";
 
 export function Text({ style, ...props }: RN.TextProps) {
   const { foreground } = getThemedColors();
@@ -15,5 +16,5 @@ export function View({ style, ...props }: RN.ViewProps) {
 
 export function TextInput({ style, ...props }: RN.TextInputProps) {
   const { foreground } = getThemedColors();
-  return <RN.TextInput style={[{color: foreground}, style]} {...props}/>
+  return <RN.TextInput style={[{ color: foreground }, style]} {...props} />;
 }

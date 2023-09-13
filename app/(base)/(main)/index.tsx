@@ -1,14 +1,14 @@
+import { router } from "expo-router";
 import { Dimensions, Pressable, RefreshControl, StatusBar } from "react-native";
 
+import { HEADER_HEIGHT } from "@/components/header";
+import { Icons } from "@/components/icons";
 import PostItem from "@/components/post-item";
+import { View } from "@/components/themed";
+import { ScrollViewWithHeader } from "@/components/view-with-header";
 import { getThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
-import { View } from "@/components/themed";
-import { Icons } from "@/components/icons";
-import { router } from "expo-router";
-import { ScrollViewWithHeader } from "@/components/view-with-header";
 import { useFeed } from "@/context/feed";
-import { HEADER_HEIGHT } from "@/components/header";
 
 export default function HomePage() {
   const { background, mutedForeground, primary } = getThemedColors();
@@ -50,7 +50,9 @@ export default function HomePage() {
             progressViewOffset={HEADER_HEIGHT}
           />
         }
-        contentContainerStyle={{minHeight: Dimensions.get("screen").height + HEADER_HEIGHT}}
+        contentContainerStyle={{
+          minHeight: Dimensions.get("screen").height + HEADER_HEIGHT,
+        }}
       >
         {posts.map((post, i) => (
           <PostItem

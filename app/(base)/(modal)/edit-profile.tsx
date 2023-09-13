@@ -1,23 +1,10 @@
-import { Image } from "react-native";
-import * as ImagePicker from "expo-image-picker";
-import { Text, View } from "@/components/themed";
-import { router } from "expo-router";
-import { getStyles } from "@/constants/style";
-import { Button } from "@/components/ui/button";
-import { getThemedColors } from "@/constants/colors";
-import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { EditableUser } from "@/types";
-import { handleFirebaseError } from "@/firebase/error-handler";
-import {
-  deleteFileFromFirebase,
-  uploadFileToFirebase,
-} from "@/firebase/storage";
-import LoadingScreen from "@/components/loading";
-import { StoragePath } from "@/firebase/config";
-import { updateUser } from "@/firebase/database";
-import { HEADER_HEIGHT, Header } from "@/components/header";
-import { IconButton } from "@/components/ui/icon-button";
+import * as ImagePicker from "expo-image-picker";
+import { router } from "expo-router";
+import { Image } from "react-native";
+
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogDescription,
@@ -25,7 +12,21 @@ import {
   DialogFooterButton,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { IconButton } from "@/components/ui/icon-button";
+import { Input } from "@/components/ui/input";
+import { Header, HEADER_HEIGHT } from "@/components/header";
+import LoadingScreen from "@/components/loading";
+import { Text, View } from "@/components/themed";
+import { getThemedColors } from "@/constants/colors";
+import { getStyles } from "@/constants/style";
 import { useCurrentUser } from "@/context/current-user";
+import { StoragePath } from "@/firebase/config";
+import { updateUser } from "@/firebase/database";
+import { handleFirebaseError } from "@/firebase/error-handler";
+import {
+  deleteFileFromFirebase,
+  uploadFileToFirebase,
+} from "@/firebase/storage";
 
 function hasDataChanged(
   original: EditableUser,

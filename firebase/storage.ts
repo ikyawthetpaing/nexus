@@ -1,13 +1,14 @@
+import { FirebaseUploadedFile } from "@/types";
+import cuid from "cuid";
 import {
   deleteObject,
   getDownloadURL,
   ref,
   uploadBytes,
 } from "firebase/storage";
-import { FIREBASE_STORAGE, StoragePath } from "@/firebase/config";
-import { FirebaseUploadedFile } from "@/types";
+
 import { appConfig } from "@/config/app";
-import cuid from "cuid";
+import { FIREBASE_STORAGE, StoragePath } from "@/firebase/config";
 
 type UploadFileToFirebaseType = {
   localFilePath: string;

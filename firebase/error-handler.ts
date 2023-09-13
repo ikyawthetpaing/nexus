@@ -25,8 +25,7 @@ const authErrors = {
     "The provided value for the emailVerified user property is invalid. It must be a boolean.",
   "auth/invalid-hash-algorithm":
     "The hash algorithm must match one of the strings in the list of supported algorithms.",
-  "auth/invalid-hash-block-size":
-    "The hash block size must be a valid number.",
+  "auth/invalid-hash-block-size": "The hash block size must be a valid number.",
   "auth/invalid-hash-derived-key-length":
     "The hash derived key length must be a valid number.",
   "auth/invalid-hash-key": "The hash key must a valid byte buffer.",
@@ -47,8 +46,7 @@ const authErrors = {
     "The provided value for the password user property is invalid. It must be a string with at least six characters.",
   "auth/invalid-password-hash":
     "The password hash must be a valid byte buffer.",
-  "auth/invalid-password-salt":
-    "The password salt must be a valid byte buffer",
+  "auth/invalid-password-salt": "The password salt must be a valid byte buffer",
   "auth/invalid-photo-url":
     "The provided value for the photoURL user property is invalid. It must be a string URL.",
   "auth/invalid-provider-data":
@@ -64,8 +62,7 @@ const authErrors = {
     "The maximum allowed number of users to import has been exceeded.",
   "auth/missing-hash-algorithm":
     "Importing users with password hashes requires that the hashing algorithm and its parameters be provided.",
-  "auth/missing-uid":
-    "A uid identifier is required for the current operation.",
+  "auth/missing-uid": "A uid identifier is required for the current operation.",
   "auth/missing-oauth-client-secret":
     "The OAuth configuration client secret is required to enable OIDC code flow.",
   "auth/phone-number-already-exists":
@@ -176,8 +173,7 @@ const authErrors = {
     "An iOS Bundle ID must be provided if an App Store ID is provided.",
   "auth/missing-or-invalid-nonce":
     "The request does not contain a valid nonce. This can occur if the SHA-256 hash of the provided raw nonce does not match the hashed nonce in the ID token payload.",
-  "auth/missing-multi-factor-info":
-    "No second factor identifier is provided.",
+  "auth/missing-multi-factor-info": "No second factor identifier is provided.",
   "auth/missing-multi-factor-session":
     "The request is missing proof of first factor successful sign-in.",
   "auth/missing-phone-number":
@@ -253,7 +249,7 @@ const authErrors = {
 
 // Firebase error handling function
 export function handleFirebaseError(error: any) {
-  let errorMessage = 'An error occurred. Please try again later.';
+  let errorMessage = "An error occurred. Please try again later.";
 
   // Check if the error code exists in the authErrors object
   if (error instanceof FirebaseError) {

@@ -1,7 +1,8 @@
+import { forwardRef } from "react";
 import { StyleSheet, TextInput, TextInputProps } from "react-native";
+
 import { getThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
-import { forwardRef } from "react";
 
 type Variant = "default" | "underline";
 
@@ -11,7 +12,7 @@ interface Props extends TextInputProps {
 
 export const Input = forwardRef<TextInput, Props>(
   ({ style, variant = "default", ...props }, ref) => {
-    const {mutedForeground} = getThemedColors();
+    const { mutedForeground } = getThemedColors();
     const { padding } = getStyles();
 
     const themedStyles = getThemedStyles({ variant });

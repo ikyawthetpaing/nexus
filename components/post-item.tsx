@@ -1,24 +1,24 @@
-import { Dimensions, Pressable } from "react-native";
-import { Feather } from "@expo/vector-icons";
-import { Post, User } from "@/types";
-import { formatCount, timeAgo } from "@/lib/utils";
-import { Icons } from "@/components/icons";
-import { getStyles } from "@/constants/style";
-import { getThemedColors } from "@/constants/colors";
-import { replies as dmReplies, users } from "@/constants/dummy-data";
-import { Text } from "@/components/themed";
-import { View } from "react-native";
 import { useEffect, useState } from "react";
-import ImageView from "react-native-image-viewing";
+import { Post, User } from "@/types";
+import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { UserLink } from "@/components/user-link";
+import { Dimensions, Pressable, View } from "react-native";
+import ImageView from "react-native-image-viewing";
+
 import { AvatarImage } from "@/components/ui/avatar-image";
 import { Separator } from "@/components/ui/separator";
+import { Icons } from "@/components/icons";
 import { ImagesList } from "@/components/images-list";
-import { getLike, getUser, toggleLike } from "@/firebase/database";
-import { useCurrentUser } from "@/context/current-user";
+import { Text } from "@/components/themed";
+import { UserLink } from "@/components/user-link";
+import { getThemedColors } from "@/constants/colors";
+import { replies as dmReplies, users } from "@/constants/dummy-data";
+import { getStyles } from "@/constants/style";
 import { useAuth } from "@/context/auth";
+import { useCurrentUser } from "@/context/current-user";
+import { getLike, getUser, toggleLike } from "@/firebase/database";
 import { handleFirebaseError } from "@/firebase/error-handler";
+import { formatCount, timeAgo } from "@/lib/utils";
 
 interface PostItemProps {
   post: Post;

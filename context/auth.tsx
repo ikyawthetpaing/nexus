@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { router, useRootNavigationState, useSegments } from "expo-router";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { useRootNavigationState, useSegments, router } from "expo-router";
+
 import LoadingScreen from "@/components/loading";
 import { FIREBASE_AUTH } from "@/firebase/config";
 

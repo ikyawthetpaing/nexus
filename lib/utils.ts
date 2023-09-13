@@ -95,9 +95,9 @@ export function isValidPassword(password: string): boolean {
 // }
 
 export function isPostsHasEmptyContent(posts: AddPost[]): boolean {
-  const isEmptyPost = (post: AddPost): boolean =>  {
+  const isEmptyPost = (post: AddPost): boolean => {
     return !post.content && post.images.length === 0;
-  }
+  };
 
   return posts.some((post) => isEmptyPost(post));
 }

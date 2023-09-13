@@ -7,11 +7,11 @@ import {
   StatusBar,
 } from "react-native";
 
-import { HEADER_HEIGHT, Header } from "@/components/header";
+import { Header, HEADER_HEIGHT } from "@/components/header";
+import { Icons } from "@/components/icons";
+import { Text, TextInput, View } from "@/components/themed";
 import { getThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
-import { Text, TextInput, View } from "@/components/themed";
-import { Icons } from "@/components/icons";
 
 export default function TabTwoScreen() {
   const { background, accent, foreground } = getThemedColors();
@@ -34,11 +34,13 @@ export default function TabTwoScreen() {
             flexDirection: "row",
             alignItems: "center",
             position: "relative",
-            padding: padding
+            padding: padding,
           }}
         >
-          <Pressable style={{zIndex: 10, position: "absolute", left: padding * 2}}>
-          <Icons.search size={18} color={foreground}/>
+          <Pressable
+            style={{ zIndex: 10, position: "absolute", left: padding * 2 }}
+          >
+            <Icons.search size={18} color={foreground} />
           </Pressable>
           <TextInput
             placeholder="Search"
@@ -50,7 +52,7 @@ export default function TabTwoScreen() {
               bottom: padding,
               position: "absolute",
               borderRadius: radius,
-              paddingLeft: padding * 4
+              paddingLeft: padding * 4,
             }}
           />
         </View>
@@ -64,7 +66,7 @@ export default function TabTwoScreen() {
           paddingTop: HEADER_HEIGHT,
         }}
       >
-        <View style={{flex: 1, width: "100%", height: "100%"}}>
+        <View style={{ flex: 1, width: "100%", height: "100%" }}>
           <Text>Search</Text>
         </View>
       </Animated.ScrollView>

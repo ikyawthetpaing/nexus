@@ -1,11 +1,18 @@
 import {
   Dispatch,
-  SetStateAction,
   forwardRef,
+  SetStateAction,
   useEffect,
   useRef,
   useState,
 } from "react";
+import { AddPost, LocalImage, Post, User } from "@/types";
+import {
+  BottomSheetModal,
+  BottomSheetModalProvider,
+} from "@gorhom/bottom-sheet";
+import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
+import * as ImagePicker from "expo-image-picker";
 import {
   Dimensions,
   Pressable,
@@ -13,29 +20,23 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { Text } from "@/components/themed";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import ImageView from "react-native-image-viewing";
+
+import { AvatarImage } from "@/components/ui/avatar-image";
+import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/ui/icon-button";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { HEADER_HEIGHT, STATUSBAR_HEIGHT } from "@/components/header";
 import { Icons } from "@/components/icons";
+import { ImagesList } from "@/components/images-list";
+import { Text } from "@/components/themed";
 import { getThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { HEADER_HEIGHT, STATUSBAR_HEIGHT } from "@/components/header";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import {
-  BottomSheetModal,
-  BottomSheetModalProvider,
-} from "@gorhom/bottom-sheet";
-import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
-import { IconButton } from "@/components/ui/icon-button";
-import * as ImagePicker from "expo-image-picker";
-import { AddPost, LocalImage, Post, User } from "@/types";
-import { ImagesList } from "@/components/images-list";
-import { AvatarImage } from "@/components/ui/avatar-image";
-import { Separator } from "@/components/ui/separator";
-import ImageView from "react-native-image-viewing";
-import { isPostsHasEmptyContent } from "@/lib/utils";
-import { getPost, getUser } from "@/firebase/database";
 import { useCurrentUser } from "@/context/current-user";
+import { getPost, getUser } from "@/firebase/database";
+import { isPostsHasEmptyContent } from "@/lib/utils";
 
 interface PostEditorProps {
   posts: AddPost[];

@@ -1,15 +1,16 @@
 import { useState } from "react";
-import { Icons } from "@/components/icons";
-import { getThemedColors } from "@/constants/colors";
-import { getStyles } from "@/constants/style";
 import { Link, router } from "expo-router";
-import { STATUSBAR_HEIGHT } from "@/components/header";
-import { Input } from "@/components/ui/input";
+
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { STATUSBAR_HEIGHT } from "@/components/header";
+import { Icons } from "@/components/icons";
 import { Spinner } from "@/components/spinner";
 import { View } from "@/components/themed";
-import { handleFirebaseError } from "@/firebase/error-handler";
+import { getThemedColors } from "@/constants/colors";
+import { getStyles } from "@/constants/style";
 import { signIn } from "@/firebase/authentication";
+import { handleFirebaseError } from "@/firebase/error-handler";
 
 export default function LoginPage() {
   const { foreground } = getThemedColors();
@@ -23,10 +24,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await signIn(
-        email,
-        password
-      );
+      await signIn(email, password);
     } catch (error) {
       handleFirebaseError(error);
     } finally {

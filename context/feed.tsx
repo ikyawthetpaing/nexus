@@ -1,12 +1,13 @@
 import React, {
+  createContext,
   Dispatch,
   SetStateAction,
-  createContext,
   useContext,
   useEffect,
   useState,
 } from "react";
 import { Post } from "@/types";
+
 import { getAllPosts } from "@/firebase/database";
 
 interface FeedContextType {

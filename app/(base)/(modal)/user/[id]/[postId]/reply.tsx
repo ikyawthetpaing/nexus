@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { PostEditor } from "@/components/post-editor";
 import { AddPost } from "@/types";
 import { router, useLocalSearchParams } from "expo-router";
-import { isPostsHasEmptyContent } from "@/lib/utils";
 import { View } from "react-native";
+
 import {
   Dialog,
   DialogDescription,
@@ -11,8 +10,10 @@ import {
   DialogFooterButton,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useUploader } from "@/context/uploader";
+import { PostEditor } from "@/components/post-editor";
 import { useCurrentUser } from "@/context/current-user";
+import { useUploader } from "@/context/uploader";
+import { isPostsHasEmptyContent } from "@/lib/utils";
 
 export default function PostReplyScreen() {
   const { postId } = useLocalSearchParams();

@@ -1,6 +1,3 @@
-import { Text, View } from "@/components/themed";
-import { getThemedColors } from "@/constants/colors";
-import { getStyles } from "@/constants/style";
 import { StatusBar } from "expo-status-bar";
 import {
   Modal,
@@ -9,6 +6,10 @@ import {
   StyleProp,
   TextStyle,
 } from "react-native";
+
+import { Text, View } from "@/components/themed";
+import { getThemedColors } from "@/constants/colors";
+import { getStyles } from "@/constants/style";
 
 interface DialogProps {
   visible: boolean;

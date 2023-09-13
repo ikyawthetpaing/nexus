@@ -1,9 +1,6 @@
-import { DBCollections, FIREBASE_DB } from "@/firebase/config";
 import { CreatePost, EditableUser, Like, Post, User } from "@/types";
+import cuid from "cuid";
 import {
-  QueryDocumentSnapshot,
-  SnapshotOptions,
-  Timestamp,
   and,
   collection,
   deleteDoc,
@@ -11,12 +8,17 @@ import {
   getDoc,
   getDocs,
   query,
+  QueryDocumentSnapshot,
   setDoc,
+  SnapshotOptions,
+  Timestamp,
   updateDoc,
   where,
 } from "firebase/firestore";
+
+import { DBCollections, FIREBASE_DB } from "@/firebase/config";
+
 import { getCurrentAuthUser } from "./authentication";
-import cuid from "cuid";
 
 // user
 const userConverter = {

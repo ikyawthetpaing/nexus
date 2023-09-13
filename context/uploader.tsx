@@ -1,17 +1,19 @@
 import React, {
+  createContext,
   Dispatch,
   SetStateAction,
-  createContext,
   useContext,
   useEffect,
   useState,
 } from "react";
-import LoadingScreen from "@/components/loading";
 import { AddPost, CreatePost, UploadedImage } from "@/types";
-import { uploadFileToFirebase } from "@/firebase/storage";
+
+import LoadingScreen from "@/components/loading";
 import { StoragePath } from "@/firebase/config";
 import { createPost } from "@/firebase/database";
 import { handleFirebaseError } from "@/firebase/error-handler";
+import { uploadFileToFirebase } from "@/firebase/storage";
+
 import { useCurrentUser } from "./current-user";
 
 type UploadType = {

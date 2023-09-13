@@ -1,3 +1,6 @@
+import React, { useState } from "react";
+import { User } from "@/types";
+import { router, usePathname } from "expo-router";
 import {
   Animated,
   Image,
@@ -7,13 +10,11 @@ import {
 } from "react-native";
 
 import { HEADER_HEIGHT, STATUSBAR_HEIGHT } from "@/components/header";
+import { Text, View } from "@/components/themed";
+import { profileConfig } from "@/config/profile";
 import { getThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
-import { Text, View } from "@/components/themed";
-import { router, usePathname } from "expo-router";
-import { profileConfig } from "@/config/profile";
-import React, { useState } from "react";
-import { User } from "@/types";
+
 import { Button } from "./ui/button";
 
 const PROFILE_NAVBAR_HEIGHT = 50;
@@ -72,7 +73,7 @@ export function ProfileHeader({
           flexDirection: "row",
           justifyContent: "space-between",
           padding: padding,
-          gap: padding
+          gap: padding,
         }}
       >
         <View style={{ gap: padding, flex: 1 }}>

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useMemo } from "react";
+import React, { createContext, useContext, useMemo, useState } from "react";
 import { Post, User } from "@/types";
 
 interface TempStorageContextType {
@@ -21,7 +21,9 @@ const TempStorageContext = createContext<TempStorageContextType | undefined>(
 export function useTempStorage() {
   const context = useContext(TempStorageContext);
   if (!context) {
-    throw new Error("useTempStorage must be used within a StorageContextProvider");
+    throw new Error(
+      "useTempStorage must be used within a StorageContextProvider"
+    );
   }
   return context;
 }

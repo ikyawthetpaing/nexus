@@ -19,9 +19,9 @@ export type Colors = {
 };
 
 type ThemeColors = {
-  light: Colors
-  dark: Colors
-}
+  light: Colors;
+  dark: Colors;
+};
 
 export const themeColors: ThemeColors = {
   light: {
@@ -37,7 +37,7 @@ export const themeColors: ThemeColors = {
     accentForeground: "hsl(0, 0%, 9%)",
     destructive: "hsl(0, 84.2%, 60.2%)",
     destructiveForeground: "hsl(0, 0%, 98%)",
-    border: "hsl(0, 0%, 89.8%)"
+    border: "hsl(0, 0%, 89.8%)",
   },
   dark: {
     background: "hsl(0, 0%, 3.9%)",
@@ -52,8 +52,8 @@ export const themeColors: ThemeColors = {
     accentForeground: "hsl(0, 0%, 98%)",
     destructive: "hsl(0, 62.8%, 30.6%)",
     destructiveForeground: "hsl(0, 0%, 98%)",
-    border: "hsl(0, 0%, 14.9%)"
-  }
+    border: "hsl(0, 0%, 14.9%)",
+  },
 };
 
 export function getThemedColors(): Colors {

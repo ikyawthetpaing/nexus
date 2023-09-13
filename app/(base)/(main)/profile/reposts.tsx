@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 
-import { Text, View } from "@/components/themed";
 import EditScreenInfo from "@/components/edit-screen-info";
+import { Text, View } from "@/components/themed";
 
 export default function ProfileRepostsPage() {
   return (

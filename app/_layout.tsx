@@ -1,9 +1,10 @@
-import { ThemeProvider } from "@/components/theme-provider";
-import { AuthProvider } from "@/context/auth";
+import { useEffect } from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
-import { useEffect } from "react";
+
+import { ThemeProvider } from "@/components/theme-provider";
+import { AuthProvider } from "@/context/auth";
 
 export {
   // Catch any errors thrown by the Layout component.

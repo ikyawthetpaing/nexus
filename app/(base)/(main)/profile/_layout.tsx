@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { router, Slot } from "expo-router";
 import {
   Animated,
   Dimensions,
@@ -8,14 +10,12 @@ import {
   StatusBar,
 } from "react-native";
 
-import { HEADER_HEIGHT, Header } from "@/components/header";
+import { IconButton } from "@/components/ui/icon-button";
+import { Header, HEADER_HEIGHT } from "@/components/header";
+import { ProfileHeader } from "@/components/profile-header";
+import { View } from "@/components/themed";
 import { getThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
-import { View } from "@/components/themed";
-import { Slot, router } from "expo-router";
-import { useState } from "react";
-import { ProfileHeader } from "@/components/profile-header";
-import { IconButton } from "@/components/ui/icon-button";
 import { useCurrentUser } from "@/context/current-user";
 
 export default function ProfileLayout() {
@@ -70,7 +70,7 @@ export default function ProfileLayout() {
         contentContainerStyle={{
           backgroundColor: background,
           paddingTop: profileHeaderHeight,
-          minHeight: Dimensions.get("screen").height + profileHeaderHeight
+          minHeight: Dimensions.get("screen").height + profileHeaderHeight,
         }}
         refreshControl={
           <RefreshControl
@@ -80,7 +80,7 @@ export default function ProfileLayout() {
           />
         }
       >
-          <Slot />
+        <Slot />
       </Animated.ScrollView>
     </SafeAreaView>
   );

@@ -1,6 +1,7 @@
-import { getThemedColors } from "@/constants/colors";
 import { Image } from "expo-image";
 import { View, ViewProps } from "react-native";
+
+import { getThemedColors } from "@/constants/colors";
 
 interface Props extends ViewProps {
   uri: string;

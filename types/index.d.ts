@@ -19,14 +19,14 @@ export type FirebaseUploadedFile = {
 };
 
 export type LocalImage = Omit<FirebaseUploadedFile, "path"> & {
-  width: number,
-  height: number
-}
+  width: number;
+  height: number;
+};
 
 export type UploadedImage = FirebaseUploadedFile & {
-  width: number,
-  height: number
-}
+  width: number;
+  height: number;
+};
 
 export type User = {
   id: string;
@@ -36,7 +36,7 @@ export type User = {
   verified: boolean;
   avatar: FirebaseUploadedFile | null;
   email: string;
-}
+};
 export type EditableUser = Omit<User, "verified" | "email" | "id">;
 export type Author = User;
 
@@ -53,13 +53,13 @@ export type Post = {
   images: UploadedImage[] | null;
   repliesCount: number;
   likesCount: number;
-  repostsCount: number,
+  repostsCount: number;
   createdAt: Timestamp;
 };
 export type EditablePost = Pick<Post, "content" | "images">;
 export type CreatePost = Pick<Post, "replyToId" | "content" | "images">;
 
 export type Like = {
-  postId: string,
-  userId: string
-}
+  postId: string;
+  userId: string;
+};

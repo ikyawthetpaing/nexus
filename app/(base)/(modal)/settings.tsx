@@ -1,11 +1,11 @@
+import { useState, useTransition } from "react";
 import { StatusBar } from "expo-status-bar";
+import { signOut } from "firebase/auth";
 import { Platform, StyleSheet } from "react-native";
 
-import { Text, View } from "@/components/themed";
 import { Button } from "@/components/ui/button";
-import { signOut } from "firebase/auth";
-import { useState, useTransition } from "react";
 import { Spinner } from "@/components/spinner";
+import { Text, View } from "@/components/themed";
 import { FIREBASE_AUTH } from "@/firebase/config";
 
 export default function ModalScreen() {
@@ -18,7 +18,9 @@ export default function ModalScreen() {
   return (
     <View style={styles.container}>
       <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
-      <Button onPress={onPressSignOut}>{loading ? <Spinner /> : "Sign out"}</Button>
+      <Button onPress={onPressSignOut}>
+        {loading ? <Spinner /> : "Sign out"}
+      </Button>
     </View>
   );
 }

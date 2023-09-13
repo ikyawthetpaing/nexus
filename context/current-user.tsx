@@ -1,15 +1,16 @@
 import React, {
+  createContext,
   Dispatch,
   SetStateAction,
-  createContext,
   useContext,
   useEffect,
   useState,
 } from "react";
+import { Post, User } from "@/types";
+
 import LoadingScreen from "@/components/loading";
 import { FIREBASE_AUTH } from "@/firebase/config";
-import { Post, User } from "@/types";
-import { getUserPosts, getUser } from "@/firebase/database";
+import { getUser, getUserPosts } from "@/firebase/database";
 
 interface CurrentUserContextType {
   user: User | null;

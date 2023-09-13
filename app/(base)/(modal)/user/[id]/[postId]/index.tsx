@@ -1,3 +1,7 @@
+import { useEffect, useState } from "react";
+import { Post, User } from "@/types";
+import { Image } from "expo-image";
+import { router, useLocalSearchParams } from "expo-router";
 import {
   Dimensions,
   Pressable,
@@ -5,30 +9,26 @@ import {
   StatusBar,
   View,
 } from "react-native";
-
-import { replies as dmReplies } from "@/constants/dummy-data";
-import { getThemedColors } from "@/constants/colors";
-import { getStyles } from "@/constants/style";
-import { Text } from "@/components/themed";
-import { router, useLocalSearchParams } from "expo-router";
-import { IconButton } from "@/components/ui/icon-button";
-import { UserLink } from "@/components/user-link";
-import { Image } from "expo-image";
-import { Button } from "@/components/ui/button";
-import { formatCount, formatDate, formatHour } from "@/lib/utils";
-import { HEADER_HEIGHT, STATUSBAR_HEIGHT } from "@/components/header";
 import ImageView from "react-native-image-viewing";
-import { useEffect, useState } from "react";
-import PostItem from "@/components/post-item";
+
+import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/ui/icon-button";
+import { HEADER_HEIGHT, STATUSBAR_HEIGHT } from "@/components/header";
 import { ImagesList } from "@/components/images-list";
-import { Post, User } from "@/types";
+import PostItem from "@/components/post-item";
+import { Text } from "@/components/themed";
+import { UserLink } from "@/components/user-link";
+import { getThemedColors } from "@/constants/colors";
+import { replies as dmReplies } from "@/constants/dummy-data";
+import { getStyles } from "@/constants/style";
+import { useCurrentUser } from "@/context/current-user";
 import {
   getPost,
-  getRepliesToParent,
   getReplies,
+  getRepliesToParent,
   getUser,
 } from "@/firebase/database";
-import { useCurrentUser } from "@/context/current-user";
+import { formatCount, formatDate, formatHour } from "@/lib/utils";
 
 export default function UserPostPage() {
   const { postId } = useLocalSearchParams();

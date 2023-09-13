@@ -1,4 +1,5 @@
 import { Animated, Platform, StatusBar, ViewProps } from "react-native";
+
 import { getThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
 

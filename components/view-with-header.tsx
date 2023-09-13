@@ -4,7 +4,8 @@ import {
   NativeSyntheticEvent,
   ScrollViewProps,
 } from "react-native";
-import { HEADER_HEIGHT, Header } from "@/components/header";
+
+import { Header, HEADER_HEIGHT } from "@/components/header";
 
 interface ScrollViewWithHeaderProps extends ScrollViewProps {
   headerChildren: React.ReactNode;
