@@ -32,11 +32,15 @@ interface PostItemProps {
 }
 
 export default function PostItem({ post, isReplyTo }: PostItemProps) {
-  const { user } = useCurrentUser();
-
   const { border, accent, mutedForeground, background } = getThemedColors();
   const { padding, borderWidthSmall, borderWidthLarge, avatarSizeSmall } =
     getStyles();
+
+  const { user } = useCurrentUser();
+
+  if (!user) {
+    return null;
+  }
 
   const [author, setAuthor] = useState<User | null>(null);
   const [liked, setLiked] = useState(false);
@@ -60,7 +64,7 @@ export default function PostItem({ post, isReplyTo }: PostItemProps) {
       doc(
         FIREBASE_DB,
         DBCollections.Likes,
-        mergeLikeId({ postId: post.id, userId: user?.id || "" })
+        mergeLikeId({ postId: post.id, userId: user.id })
       ).withConverter(likeConverter),
       (doc) => {
         if (doc.exists()) {
@@ -111,7 +115,9 @@ export default function PostItem({ post, isReplyTo }: PostItemProps) {
 
   async function onLike() {
     try {
-      await toggleLike({ postId: post.id, userId: user?.id! });
+      if (user) {
+        await toggleLike({ postId: post.id, userId: user.id });
+      }
       setLiked(!liked);
     } catch (error) {
       handleFirebaseError(error);

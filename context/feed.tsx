@@ -39,6 +39,7 @@ export function FeedContextProvider({ children }: Props) {
 
   useEffect(() => {
     setLoading(true);
+
     const q = query(
       collection(FIREBASE_DB, DBCollections.Posts),
       where("replyToId", "==", null)
