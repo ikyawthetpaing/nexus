@@ -11,19 +11,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { PostEditor } from "@/components/post-editor";
-import { useCurrentUser } from "@/context/current-user";
 import { useUploader } from "@/context/uploader";
 import { isPostsHasEmptyContent } from "@/lib/utils";
 
 export default function PostReplyScreen() {
   const { postId } = useLocalSearchParams();
   const replyToId = typeof postId === "string" ? postId : undefined;
-  const { user } = useCurrentUser();
   const { setUpload } = useUploader();
-
-  if (!user) {
-    return null;
-  }
 
   const [dialogVisiable, setDailogVisiable] = useState(false);
   const [posts, setPosts] = useState<AddPost[]>([

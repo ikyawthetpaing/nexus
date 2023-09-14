@@ -1,4 +1,4 @@
-import { Link, LinkProps } from "expo-router";
+import { Link } from "expo-router";
 
 interface Props {
   userId: string;

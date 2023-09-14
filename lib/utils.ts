@@ -1,6 +1,5 @@
 import { AddPost } from "@/types";
 import { Timestamp } from "firebase/firestore";
-import { Platform } from "react-native";
 
 export function timeAgo(createdAt: Timestamp): string {
   const now = new Date();

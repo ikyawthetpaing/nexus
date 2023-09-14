@@ -1,11 +1,11 @@
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { signOut } from "firebase/auth";
 import { Platform, StyleSheet } from "react-native";
 
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/spinner";
-import { Text, View } from "@/components/themed";
+import { View } from "@/components/themed";
 import { FIREBASE_AUTH } from "@/firebase/config";
 
 export default function ModalScreen() {

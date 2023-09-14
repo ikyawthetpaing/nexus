@@ -47,7 +47,7 @@ export function FeedContextProvider({ children }: Props) {
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const newPosts: Post[] = [];
       querySnapshot.forEach((doc) => {
-        newPosts.push(doc.data());
+        newPosts.unshift(doc.data());
       });
       setPosts(newPosts);
       setLoading(false);

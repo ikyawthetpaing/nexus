@@ -24,17 +24,13 @@ export const uploadFileToFirebase = async ({
 
   const storageRef = ref(FIREBASE_STORAGE, remotePath);
 
-  try {
-    const response = await fetch(localFilePath);
-    const blob = await response.blob();
+  const response = await fetch(localFilePath);
+  const blob = await response.blob();
 
-    await uploadBytes(storageRef, blob);
+  await uploadBytes(storageRef, blob);
 
-    const fileUrl = await getDownloadURL(storageRef);
-    return { path: remotePath, uri: fileUrl } as FirebaseUploadedFile;
-  } catch (error) {
-    throw error;
-  }
+  const fileUrl = await getDownloadURL(storageRef);
+  return { path: remotePath, uri: fileUrl } as FirebaseUploadedFile;
 };
 
 export const deleteFileFromFirebase = async ({

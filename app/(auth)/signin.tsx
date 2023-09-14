@@ -7,13 +7,13 @@ import { STATUSBAR_HEIGHT } from "@/components/header";
 import { Icons } from "@/components/icons";
 import { Spinner } from "@/components/spinner";
 import { View } from "@/components/themed";
-import { getThemedColors } from "@/constants/colors";
+import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
 import { signIn } from "@/firebase/authentication";
 import { handleFirebaseError } from "@/firebase/error-handler";
 
 export default function LoginPage() {
-  const { foreground } = getThemedColors();
+  const { foreground } = useThemedColors();
   const { padding } = getStyles();
 
   const [email, setEmail] = useState("");

@@ -248,13 +248,14 @@ const authErrors = {
 };
 
 // Firebase error handling function
-export function handleFirebaseError(error: any) {
+export function handleFirebaseError(error: unknown) {
   let errorMessage = "An error occurred. Please try again later.";
 
   // Check if the error code exists in the authErrors object
   if (error instanceof FirebaseError) {
     if (error.code in authErrors) {
-      // @ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //@ts-ignore
       errorMessage = authErrors[error.code];
     }
   } else {

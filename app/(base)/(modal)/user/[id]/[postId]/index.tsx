@@ -14,9 +14,8 @@ import LoadingScreen from "@/components/loading";
 import PostItem from "@/components/post-item";
 import { Text } from "@/components/themed";
 import { UserLink } from "@/components/user-link";
-import { getThemedColors } from "@/constants/colors";
+import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
-import { useAuth } from "@/context/auth";
 import { useCurrentUser } from "@/context/current-user";
 import { DBCollections, FIREBASE_DB } from "@/firebase/config";
 import {
@@ -32,16 +31,12 @@ import { formatCount, formatDate, formatHour } from "@/lib/utils";
 
 export default function UserPostPage() {
   const { user } = useCurrentUser();
-  // const {user} = useAuth();
-  // if (!user) {
-  //   return null;
-  // }
 
   const { postId: _postId } = useLocalSearchParams();
   const postId = typeof _postId === "string" ? _postId : "";
 
   const { background, mutedForeground, accent, muted, border } =
-    getThemedColors();
+    useThemedColors();
   const { padding, avatarSizeSmall, borderWidthSmall } = getStyles();
 
   const footerHeight = HEADER_HEIGHT - STATUSBAR_HEIGHT;
@@ -388,7 +383,13 @@ export default function UserPostPage() {
                 }}
                 onPress={onLike}
               />
-              <IconButton icon="comment" iconProps={{ size: 18 }} />
+              <IconButton
+                icon="comment"
+                iconProps={{ size: 18 }}
+                onPress={() =>
+                  router.push(`/user/${post.authorId}/${post.id}/reply`)
+                }
+              />
               <IconButton icon="squareShare" iconProps={{ size: 18 }} />
               <IconButton icon="share" iconProps={{ size: 18 }} />
             </View>

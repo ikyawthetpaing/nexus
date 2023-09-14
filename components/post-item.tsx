@@ -12,7 +12,7 @@ import { Icons } from "@/components/icons";
 import { ImagesList } from "@/components/images-list";
 import { Text } from "@/components/themed";
 import { UserLink } from "@/components/user-link";
-import { getThemedColors } from "@/constants/colors";
+import { useThemedColors } from "@/constants/colors";
 import { replies as dmReplies, users } from "@/constants/dummy-data";
 import { getStyles } from "@/constants/style";
 import { useCurrentUser } from "@/context/current-user";
@@ -32,15 +32,11 @@ interface PostItemProps {
 }
 
 export default function PostItem({ post, isReplyTo }: PostItemProps) {
-  const { border, accent, mutedForeground, background } = getThemedColors();
+  const { border, accent, mutedForeground, background } = useThemedColors();
   const { padding, borderWidthSmall, borderWidthLarge, avatarSizeSmall } =
     getStyles();
 
-  const { user } = useCurrentUser();
-
-  if (!user) {
-    return null;
-  }
+  const { user: currentUser } = useCurrentUser();
 
   const [author, setAuthor] = useState<User | null>(null);
   const [liked, setLiked] = useState(false);
@@ -57,21 +53,6 @@ export default function PostItem({ post, isReplyTo }: PostItemProps) {
       ),
       (doc) => {
         setAuthor(doc.data() || null);
-      }
-    );
-
-    const likedUnsubscribe = onSnapshot(
-      doc(
-        FIREBASE_DB,
-        DBCollections.Likes,
-        mergeLikeId({ postId: post.id, userId: user.id })
-      ).withConverter(likeConverter),
-      (doc) => {
-        if (doc.exists()) {
-          setLiked(true);
-        } else {
-          setLiked(false);
-        }
       }
     );
 
@@ -107,16 +88,38 @@ export default function PostItem({ post, isReplyTo }: PostItemProps) {
 
     return () => {
       authorUnsubscribe();
-      likedUnsubscribe();
       likeCountUnsubscribe();
       replyCountUnsubscribe();
     };
-  }, []);
+  }, [post]);
+
+  useEffect(() => {
+    if (currentUser) {
+      const likedUnsubscribe = onSnapshot(
+        doc(
+          FIREBASE_DB,
+          DBCollections.Likes,
+          mergeLikeId({ postId: post.id, userId: currentUser.id })
+        ).withConverter(likeConverter),
+        (doc) => {
+          if (doc.exists()) {
+            setLiked(true);
+          } else {
+            setLiked(false);
+          }
+        }
+      );
+
+      return () => {
+        likedUnsubscribe();
+      };
+    }
+  }, [currentUser, post]);
 
   async function onLike() {
     try {
-      if (user) {
-        await toggleLike({ postId: post.id, userId: user.id });
+      if (currentUser) {
+        await toggleLike({ postId: post.id, userId: currentUser.id });
       }
       setLiked(!liked);
     } catch (error) {
@@ -322,7 +325,7 @@ interface RepliesReferenceProps {
 }
 
 function RepliesReference({ replies }: RepliesReferenceProps) {
-  const { background } = getThemedColors();
+  const { background } = useThemedColors();
   const { borderWidthLarge } = getStyles();
 
   const avatarSize = 20;

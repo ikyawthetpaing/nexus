@@ -32,7 +32,7 @@ import { HEADER_HEIGHT, STATUSBAR_HEIGHT } from "@/components/header";
 import { Icons } from "@/components/icons";
 import { ImagesList } from "@/components/images-list";
 import { Text } from "@/components/themed";
-import { getThemedColors } from "@/constants/colors";
+import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
 import { useCurrentUser } from "@/context/current-user";
 import { getPost, getUser } from "@/firebase/database";
@@ -58,16 +58,12 @@ export function PostEditor({
   const { user: currentUser } = useCurrentUser();
 
   const { border, accent, background, accentForeground, foreground } =
-    getThemedColors();
+    useThemedColors();
   const { padding } = getStyles();
   const headerAndFooterHeight = HEADER_HEIGHT - STATUSBAR_HEIGHT;
   const snapPoints = ["25%", "50%"];
 
-  if (!currentUser) {
-    return null;
-  }
-
-  const [isOpen, setIsOpen] = useState(false);
+  const [, setIsOpen] = useState(false);
   const bottomSheetModalRef = useRef<BottomSheetModalMethods>(null);
   const [editingFocus, setEditingFocus] = useState(false);
   const inputRef = useRef<TextInput>(null);
@@ -157,7 +153,7 @@ export function PostEditor({
   }
 
   const pickImageAsync = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,
       allowsMultipleSelection: true,
@@ -186,6 +182,10 @@ export function PostEditor({
       setPosts(newValues);
     }
   };
+
+  if (!currentUser) {
+    return null;
+  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: background }}>
@@ -462,7 +462,11 @@ const PostEditorItem = forwardRef<TextInput, PostEditorItemProps>(
           </View>
           {!(firstChild && !post.content && !post.images.length) && (
             <View style={{ paddingRight: padding, paddingTop: padding }}>
-              <IconButton icon="close" size={14} onPress={removePost} />
+              <IconButton
+                icon="close"
+                iconProps={{ size: 14 }}
+                onPress={removePost}
+              />
             </View>
           )}
         </View>

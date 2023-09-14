@@ -1,7 +1,7 @@
 import { Pressable, PressableProps } from "react-native";
 
 import { defaultIconProps, IconProps, Icons } from "@/components/icons";
-import { getThemedColors } from "@/constants/colors";
+import { useThemedColors } from "@/constants/colors";
 
 interface IconButtonProps extends PressableProps {
   icon: keyof typeof Icons;
@@ -9,7 +9,7 @@ interface IconButtonProps extends PressableProps {
 }
 
 export function IconButton({ icon, iconProps, ...props }: IconButtonProps) {
-  const { mutedForeground, foreground } = getThemedColors();
+  const { mutedForeground, foreground } = useThemedColors();
   const { size, color, strokeWidth, filled }: IconProps = {
     ...defaultIconProps,
     ...iconProps,

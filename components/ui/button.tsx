@@ -1,6 +1,6 @@
 import { Pressable, PressableProps, Text, View } from "react-native";
 
-import { getThemedColors } from "@/constants/colors";
+import { useThemedColors } from "@/constants/colors";
 
 interface ButtonProps extends PressableProps {
   children: React.ReactNode;
@@ -22,7 +22,7 @@ export function Button({
     muted,
     mutedForeground,
     border,
-  } = getThemedColors();
+  } = useThemedColors();
 
   return (
     <Pressable {...props}>

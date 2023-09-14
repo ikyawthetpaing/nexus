@@ -13,21 +13,21 @@ import { IconButton } from "@/components/ui/icon-button";
 import { Header } from "@/components/header";
 import { ProfileHeader } from "@/components/profile-header";
 import { View } from "@/components/themed";
-import { getThemedColors } from "@/constants/colors";
+import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
 import { useCurrentUser } from "@/context/current-user";
 
 export default function ProfileLayout() {
-  const { background } = getThemedColors();
+  const { background } = useThemedColors();
   const { padding } = getStyles();
 
   const { user } = useCurrentUser();
 
+  const [profileHeaderHeight, setProfileHeaderHeight] = useState(0);
+
   if (!user) {
     return null;
   }
-
-  const [profileHeaderHeight, setProfileHeaderHeight] = useState(0);
 
   const scrollY = new Animated.Value(0);
 

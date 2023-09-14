@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Header, HEADER_HEIGHT } from "@/components/header";
 import LoadingScreen from "@/components/loading";
 import { Text, View } from "@/components/themed";
-import { getThemedColors } from "@/constants/colors";
+import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
 import { useCurrentUser } from "@/context/current-user";
 import { StoragePath } from "@/firebase/config";
@@ -42,18 +42,14 @@ function hasDataChanged(
 export default function EditProfile() {
   const { user } = useCurrentUser();
 
-  if (!user) {
-    return null;
-  }
-
-  const { accent, mutedForeground } = getThemedColors();
+  const { accent, mutedForeground } = useThemedColors();
   const { padding } = getStyles();
 
   const [selectedImage, setSelectedImage] = useState<string>();
   const [previewImage, setPreviewImage] = useState<string>();
 
-  const [originalData, setOriginalData] = useState<EditableUser>(user);
-  const [formData, setFormData] = useState<EditableUser>(user);
+  const [originalData, setOriginalData] = useState<EditableUser | null>(user);
+  const [formData, setFormData] = useState<EditableUser | null>(user);
   const [uploading, setUploading] = useState(false);
   const [dialogVisiable, setDailogVisiable] = useState(false);
   const [isDataChanged, setIsDataChanged] = useState(false);
@@ -61,12 +57,16 @@ export default function EditProfile() {
   useEffect(() => {
     setOriginalData(user);
     setFormData(user);
-    setPreviewImage(user.avatar?.uri);
+    setPreviewImage(user?.avatar?.uri);
     setSelectedImage(undefined);
   }, [user]);
 
   useEffect(() => {
-    setIsDataChanged(hasDataChanged(originalData, formData) || !!selectedImage);
+    if (originalData && formData) {
+      setIsDataChanged(
+        hasDataChanged(originalData, formData) || !!selectedImage
+      );
+    }
   }, [formData, selectedImage]);
 
   useEffect(() => {
@@ -76,7 +76,7 @@ export default function EditProfile() {
   }, [selectedImage]);
 
   const pickImageAsync = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
+    const result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       quality: 1,
       aspect: [1, 1],
@@ -97,7 +97,11 @@ export default function EditProfile() {
   }
 
   async function onPressSave() {
-    if (hasDataChanged(originalData, formData) || selectedImage) {
+    if (
+      originalData &&
+      formData &&
+      (hasDataChanged(originalData, formData) || selectedImage)
+    ) {
       setUploading(true);
       try {
         let uploadedFile = user?.avatar || null;
@@ -110,14 +114,12 @@ export default function EditProfile() {
             storagePath: StoragePath.Avatars,
           });
         }
-        if (user?.email) {
+        if (user && formData) {
           const uploadData: EditableUser = {
             ...formData,
             avatar: uploadedFile,
           };
           await updateUser(uploadData, user.id);
-        } else {
-          alert("Unauthrouzed.");
         }
       } catch (error) {
         handleFirebaseError(error);
@@ -125,6 +127,10 @@ export default function EditProfile() {
         setUploading(false);
       }
     }
+  }
+
+  if (!user || !originalData || !formData) {
+    return null; // not found
   }
 
   if (uploading) {

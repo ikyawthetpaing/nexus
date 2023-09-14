@@ -1,6 +1,6 @@
 import { View, ViewProps } from "react-native";
 
-import { getThemedColors } from "@/constants/colors";
+import { useThemedColors } from "@/constants/colors";
 
 interface Props extends ViewProps {
   size?: number;
@@ -12,7 +12,7 @@ export function Separator({
   style,
   ...props
 }: Props) {
-  const { muted } = getThemedColors();
+  const { muted } = useThemedColors();
   return (
     <View
       style={[

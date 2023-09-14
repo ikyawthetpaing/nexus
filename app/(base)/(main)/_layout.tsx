@@ -1,10 +1,10 @@
 import { Tabs } from "expo-router";
 
 import { Icons } from "@/components/icons";
-import { getThemedColors } from "@/constants/colors";
+import { useThemedColors } from "@/constants/colors";
 
 export default function TabLayout() {
-  const { primary, background, border } = getThemedColors();
+  const { primary, background, border } = useThemedColors();
 
   return (
     <Tabs

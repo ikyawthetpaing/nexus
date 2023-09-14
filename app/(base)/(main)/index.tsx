@@ -6,12 +6,12 @@ import { Icons } from "@/components/icons";
 import PostItem from "@/components/post-item";
 import { View } from "@/components/themed";
 import { ScrollViewWithHeader } from "@/components/view-with-header";
-import { getThemedColors } from "@/constants/colors";
+import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
 import { useFeed } from "@/context/feed";
 
 export default function HomePage() {
-  const { background, mutedForeground, primary } = getThemedColors();
+  const { background, mutedForeground, primary } = useThemedColors();
   const { padding } = getStyles();
 
   const { posts, loading, setRefresh } = useFeed();

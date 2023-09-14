@@ -1,5 +1,4 @@
 import { Href } from "expo-router";
-import { typeTimestamp } from "firebase/firestore";
 
 export type AppConfig = {
   name: string;

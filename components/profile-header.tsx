@@ -12,7 +12,7 @@ import {
 import { HEADER_HEIGHT, STATUSBAR_HEIGHT } from "@/components/header";
 import { Text, View } from "@/components/themed";
 import { profileConfig } from "@/config/profile";
-import { getThemedColors } from "@/constants/colors";
+import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
 
 import { Button } from "./ui/button";
@@ -30,7 +30,7 @@ export function ProfileHeader({
   scrollY,
   getHeight,
 }: ProfileHeaderProps) {
-  const { background, mutedForeground, accent, border } = getThemedColors();
+  const { background, mutedForeground, accent, border } = useThemedColors();
   const { padding, borderWidthSmall: borderWidth } = getStyles();
 
   const pathname = usePathname();

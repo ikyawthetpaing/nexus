@@ -1,19 +1,15 @@
 import { CreatePost, EditableUser, Like, Post, User } from "@/types";
 import cuid from "cuid";
 import {
-  and,
   collection,
   deleteDoc,
   doc,
   getDoc,
-  getDocs,
-  query,
   QueryDocumentSnapshot,
   setDoc,
   SnapshotOptions,
   Timestamp,
   updateDoc,
-  where,
 } from "firebase/firestore";
 
 import { DBCollections, FIREBASE_DB } from "@/firebase/config";

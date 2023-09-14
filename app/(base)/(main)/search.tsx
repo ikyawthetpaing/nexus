@@ -10,11 +10,11 @@ import {
 import { Header, HEADER_HEIGHT } from "@/components/header";
 import { Icons } from "@/components/icons";
 import { Text, TextInput, View } from "@/components/themed";
-import { getThemedColors } from "@/constants/colors";
+import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
 
 export default function TabTwoScreen() {
-  const { background, accent, foreground } = getThemedColors();
+  const { background, accent, foreground } = useThemedColors();
   const { padding, borderRadius } = getStyles();
 
   const scrollY = new Animated.Value(0);

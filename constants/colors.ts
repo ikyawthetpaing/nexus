@@ -56,7 +56,7 @@ export const themeColors: ThemeColors = {
   },
 };
 
-export function getThemedColors(): Colors {
+export function useThemedColors(): Colors {
   const colorScheme = useColorScheme();
   const selectedTheme = themeColors[colorScheme ?? "light"];
   return selectedTheme;

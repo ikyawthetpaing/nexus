@@ -8,7 +8,7 @@ import {
 } from "react-native";
 
 import { Text, View } from "@/components/themed";
-import { getThemedColors } from "@/constants/colors";
+import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
 
 interface DialogProps {
@@ -66,7 +66,7 @@ interface DialogDescriptionProps {
 }
 
 export function DialogDescription({ children }: DialogDescriptionProps) {
-  const { mutedForeground } = getThemedColors();
+  const { mutedForeground } = useThemedColors();
   return (
     <Text
       style={{
@@ -99,7 +99,7 @@ export function DialogFooterButton({
   textStyle,
   ...props
 }: DialogFooterButtonProps) {
-  const { border, accent } = getThemedColors();
+  const { border, accent } = useThemedColors();
   const { borderWidthSmall } = getStyles();
 
   return (

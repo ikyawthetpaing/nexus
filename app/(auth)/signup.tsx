@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { STATUSBAR_HEIGHT } from "@/components/header";
 import { Icons } from "@/components/icons";
 import { Text, View } from "@/components/themed";
-import { getThemedColors } from "@/constants/colors";
+import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
 import { useAuth } from "@/context/auth";
 import { FIREBASE_AUTH } from "@/firebase/config";
@@ -44,7 +44,7 @@ function Step({
   input: JSX.Element;
   onPress: () => void;
 }) {
-  const { mutedForeground } = getThemedColors();
+  const { mutedForeground } = useThemedColors();
   const { padding } = getStyles();
   return (
     <View style={{ paddingHorizontal: padding, gap: padding * 1.75 }}>
@@ -64,8 +64,8 @@ function Step({
 }
 
 export default function SignUpPage() {
-  const { user: user } = useAuth();
-  const { background, foreground, mutedForeground } = getThemedColors();
+  const { user } = useAuth();
+  const { background, foreground, mutedForeground } = useThemedColors();
   const { padding } = getStyles();
 
   const [error, setError] = useState<string | null>(null);
