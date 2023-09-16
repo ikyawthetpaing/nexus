@@ -7,7 +7,6 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "test": "jest --watchAll",
     "build:preview:android": "eas build -p android --profile preview",
     "format": "prettier --write .",
     "check:lint": "eslint . --ext ts --ext tsx --ext js",

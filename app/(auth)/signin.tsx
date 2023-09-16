@@ -12,7 +12,7 @@ import { getStyles } from "@/constants/style";
 import { signIn } from "@/firebase/authentication";
 import { handleFirebaseError } from "@/firebase/error-handler";
 
-export default function LoginPage() {
+export default function SignInScreen() {
   const { foreground } = useThemedColors();
   const { padding } = getStyles();
 
@@ -42,7 +42,7 @@ export default function LoginPage() {
           alignItems: "center",
         }}
       >
-        <Icons.LogoIcon size={128} color={foreground} />
+        <Icons.LogoIcon size={96} color={foreground} />
       </View>
       <View
         style={{

@@ -1,14 +1,24 @@
 import { Href } from "expo-router";
 
+import { Icons } from "@/components/icons";
+
 export type AppConfig = {
   name: string;
   url: string;
   authors: { name: string; url: string }[];
   creator: string;
+
+  tabBarNavItems: TabBar[];
+  profileNavItems: NavItem[];
 };
 
 export type NavItem = {
   title: string;
+  slug: Href;
+};
+
+export type TabBar = {
+  icon: keyof typeof Icons;
   slug: Href;
 };
 

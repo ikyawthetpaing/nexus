@@ -11,12 +11,12 @@ import { Text, View } from "@/components/themed";
 import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
 
-interface DialogProps {
-  visible: boolean;
+interface AlertProps {
+  visible?: boolean;
   children: React.ReactNode;
 }
 
-export function Dialog({ children, visible }: DialogProps) {
+function Alert({ children, visible }: AlertProps) {
   return (
     <Modal transparent visible={visible}>
       <StatusBar backgroundColor="rgba(0, 0, 0, 0.5)" />
@@ -42,11 +42,11 @@ export function Dialog({ children, visible }: DialogProps) {
   );
 }
 
-interface DialogTitleProps {
+interface AlertTitleProps {
   children: React.ReactNode;
 }
 
-export function DialogTitle({ children }: DialogTitleProps) {
+function AlertTitle({ children }: AlertTitleProps) {
   return (
     <Text
       style={{
@@ -61,11 +61,11 @@ export function DialogTitle({ children }: DialogTitleProps) {
   );
 }
 
-interface DialogDescriptionProps {
+interface AlertDescriptionProps {
   children: React.ReactNode;
 }
 
-export function DialogDescription({ children }: DialogDescriptionProps) {
+function AlertDescription({ children }: AlertDescriptionProps) {
   const { mutedForeground } = useThemedColors();
   return (
     <Text
@@ -81,24 +81,24 @@ export function DialogDescription({ children }: DialogDescriptionProps) {
   );
 }
 
-interface DialogFooterProps {
+interface AlertFooterProps {
   children: React.ReactNode;
 }
 
-export function DialogFooter({ children }: DialogFooterProps) {
+function AlertFooter({ children }: AlertFooterProps) {
   return <View style={{ marginTop: 32 }}>{children}</View>;
 }
 
-interface DialogFooterButtonProps extends PressableProps {
+interface AlertFooterButtonProps extends PressableProps {
   children: React.ReactNode;
   textStyle?: StyleProp<TextStyle>;
 }
 
-export function DialogFooterButton({
+function AlertFooterButton({
   children,
   textStyle,
   ...props
-}: DialogFooterButtonProps) {
+}: AlertFooterButtonProps) {
   const { border, accent } = useThemedColors();
   const { borderWidthSmall } = getStyles();
 
@@ -122,3 +122,5 @@ export function DialogFooterButton({
     </Pressable>
   );
 }
+
+export { Alert, AlertTitle, AlertDescription, AlertFooter, AlertFooterButton };

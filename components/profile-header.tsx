@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { User } from "@/types";
+import { NavItem, User } from "@/types";
 import { router, usePathname } from "expo-router";
 import {
   Animated,
@@ -9,13 +9,11 @@ import {
   ViewProps,
 } from "react-native";
 
+import { Button } from "@/components/ui/button";
 import { HEADER_HEIGHT, STATUSBAR_HEIGHT } from "@/components/header";
 import { Text, View } from "@/components/themed";
-import { profileConfig } from "@/config/profile";
 import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
-
-import { Button } from "./ui/button";
 
 const PROFILE_NAVBAR_HEIGHT = 50;
 
@@ -23,12 +21,14 @@ interface ProfileHeaderProps extends ViewProps {
   user: User;
   scrollY: Animated.Value;
   getHeight?: (h: number) => void;
+  navItems: NavItem[];
 }
 
 export function ProfileHeader({
   user,
   scrollY,
   getHeight,
+  navItems,
 }: ProfileHeaderProps) {
   const { background, mutedForeground, accent, border } = useThemedColors();
   const { padding, borderWidthSmall: borderWidth } = getStyles();
@@ -138,7 +138,7 @@ export function ProfileHeader({
           flexDirection: "row",
         }}
       >
-        {profileConfig.navItems.map((navItem, index) => (
+        {navItems.map((navItem, index) => (
           <Pressable
             key={index}
             onPress={() => router.push(navItem.slug)}

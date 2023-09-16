@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { User } from "@/types";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import {
   createUserWithEmailAndPassword,
   User as FirebaseUser,
@@ -11,6 +11,13 @@ import {
 import { Pressable, StatusBar } from "react-native";
 
 import { Button } from "@/components/ui/button";
+import {
+  Alert,
+  AlertDescription,
+  AlertFooter,
+  AlertFooterButton,
+  AlertTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { STATUSBAR_HEIGHT } from "@/components/header";
 import { Icons } from "@/components/icons";
@@ -21,7 +28,7 @@ import { useAuth } from "@/context/auth";
 import { FIREBASE_AUTH } from "@/firebase/config";
 import { createUser } from "@/firebase/database";
 import { handleFirebaseError } from "@/firebase/error-handler";
-import { isValidEmail, isValidPassword, isValidUsername } from "@/lib/utils";
+import { isValidEmail, isValidUsername } from "@/lib/utils";
 
 interface FormStep {
   title: string;
@@ -63,12 +70,18 @@ function Step({
   );
 }
 
-export default function SignUpPage() {
+export default function SignUpScreen() {
   const { user } = useAuth();
   const { background, foreground, mutedForeground } = useThemedColors();
   const { padding } = getStyles();
 
   const [error, setError] = useState<string | null>(null);
+  const [alert, setAlert] = useState<{
+    title: string;
+    description?: string;
+    button: { text: string; action: () => void }[];
+  } | null>(null);
+
   const [formData, setFormData] = useState({
     fullName: "",
     password: "",
@@ -83,7 +96,7 @@ export default function SignUpPage() {
       errorMessage: "Must be at least 3 letters.",
       input: (
         <Input
-          placeholder="Fullname"
+          placeholder="Name"
           autoCapitalize="words"
           autoFocus={true}
           value={formData.fullName}
@@ -95,9 +108,8 @@ export default function SignUpPage() {
       title: "Create a password",
       description:
         "Create a password with a least 8 letters or numbers. It should be something others can't guess.",
-      validate: () =>
-        formData.password.length >= 8 && isValidPassword(formData.password),
-      errorMessage: "Must be a valid password.",
+      validate: () => formData.password.length >= 8,
+      errorMessage: "Password must be at least 8 letters.",
       input: (
         <Input
           placeholder="Password"
@@ -139,7 +151,6 @@ export default function SignUpPage() {
           autoCapitalize="none"
           keyboardType="email-address"
           textContentType="emailAddress"
-          autoFocus={true}
           value={formData.email}
           onChangeText={(text) => setFormData({ ...formData, email: text })}
         />
@@ -164,9 +175,18 @@ export default function SignUpPage() {
   async function verificationEmail(user: FirebaseUser) {
     try {
       await sendEmailVerification(user);
-      alert(`Verification email sent to ${user.email}`);
-    } catch (error) {
-      handleFirebaseError(error);
+      setAlert({
+        title: "Verify Email",
+        description: `Verification email sent to ${user.email}.`,
+        button: [
+          {
+            text: "Ok",
+            action: () => setAlert(null),
+          },
+        ],
+      });
+    } catch (err) {
+      handleFirebaseError(err);
     }
   }
 
@@ -174,8 +194,8 @@ export default function SignUpPage() {
     try {
       await updateEmail(user, email);
       await verificationEmail(user);
-    } catch (error) {
-      handleFirebaseError(error);
+    } catch (err) {
+      handleFirebaseError(err);
     }
   }
 
@@ -223,8 +243,8 @@ export default function SignUpPage() {
       } else {
         setError(currentFormStep.errorMessage);
       }
-    } catch (error) {
-      handleFirebaseError(error);
+    } catch (err) {
+      handleFirebaseError(err);
     }
   };
 
@@ -248,10 +268,47 @@ export default function SignUpPage() {
             onPress={onPressNext}
           />
           <View style={{ alignItems: "center", padding: padding * 2 }}>
-            <Link href={"/login"}>Already have an account?</Link>
+            <Button
+              variant="ghost"
+              size="sm"
+              onPress={() =>
+                setAlert({
+                  title: "Already have an account?",
+                  button: [
+                    {
+                      text: "Continue Sign Up",
+                      action: () => setAlert(null),
+                    },
+                    {
+                      text: "Login",
+                      action: () => router.push("/signin"),
+                    },
+                  ],
+                })
+              }
+            >
+              Already have an account?
+            </Button>
           </View>
         </View>
       </View>
+      <Alert visible={!!alert}>
+        <AlertTitle>{alert?.title}</AlertTitle>
+        {alert?.description && (
+          <AlertDescription>{alert?.description}</AlertDescription>
+        )}
+        <AlertFooter>
+          {alert?.button.map((btn, i) => (
+            <AlertFooterButton
+              key={i}
+              textStyle={{ fontWeight: "500", color: "#60a5fa" }}
+              onPress={btn.action}
+            >
+              {btn.text}
+            </AlertFooterButton>
+          ))}
+        </AlertFooter>
+      </Alert>
     </View>
   );
 }

@@ -4,7 +4,7 @@ import { Platform, StyleSheet } from "react-native";
 import EditScreenInfo from "@/components/edit-screen-info";
 import { Text, View } from "@/components/themed";
 
-export default function ModalScreen() {
+export default function NotificationsScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Notifications</Text>

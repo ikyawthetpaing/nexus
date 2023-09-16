@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { router, Slot } from "expo-router";
 import {
   Animated,
@@ -13,6 +13,7 @@ import { IconButton } from "@/components/ui/icon-button";
 import { Header } from "@/components/header";
 import { ProfileHeader } from "@/components/profile-header";
 import { View } from "@/components/themed";
+import { appConfig } from "@/config/app";
 import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
 import { useCurrentUser } from "@/context/current-user";
@@ -51,7 +52,7 @@ export default function ProfileLayout() {
         >
           <IconButton icon="world" />
           <View style={{ flexDirection: "row", gap: padding }}>
-            <IconButton icon="add" onPress={() => router.push("/post")} />
+            <IconButton icon="add" onPress={() => router.push("/add-post")} />
             <IconButton icon="menu" onPress={() => router.push("/settings")} />
           </View>
         </View>
@@ -60,6 +61,7 @@ export default function ProfileLayout() {
         user={user}
         scrollY={scrollY}
         getHeight={(h) => setProfileHeaderHeight(h)}
+        navItems={appConfig.profileNavItems}
       />
       <Animated.ScrollView
         bounces={false}

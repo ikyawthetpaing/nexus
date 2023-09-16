@@ -10,7 +10,7 @@ import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
 import { useFeed } from "@/context/feed";
 
-export default function HomePage() {
+export default function HomeScreen() {
   const { background, mutedForeground, primary } = useThemedColors();
   const { padding } = getStyles();
 

@@ -29,7 +29,7 @@ import {
 import { handleFirebaseError } from "@/firebase/error-handler";
 import { formatCount, formatDate, formatHour } from "@/lib/utils";
 
-export default function UserPostPage() {
+export default function UserPostDetailScreen() {
   const { user } = useCurrentUser();
 
   const { postId: _postId } = useLocalSearchParams();

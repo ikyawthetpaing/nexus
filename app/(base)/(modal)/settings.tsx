@@ -8,7 +8,7 @@ import { Spinner } from "@/components/spinner";
 import { View } from "@/components/themed";
 import { FIREBASE_AUTH } from "@/firebase/config";
 
-export default function ModalScreen() {
+export default function SettingsScreen() {
   const [loading, setLoading] = useState(false);
   async function onPressSignOut() {
     setLoading(true);

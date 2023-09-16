@@ -4,11 +4,11 @@ import { router, useLocalSearchParams } from "expo-router";
 import { View } from "react-native";
 
 import {
-  Dialog,
-  DialogDescription,
-  DialogFooter,
-  DialogFooterButton,
-  DialogTitle,
+  Alert,
+  AlertDescription,
+  AlertFooter,
+  AlertFooterButton,
+  AlertTitle,
 } from "@/components/ui/dialog";
 import { PostEditor } from "@/components/post-editor";
 import { useUploader } from "@/context/uploader";
@@ -54,23 +54,23 @@ export default function PostReplyScreen() {
         onCancel={onCancel}
         onSubmit={onSubmit}
       />
-      <Dialog visible={dialogVisiable}>
-        <DialogTitle>Unsaved changes</DialogTitle>
-        <DialogDescription>
+      <Alert visible={dialogVisiable}>
+        <AlertTitle>Unsaved changes</AlertTitle>
+        <AlertDescription>
           You have unsaved changes. Are you sure you want to cancel?
-        </DialogDescription>
-        <DialogFooter>
-          <DialogFooterButton
+        </AlertDescription>
+        <AlertFooter>
+          <AlertFooterButton
             textStyle={{ fontWeight: "500", color: "#60a5fa" }}
             onPress={() => router.back()}
           >
             Yes
-          </DialogFooterButton>
-          <DialogFooterButton onPress={() => setDailogVisiable(false)}>
+          </AlertFooterButton>
+          <AlertFooterButton onPress={() => setDailogVisiable(false)}>
             No
-          </DialogFooterButton>
-        </DialogFooter>
-      </Dialog>
+          </AlertFooterButton>
+        </AlertFooter>
+      </Alert>
     </View>
   );
 }

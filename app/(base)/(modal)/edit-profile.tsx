@@ -6,11 +6,11 @@ import { Image } from "react-native";
 
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogDescription,
-  DialogFooter,
-  DialogFooterButton,
-  DialogTitle,
+  Alert,
+  AlertDescription,
+  AlertFooter,
+  AlertFooterButton,
+  AlertTitle,
 } from "@/components/ui/dialog";
 import { IconButton } from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
@@ -39,7 +39,7 @@ function hasDataChanged(
   );
 }
 
-export default function EditProfile() {
+export default function EditProfileScreen() {
   const { user } = useCurrentUser();
 
   const { accent, mutedForeground } = useThemedColors();
@@ -232,23 +232,23 @@ export default function EditProfile() {
           </View>
         </View>
       </View>
-      <Dialog visible={dialogVisiable}>
-        <DialogTitle>Unsaved changes</DialogTitle>
-        <DialogDescription>
+      <Alert visible={dialogVisiable}>
+        <AlertTitle>Unsaved changes</AlertTitle>
+        <AlertDescription>
           You have unsaved changes. Are you sure you want to cancel?
-        </DialogDescription>
-        <DialogFooter>
-          <DialogFooterButton
+        </AlertDescription>
+        <AlertFooter>
+          <AlertFooterButton
             textStyle={{ fontWeight: "500", color: "#60a5fa" }}
             onPress={() => router.back()}
           >
             Yes
-          </DialogFooterButton>
-          <DialogFooterButton onPress={() => setDailogVisiable(false)}>
+          </AlertFooterButton>
+          <AlertFooterButton onPress={() => setDailogVisiable(false)}>
             No
-          </DialogFooterButton>
-        </DialogFooter>
-      </Dialog>
+          </AlertFooterButton>
+        </AlertFooter>
+      </Alert>
     </View>
   );
 }

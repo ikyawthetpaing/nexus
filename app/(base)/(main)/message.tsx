@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 import EditScreenInfo from "@/components/edit-screen-info";
 import { Text, View } from "@/components/themed";
 
-export default function TabTwoScreen() {
+export default function MessageScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Messages</Text>

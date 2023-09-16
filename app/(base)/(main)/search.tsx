@@ -13,7 +13,7 @@ import { Text, TextInput, View } from "@/components/themed";
 import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
 
-export default function TabTwoScreen() {
+export default function SearchScreen() {
   const { background, accent, foreground } = useThemedColors();
   const { padding, borderRadius } = getStyles();
 
