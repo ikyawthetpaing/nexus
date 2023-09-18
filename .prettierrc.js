@@ -15,6 +15,7 @@ module.exports = {
     "^@/components/(.*)$",
     "^@/config/(.*)$",
     "^@/constants/(.*)$",
+    "^@/hooks/(.*)$",
     "^@/context/(.*)$",
     "^@/firebase/(.*)$",
     "^@/lib/(.*)$",

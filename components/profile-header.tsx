@@ -12,8 +12,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { HEADER_HEIGHT, STATUSBAR_HEIGHT } from "@/components/header";
 import { Text, View } from "@/components/themed";
-import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
+import { useTheme } from "@/context/theme";
 
 const PROFILE_NAVBAR_HEIGHT = 50;
 
@@ -30,7 +30,7 @@ export function ProfileHeader({
   getHeight,
   navItems,
 }: ProfileHeaderProps) {
-  const { background, mutedForeground, accent, border } = useThemedColors();
+  const { background, mutedForeground, accent, border } = useTheme();
   const { padding, borderWidthSmall: borderWidth } = getStyles();
 
   const pathname = usePathname();

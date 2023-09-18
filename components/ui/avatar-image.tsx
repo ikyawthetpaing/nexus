@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import { View, ViewProps } from "react-native";
 
-import { useThemedColors } from "@/constants/colors";
+import { useTheme } from "@/context/theme";
 
 interface Props extends ViewProps {
   uri: string;
@@ -9,7 +9,7 @@ interface Props extends ViewProps {
 }
 
 export function AvatarImage({ size, uri, style, ...props }: Props) {
-  const { accent } = useThemedColors();
+  const { accent } = useTheme();
   return (
     <View
       style={[

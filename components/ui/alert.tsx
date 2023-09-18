@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   Modal,
@@ -8,8 +9,8 @@ import {
 } from "react-native";
 
 import { Text, View } from "@/components/themed";
-import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
+import { useTheme } from "@/context/theme";
 
 interface AlertProps {
   visible?: boolean;
@@ -66,7 +67,7 @@ interface AlertDescriptionProps {
 }
 
 function AlertDescription({ children }: AlertDescriptionProps) {
-  const { mutedForeground } = useThemedColors();
+  const { mutedForeground } = useTheme();
   return (
     <Text
       style={{
@@ -99,7 +100,7 @@ function AlertFooterButton({
   textStyle,
   ...props
 }: AlertFooterButtonProps) {
-  const { border, accent } = useThemedColors();
+  const { border, accent } = useTheme();
   const { borderWidthSmall } = getStyles();
 
   return (
@@ -123,4 +124,47 @@ function AlertFooterButton({
   );
 }
 
-export { Alert, AlertTitle, AlertDescription, AlertFooter, AlertFooterButton };
+function useAlert() {
+  const [alert, setAlert] = useState<{
+    title: string;
+    description?: string;
+    button: { text: string; action: () => void }[];
+  } | null>(null);
+
+  const AlertDialog = () => {
+    if (!alert) {
+      return null; // Return null if there's no alert to show
+    }
+
+    return (
+      <Alert visible={true}>
+        <AlertTitle>{alert.title}</AlertTitle>
+        {alert.description && (
+          <AlertDescription>{alert.description}</AlertDescription>
+        )}
+        <AlertFooter>
+          {alert.button.map((btn, i) => (
+            <AlertFooterButton
+              key={i}
+              textStyle={{ fontWeight: "500", color: "#60a5fa" }}
+              onPress={btn.action}
+            >
+              {btn.text}
+            </AlertFooterButton>
+          ))}
+        </AlertFooter>
+      </Alert>
+    );
+  };
+
+  return { Alert: AlertDialog, setAlert };
+}
+
+export {
+  Alert,
+  AlertTitle,
+  AlertDescription,
+  AlertFooter,
+  AlertFooterButton,
+  useAlert,
+};

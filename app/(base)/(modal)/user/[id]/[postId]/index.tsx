@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { Post, User } from "@/types";
+import { Post } from "@/types";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
-import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
 import { Dimensions, Pressable, ScrollView, View } from "react-native";
 import ImageView from "react-native-image-viewing";
 
@@ -10,159 +9,52 @@ import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { HEADER_HEIGHT, STATUSBAR_HEIGHT } from "@/components/header";
 import { ImagesList } from "@/components/images-list";
-import LoadingScreen from "@/components/loading";
+import { LoadingScreen } from "@/components/loading-screen";
 import PostItem from "@/components/post-item";
 import { Text } from "@/components/themed";
 import { UserLink } from "@/components/user-link";
-import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
-import { useCurrentUser } from "@/context/current-user";
-import { DBCollections, FIREBASE_DB } from "@/firebase/config";
 import {
-  getRepliesToParent,
-  likeConverter,
-  mergeLikeId,
-  postConverter,
-  toggleLike,
-  userConverter,
-} from "@/firebase/database";
+  usePostLikeCountSnapshot,
+  usePostRepliesSnapshot,
+  usePostReplyCountSnapshot,
+  usePostSnapshot,
+  useUserLikedSnapshot,
+  useUserSnapshot,
+} from "@/hooks/snapshots";
+import { useCurrentUser } from "@/context/current-user";
+import { useTheme } from "@/context/theme";
+import { getRepliesToParent, toggleLike } from "@/firebase/db";
 import { handleFirebaseError } from "@/firebase/error-handler";
 import { formatCount, formatDate, formatHour } from "@/lib/utils";
 
 export default function UserPostDetailScreen() {
-  const { user } = useCurrentUser();
+  const { background, mutedForeground, accent, muted, border } = useTheme();
+  const { padding, avatarSizeSmall, borderWidthSmall } = getStyles();
 
+  const { user } = useCurrentUser();
   const { postId: _postId } = useLocalSearchParams();
   const postId = typeof _postId === "string" ? _postId : "";
 
-  const { background, mutedForeground, accent, muted, border } =
-    useThemedColors();
-  const { padding, avatarSizeSmall, borderWidthSmall } = getStyles();
-
   const footerHeight = HEADER_HEIGHT - STATUSBAR_HEIGHT;
 
-  const [post, setPost] = useState<Post | null>(null);
-  const [author, setAuthor] = useState<User | null>(null);
-  const [replies, setReplies] = useState<Post[]>([]);
   const [repliesTo, setRepliesTo] = useState<Post[]>([]);
-  const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
-  const [replyCount, setReplyCount] = useState(0);
+
+  const { post, loading: postLoading } = usePostSnapshot(postId);
+  const { user: author, loading: authorLoading } = useUserSnapshot(
+    post?.authorId || ""
+  );
+  const { likeCount } = usePostLikeCountSnapshot(postId);
+  const { replyCount } = usePostReplyCountSnapshot(postId);
+  const { liked } = useUserLikedSnapshot(postId, user?.id || "");
+  const { replies } = usePostRepliesSnapshot(postId);
 
   const [imageViewingVisible, setImageViewingVisible] = useState(false);
   const [viewImage, setViewImage] = useState(0);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const postUnsubscribe = onSnapshot(
-      doc(FIREBASE_DB, DBCollections.Posts, postId).withConverter(
-        postConverter
-      ),
-      (docSnapshot) => {
-        if (docSnapshot.exists()) {
-          setPost(docSnapshot.data() || null);
-          setLoading(false);
-        } else {
-          setPost(null);
-          setLoading(false);
-        }
-      },
-      (error) => {
-        console.error("Error fetching post:", error);
-        setLoading(false);
-      }
-    );
-
-    return () => {
-      postUnsubscribe();
-    };
-  }, [postId]);
 
   useEffect(() => {
     if (post) {
-      const authorUnsubscribe = onSnapshot(
-        doc(FIREBASE_DB, DBCollections.Users, post.authorId).withConverter(
-          userConverter
-        ),
-        (docSnapshot) => {
-          if (docSnapshot.exists()) {
-            setAuthor(docSnapshot.data() || null);
-          } else {
-            setAuthor(null);
-          }
-        },
-        (error) => {
-          console.error("Error fetching author:", error);
-        }
-      );
-
-      const repliesQuery = query(
-        collection(FIREBASE_DB, DBCollections.Posts),
-        where("replyToId", "==", post.id)
-      ).withConverter(postConverter);
-      const repliesUnsubscribe = onSnapshot(
-        repliesQuery,
-        (querySnapshot) => {
-          const _replies: Post[] = [];
-          querySnapshot.forEach((doc) => {
-            _replies.push(doc.data());
-          });
-
-          setReplies(_replies);
-        },
-        (error) => {
-          console.error("Error fetching replies:", error);
-        }
-      );
-
       getRepliesToParent(post.replyToId).then((result) => setRepliesTo(result));
-
-      const likeCountQuery = query(
-        collection(FIREBASE_DB, DBCollections.Likes),
-        where("postId", "==", post.id)
-      ).withConverter(likeConverter);
-      const likeCountUnsubscribe = onSnapshot(
-        likeCountQuery,
-        (querySnapshot) => {
-          setLikeCount(querySnapshot.docs.length);
-        },
-        (error) => {
-          console.error("Error fetching like count:", error);
-        }
-      );
-
-      const replyCountQuery = query(
-        collection(FIREBASE_DB, DBCollections.Posts),
-        where("replyToId", "==", post.id)
-      ).withConverter(likeConverter);
-      const replyCountUnsubscribe = onSnapshot(
-        replyCountQuery,
-        (querySnapshot) => {
-          setReplyCount(querySnapshot.docs.length);
-        },
-        (error) => {
-          console.error("Error fetching reply count:", error);
-        }
-      );
-
-      const unsubLiked = onSnapshot(
-        doc(
-          FIREBASE_DB,
-          DBCollections.Likes,
-          mergeLikeId({ postId: post.id, userId: user?.id || "" })
-        ).withConverter(likeConverter),
-        (doc) => {
-          setLiked(!!doc.data() || false);
-        }
-      );
-
-      return () => {
-        authorUnsubscribe();
-        repliesUnsubscribe();
-        likeCountUnsubscribe();
-        replyCountUnsubscribe();
-        unsubLiked();
-      };
     }
   }, [post]);
 
@@ -170,14 +62,13 @@ export default function UserPostDetailScreen() {
     try {
       if (post && user) {
         await toggleLike({ postId: post.id, userId: user.id });
-        setLiked(!liked);
       }
     } catch (error) {
       handleFirebaseError(error);
     }
   }
 
-  if (loading) {
+  if (postLoading || authorLoading) {
     return <LoadingScreen />;
   }
 

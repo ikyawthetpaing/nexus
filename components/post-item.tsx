@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
-import { Post, User } from "@/types";
+import { useMemo, useState } from "react";
+import { Post } from "@/types";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
 import { Dimensions, Pressable, View } from "react-native";
 import ImageView from "react-native-image-viewing";
 
@@ -12,17 +11,16 @@ import { Icons } from "@/components/icons";
 import { ImagesList } from "@/components/images-list";
 import { Text } from "@/components/themed";
 import { UserLink } from "@/components/user-link";
-import { useThemedColors } from "@/constants/colors";
-import { replies as dmReplies, users } from "@/constants/dummy-data";
 import { getStyles } from "@/constants/style";
-import { useCurrentUser } from "@/context/current-user";
-import { DBCollections, FIREBASE_DB } from "@/firebase/config";
 import {
-  likeConverter,
-  mergeLikeId,
-  toggleLike,
-  userConverter,
-} from "@/firebase/database";
+  usePostLikeCountSnapshot,
+  usePostReplyCountSnapshot,
+  useUserLikedSnapshot,
+  useUserSnapshot,
+} from "@/hooks/snapshots";
+import { useTheme } from "@/context/theme";
+import { getAuthUser } from "@/firebase/auth";
+import { toggleLike } from "@/firebase/db";
 import { handleFirebaseError } from "@/firebase/error-handler";
 import { formatCount, timeAgo } from "@/lib/utils";
 
@@ -32,105 +30,33 @@ interface PostItemProps {
 }
 
 export default function PostItem({ post, isReplyTo }: PostItemProps) {
-  const { border, accent, mutedForeground, background } = useThemedColors();
+  const { border, accent, mutedForeground, background } = useTheme();
   const { padding, borderWidthSmall, borderWidthLarge, avatarSizeSmall } =
     getStyles();
 
-  const { user: currentUser } = useCurrentUser();
-
-  const [author, setAuthor] = useState<User | null>(null);
-  const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
-  const [replyCount, setReplyCount] = useState(0);
+  const authUserId = useMemo(() => getAuthUser()?.uid || "", []);
+  const { user: author } = useUserSnapshot(post.authorId);
+  const { likeCount } = usePostLikeCountSnapshot(post.id);
+  const { replyCount } = usePostReplyCountSnapshot(post.id);
+  const { liked } = useUserLikedSnapshot(post.id, authUserId);
 
   const [imageViewingVisible, setImageViewingVisible] = useState(false);
   const [viewImage, setViewImage] = useState(0);
 
-  useEffect(() => {
-    const authorUnsubscribe = onSnapshot(
-      doc(FIREBASE_DB, DBCollections.Users, post.authorId).withConverter(
-        userConverter
-      ),
-      (doc) => {
-        setAuthor(doc.data() || null);
-      }
-    );
-
-    const likeCountQuery = query(
-      collection(FIREBASE_DB, DBCollections.Likes),
-      where("postId", "==", post.id)
-    ).withConverter(likeConverter);
-
-    const likeCountUnsubscribe = onSnapshot(
-      likeCountQuery,
-      (querySnapshot) => {
-        setLikeCount(querySnapshot.docs.length);
-      },
-      (error) => {
-        console.error("Error fetching like count:", error);
-      }
-    );
-
-    const replyCountQuery = query(
-      collection(FIREBASE_DB, DBCollections.Posts),
-      where("replyToId", "==", post.id)
-    ).withConverter(likeConverter);
-
-    const replyCountUnsubscribe = onSnapshot(
-      replyCountQuery,
-      (querySnapshot) => {
-        setReplyCount(querySnapshot.docs.length);
-      },
-      (error) => {
-        console.error("Error fetching reply count:", error);
-      }
-    );
-
-    return () => {
-      authorUnsubscribe();
-      likeCountUnsubscribe();
-      replyCountUnsubscribe();
-    };
-  }, [post]);
-
-  useEffect(() => {
-    if (currentUser) {
-      const likedUnsubscribe = onSnapshot(
-        doc(
-          FIREBASE_DB,
-          DBCollections.Likes,
-          mergeLikeId({ postId: post.id, userId: currentUser.id })
-        ).withConverter(likeConverter),
-        (doc) => {
-          if (doc.exists()) {
-            setLiked(true);
-          } else {
-            setLiked(false);
-          }
-        }
-      );
-
-      return () => {
-        likedUnsubscribe();
-      };
-    }
-  }, [currentUser, post]);
-
   async function onLike() {
     try {
-      if (currentUser) {
-        await toggleLike({ postId: post.id, userId: currentUser.id });
+      if (authUserId) {
+        await toggleLike({ postId: post.id, userId: authUserId });
       }
-      setLiked(!liked);
     } catch (error) {
       handleFirebaseError(error);
     }
   }
 
-  const replies = dmReplies.filter(({ replyToId }) => replyToId === post.id);
+  // const replies = dmReplies.filter(({ replyToId }) => replyToId === post.id);
 
   return (
-    <>
+    <View>
       <Pressable
         onPress={() =>
           router.push(`/(base)/(modal)/user/${post.authorId}/${post.id}`)
@@ -181,7 +107,7 @@ export default function PostItem({ post, isReplyTo }: PostItemProps) {
                         orientation="vertical"
                       />
                     </View>
-                    <RepliesReference replies={replies} />
+                    {/* <RepliesReference replies={replies} /> */}
                   </>
                 ))}
             </View>
@@ -316,58 +242,58 @@ export default function PostItem({ post, isReplyTo }: PostItemProps) {
           presentationStyle="overFullScreen"
         />
       )}
-    </>
-  );
-}
-
-interface RepliesReferenceProps {
-  replies: Post[];
-}
-
-function RepliesReference({ replies }: RepliesReferenceProps) {
-  const { background } = useThemedColors();
-  const { borderWidthLarge } = getStyles();
-
-  const avatarSize = 20;
-
-  const [repliersImage, setRepliersImage] = useState<string[]>([]);
-
-  useEffect(() => {
-    const fetchedImages: string[] = [];
-
-    replies.slice(0, 3).map((reply) => {
-      const userImage = getUserImage(reply.authorId);
-      if (userImage) {
-        fetchedImages.push(userImage);
-      }
-    });
-
-    setRepliersImage(fetchedImages);
-  }, [replies]);
-
-  function getUserImage(userId: string) {
-    const user = users.find(({ id }) => id === userId);
-    return user?.avatar?.uri;
-  }
-
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-        justifyContent: "center",
-      }}
-    >
-      {repliersImage.map((uri, i) => (
-        <AvatarImage
-          key={i}
-          size={avatarSize}
-          uri={uri}
-          style={[
-            { borderWidth: borderWidthLarge, borderColor: background },
-            i !== 0 && { marginLeft: -(avatarSize / 2) },
-          ]}
-        />
-      ))}
     </View>
   );
 }
+
+// interface RepliesReferenceProps {
+//   replies: Post[];
+// }
+
+// function RepliesReference({ replies }: RepliesReferenceProps) {
+//   const { background } = useThemedColors();
+//   const { borderWidthLarge } = getStyles();
+
+//   const avatarSize = 20;
+
+//   const [repliersImage, setRepliersImage] = useState<string[]>([]);
+
+//   useEffect(() => {
+//     const fetchedImages: string[] = [];
+
+//     replies.slice(0, 3).map((reply) => {
+//       const userImage = getUserImage(reply.authorId);
+//       if (userImage) {
+//         fetchedImages.push(userImage);
+//       }
+//     });
+
+//     setRepliersImage(fetchedImages);
+//   }, [replies]);
+
+//   function getUserImage(userId: string) {
+//     const user = users.find(({ id }) => id === userId);
+//     return user?.avatar?.uri;
+//   }
+
+//   return (
+//     <View
+//       style={{
+//         flexDirection: "row",
+//         justifyContent: "center",
+//       }}
+//     >
+//       {repliersImage.map((uri, i) => (
+//         <AvatarImage
+//           key={i}
+//           size={avatarSize}
+//           uri={uri}
+//           style={[
+//             { borderWidth: borderWidthLarge, borderColor: background },
+//             i !== 0 && { marginLeft: -(avatarSize / 2) },
+//           ]}
+//         />
+//       ))}
+//     </View>
+//   );
+// }

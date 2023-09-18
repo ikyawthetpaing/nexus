@@ -1,7 +1,7 @@
 import { Animated, Platform, StatusBar, ViewProps } from "react-native";
 
-import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
+import { useTheme } from "@/context/theme";
 
 interface HeaderProps extends ViewProps {
   scrollY?: Animated.Value;
@@ -17,7 +17,7 @@ export function Header({
   children,
   ...props
 }: HeaderProps) {
-  const { border, background } = useThemedColors();
+  const { border, background } = useTheme();
   const { borderWidthSmall: borderWidth } = getStyles();
 
   const diffClampScrollY = Animated.diffClamp(scrollY, 0, HEADER_HEIGHT);

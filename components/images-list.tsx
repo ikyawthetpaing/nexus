@@ -3,8 +3,8 @@ import { Image } from "expo-image";
 import { Pressable, ScrollView, useColorScheme, ViewProps } from "react-native";
 
 import { IconButton } from "@/components/ui/icon-button";
-import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
+import { useTheme } from "@/context/theme";
 
 interface Props extends ViewProps {
   images: LocalImage[];
@@ -21,7 +21,7 @@ export function ImagesList({
   style,
   ...props
 }: Props) {
-  const { border } = useThemedColors();
+  const { border } = useTheme();
   const { padding, borderRadius, borderWidthSmall } = getStyles();
   const MAX_HEIGHT = 600;
 

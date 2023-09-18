@@ -7,13 +7,13 @@ import { STATUSBAR_HEIGHT } from "@/components/header";
 import { Icons } from "@/components/icons";
 import { Spinner } from "@/components/spinner";
 import { View } from "@/components/themed";
-import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
-import { signIn } from "@/firebase/authentication";
+import { useTheme } from "@/context/theme";
+import { signIn } from "@/firebase/auth";
 import { handleFirebaseError } from "@/firebase/error-handler";
 
 export default function SignInScreen() {
-  const { foreground } = useThemedColors();
+  const { foreground } = useTheme();
   const { padding } = getStyles();
 
   const [email, setEmail] = useState("");
@@ -54,7 +54,7 @@ export default function SignInScreen() {
       >
         <View style={{ gap: 20 }}>
           <Input
-            placeholder="Enter email"
+            placeholder="Email"
             autoCapitalize="none"
             keyboardType="email-address"
             textContentType="emailAddress"
@@ -62,7 +62,7 @@ export default function SignInScreen() {
             onChangeText={(text) => setEmail(text)}
           />
           <Input
-            placeholder="Enter password"
+            placeholder="Password"
             autoCapitalize="none"
             autoCorrect={false}
             secureTextEntry={true}

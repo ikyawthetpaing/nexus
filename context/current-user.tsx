@@ -1,16 +1,8 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useMemo } from "react";
 import { Post, User } from "@/types";
-import {
-  and,
-  collection,
-  doc,
-  onSnapshot,
-  query,
-  where,
-} from "firebase/firestore";
 
-import { DBCollections, FIREBASE_AUTH, FIREBASE_DB } from "@/firebase/config";
-import { postConverter, userConverter } from "@/firebase/database";
+import { useUserPostsSnapshot, useUserSnapshot } from "@/hooks/snapshots";
+import { getAuthUser } from "@/firebase/auth";
 
 interface CurrentUserContextType {
   user: User | null;
@@ -36,57 +28,10 @@ interface Props {
 }
 
 export function CurrentUserContextProvider({ children }: Props) {
-  const [user, setUser] = useState<User | null>(null);
-  const [posts, setPosts] = useState<Post[]>([]);
+  const authUserId = useMemo(() => getAuthUser()?.uid || "", []);
 
-  useEffect(() => {
-    const authUser = FIREBASE_AUTH.currentUser;
-
-    if (authUser) {
-      const userUnsubscribe = onSnapshot(
-        doc(FIREBASE_DB, DBCollections.Users, authUser.uid).withConverter(
-          userConverter
-        ),
-        (doc) => {
-          if (doc.exists()) {
-            setUser(doc.data());
-          } else {
-            setUser(null);
-          }
-        }
-      );
-
-      return () => {
-        userUnsubscribe();
-      };
-    }
-  }, []);
-
-  useEffect(() => {
-    if (user) {
-      const postsQuery = query(
-        collection(FIREBASE_DB, DBCollections.Posts),
-        and(where("authorId", "==", user.id), where("replyToId", "==", null))
-      ).withConverter(postConverter);
-      const postsUnsubscribe = onSnapshot(
-        postsQuery,
-        (querySnapshot) => {
-          const _posts: Post[] = [];
-          querySnapshot.forEach((doc) => {
-            _posts.unshift(doc.data());
-          });
-
-          setPosts(_posts);
-        },
-        (error) => {
-          console.error("Error fetching posts:", error);
-        }
-      );
-      return () => {
-        postsUnsubscribe();
-      };
-    }
-  }, [user]);
+  const { user } = useUserSnapshot(authUserId);
+  const { posts } = useUserPostsSnapshot(authUserId);
 
   const userContext: CurrentUserContextType = {
     user,

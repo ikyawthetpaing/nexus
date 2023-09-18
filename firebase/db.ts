@@ -12,11 +12,10 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
+import { getAuthUser } from "@/firebase/auth";
 import { DBCollections, FIREBASE_DB } from "@/firebase/config";
 
-import { getCurrentAuthUser } from "./authentication";
-
-// user
+// converters
 export const userConverter = {
   toFirestore: (user: User) => {
     return user;
@@ -30,6 +29,33 @@ export const userConverter = {
   },
 };
 
+export const postConverter = {
+  toFirestore: (postData: Post) => {
+    return postData;
+  },
+  fromFirestore: (
+    snapshot: QueryDocumentSnapshot,
+    options: SnapshotOptions
+  ) => {
+    const postData = snapshot.data(options) as Post;
+    return postData;
+  },
+};
+
+export const likeConverter = {
+  toFirestore: (data: Like) => {
+    return data;
+  },
+  fromFirestore: (
+    snapshot: QueryDocumentSnapshot,
+    options: SnapshotOptions
+  ) => {
+    const data = snapshot.data(options) as Like;
+    return data;
+  },
+};
+
+// user
 export const createUser = async (userData: User, authUserUid: string) => {
   try {
     const docRef = collection(FIREBASE_DB, DBCollections.Users);
@@ -79,22 +105,9 @@ export const getUser = async (userId: string) => {
 };
 
 // post
-export const postConverter = {
-  toFirestore: (postData: Post) => {
-    return postData;
-  },
-  fromFirestore: (
-    snapshot: QueryDocumentSnapshot,
-    options: SnapshotOptions
-  ) => {
-    const postData = snapshot.data(options) as Post;
-    return postData;
-  },
-};
-
 export async function createPost(data: CreatePost) {
   try {
-    const currentUser = getCurrentAuthUser();
+    const currentUser = getAuthUser();
 
     if (!currentUser) {
       throw Error("Unauthorized.");
@@ -163,19 +176,6 @@ export async function getRepliesToParent(rootRelpyToId: string | null) {
 }
 
 // like
-export const likeConverter = {
-  toFirestore: (data: Like) => {
-    return data;
-  },
-  fromFirestore: (
-    snapshot: QueryDocumentSnapshot,
-    options: SnapshotOptions
-  ) => {
-    const data = snapshot.data(options) as Like;
-    return data;
-  },
-};
-
 export function mergeLikeId({ postId, userId }: Like) {
   return `${postId}${userId}`;
 }

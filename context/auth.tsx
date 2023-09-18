@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { router, useRootNavigationState, useSegments } from "expo-router";
 import { onAuthStateChanged, User } from "firebase/auth";
 
-import LoadingScreen from "@/components/loading";
+import { LoadingScreen } from "@/components/loading-screen";
 import { FIREBASE_AUTH } from "@/firebase/config";
 
 interface AuthContextType {
@@ -54,15 +54,13 @@ function useProtectedRoute(user: User | null) {
       if (!user) {
         router.replace("/signin");
       } else if (user && !user.emailVerified) {
-        router.replace("/signup");
+        router.replace("/verify-email");
       } else if (user && inAuthGroup) {
         router.replace("/");
       }
     }
     console.log("run: [shouldRedirect, user]");
   }, [shouldRedirect, user]);
-
-  return shouldRedirect;
 }
 
 interface AuthProviderProps {
@@ -83,7 +81,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   // Use the useProtectedRoute hook to handle protected routes, but only when auth is not initializing
-  useProtectedRoute(authInitializing ? null : user);
+  useProtectedRoute(user);
 
   const authContext: AuthContextType = {
     user: user,

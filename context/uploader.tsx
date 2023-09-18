@@ -8,9 +8,9 @@ import React, {
 } from "react";
 import { AddPost, CreatePost, UploadedImage } from "@/types";
 
-import LoadingScreen from "@/components/loading";
+import { LoadingScreen } from "@/components/loading-screen";
 import { StoragePath } from "@/firebase/config";
-import { createPost } from "@/firebase/database";
+import { createPost } from "@/firebase/db";
 import { handleFirebaseError } from "@/firebase/error-handler";
 import { uploadFileToFirebase } from "@/firebase/storage";
 

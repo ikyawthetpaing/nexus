@@ -3,8 +3,9 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 
-import { ThemeProvider } from "@/components/theme-provider";
+import { StatusBar } from "@/components/status-bar";
 import { AuthProvider } from "@/context/auth";
+import { ThemeProvider } from "@/context/theme";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -41,10 +42,11 @@ export default function RootLayout() {
   }
 
   return (
-    <AuthProvider>
-      <ThemeProvider>
+    <ThemeProvider>
+      <AuthProvider>
         <Stack screenOptions={{ headerShown: false }} />
-      </ThemeProvider>
-    </AuthProvider>
+        <StatusBar />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

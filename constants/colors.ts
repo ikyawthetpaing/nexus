@@ -1,21 +1,17 @@
-import { useColorScheme } from "react-native";
-
-type ColorValue = string;
-
 export type Colors = {
-  background: ColorValue;
-  foreground: ColorValue;
-  primary: ColorValue;
-  primaryForeground: ColorValue;
-  secondary: ColorValue;
-  secondaryForeground: ColorValue;
-  muted: ColorValue;
-  mutedForeground: ColorValue;
-  accent: ColorValue;
-  accentForeground: ColorValue;
-  destructive: ColorValue;
-  destructiveForeground: ColorValue;
-  border: ColorValue;
+  background: string;
+  foreground: string;
+  primary: string;
+  primaryForeground: string;
+  secondary: string;
+  secondaryForeground: string;
+  muted: string;
+  mutedForeground: string;
+  accent: string;
+  accentForeground: string;
+  destructive: string;
+  destructiveForeground: string;
+  border: string;
 };
 
 type ThemeColors = {
@@ -55,9 +51,3 @@ export const themeColors: ThemeColors = {
     border: "hsl(0, 0%, 14.9%)",
   },
 };
-
-export function useThemedColors(): Colors {
-  const colorScheme = useColorScheme();
-  const selectedTheme = themeColors[colorScheme ?? "light"];
-  return selectedTheme;
-}

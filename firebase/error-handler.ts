@@ -262,5 +262,6 @@ export function handleFirebaseError(error: unknown) {
     console.error(error);
   }
 
+  // eslint-disable-next-line no-alert
   alert(errorMessage);
 }

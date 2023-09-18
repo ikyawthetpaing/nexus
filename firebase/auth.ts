@@ -6,13 +6,13 @@ import {
 import { FIREBASE_AUTH } from "@/firebase/config";
 
 export async function signUp(email: string, password: string) {
-  await createUserWithEmailAndPassword(FIREBASE_AUTH, email, password);
+  return await createUserWithEmailAndPassword(FIREBASE_AUTH, email, password);
 }
 
 export async function signIn(email: string, password: string) {
-  await signInWithEmailAndPassword(FIREBASE_AUTH, email, password);
+  return await signInWithEmailAndPassword(FIREBASE_AUTH, email, password);
 }
 
-export function getCurrentAuthUser() {
+export function getAuthUser() {
   return FIREBASE_AUTH.currentUser;
 }

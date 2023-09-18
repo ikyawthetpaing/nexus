@@ -1,50 +1,10 @@
-import React, { useEffect, useRef } from "react";
-import { Animated, Easing, StyleSheet, View } from "react-native";
+import { ActivityIndicator, ActivityIndicatorProps } from "react-native";
 
-export function Spinner() {
-  const spinValue = useRef(new Animated.Value(0)).current;
+import { useTheme } from "@/context/theme";
 
-  useEffect(() => {
-    const spin = () => {
-      Animated.loop(
-        Animated.timing(spinValue, {
-          toValue: 1,
-          duration: 1000,
-          easing: Easing.linear,
-          useNativeDriver: true,
-        })
-      ).start();
-    };
+interface Props extends ActivityIndicatorProps {}
 
-    spin();
-  }, []);
-
-  const spin = spinValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["0deg", "360deg"],
-  });
-
-  return (
-    <View style={styles.spinnerContainer}>
-      <Animated.View
-        style={[styles.spinner, { transform: [{ rotate: spin }] }]}
-      />
-    </View>
-  );
+export function Spinner({ ...props }: Props) {
+  const { foreground } = useTheme();
+  return <ActivityIndicator color={foreground} {...props} />;
 }
-
-const styles = StyleSheet.create({
-  spinnerContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  spinner: {
-    width: 20,
-    height: 20,
-    borderColor: "gray",
-    borderTopWidth: 2,
-    borderBottomWidth: 2,
-    borderRadius: 10,
-  },
-});

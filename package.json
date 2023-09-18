@@ -9,6 +9,7 @@
     "web": "expo start --web",
     "build:preview:android": "eas build -p android --profile preview",
     "format": "prettier --write .",
+    "lint:fix": "eslint --fix . --ext ts --ext tsx --ext js",
     "check:lint": "eslint . --ext ts --ext tsx --ext js",
     "check:format": "prettier --check .",
     "check:types": "tsc --pretty --noEmit"
@@ -24,8 +25,8 @@
     "cuid": "^3.0.0",
     "expo": "~49.0.8",
     "expo-font": "~11.4.0",
-    "expo-image": "^1.3.2",
-    "expo-image-picker": "^14.3.2",
+    "expo-image": "~1.3.3",
+    "expo-image-picker": "~14.3.2",
     "expo-linking": "~5.0.2",
     "expo-router": "2.0.0",
     "expo-splash-screen": "~0.20.5",

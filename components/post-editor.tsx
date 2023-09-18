@@ -32,10 +32,10 @@ import { HEADER_HEIGHT, STATUSBAR_HEIGHT } from "@/components/header";
 import { Icons } from "@/components/icons";
 import { ImagesList } from "@/components/images-list";
 import { Text } from "@/components/themed";
-import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
 import { useCurrentUser } from "@/context/current-user";
-import { getPost, getUser } from "@/firebase/database";
+import { useTheme } from "@/context/theme";
+import { getPost, getUser } from "@/firebase/db";
 import { isPostsHasEmptyContent } from "@/lib/utils";
 
 interface PostEditorProps {
@@ -58,7 +58,7 @@ export function PostEditor({
   const { user: currentUser } = useCurrentUser();
 
   const { border, accent, background, accentForeground, foreground } =
-    useThemedColors();
+    useTheme();
   const { padding } = getStyles();
   const headerAndFooterHeight = HEADER_HEIGHT - STATUSBAR_HEIGHT;
   const snapPoints = ["25%", "50%"];

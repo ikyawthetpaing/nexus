@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { StatusBar } from "expo-status-bar";
 import { signOut } from "firebase/auth";
-import { Platform, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/spinner";
@@ -17,7 +16,6 @@ export default function SettingsScreen() {
   }
   return (
     <View style={styles.container}>
-      <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
       <Button onPress={onPressSignOut}>
         {loading ? <Spinner /> : "Sign out"}
       </Button>

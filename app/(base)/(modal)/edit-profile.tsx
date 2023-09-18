@@ -4,24 +4,18 @@ import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { Image } from "react-native";
 
+import { useAlert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import {
-  Alert,
-  AlertDescription,
-  AlertFooter,
-  AlertFooterButton,
-  AlertTitle,
-} from "@/components/ui/dialog";
 import { IconButton } from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
 import { Header, HEADER_HEIGHT } from "@/components/header";
-import LoadingScreen from "@/components/loading";
+import { LoadingScreen } from "@/components/loading-screen";
 import { Text, View } from "@/components/themed";
-import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
 import { useCurrentUser } from "@/context/current-user";
+import { useTheme } from "@/context/theme";
 import { StoragePath } from "@/firebase/config";
-import { updateUser } from "@/firebase/database";
+import { updateUser } from "@/firebase/db";
 import { handleFirebaseError } from "@/firebase/error-handler";
 import {
   deleteFileFromFirebase,
@@ -41,8 +35,8 @@ function hasDataChanged(
 
 export default function EditProfileScreen() {
   const { user } = useCurrentUser();
-
-  const { accent, mutedForeground } = useThemedColors();
+  const { Alert, setAlert } = useAlert();
+  const { accent, mutedForeground } = useTheme();
   const { padding } = getStyles();
 
   const [selectedImage, setSelectedImage] = useState<string>();
@@ -51,7 +45,6 @@ export default function EditProfileScreen() {
   const [originalData, setOriginalData] = useState<EditableUser | null>(user);
   const [formData, setFormData] = useState<EditableUser | null>(user);
   const [uploading, setUploading] = useState(false);
-  const [dialogVisiable, setDailogVisiable] = useState(false);
   const [isDataChanged, setIsDataChanged] = useState(false);
 
   useEffect(() => {
@@ -92,7 +85,15 @@ export default function EditProfileScreen() {
     if (!isDataChanged) {
       router.back();
     } else {
-      setDailogVisiable(true);
+      setAlert({
+        title: "Unsaved changes",
+        description:
+          "You have unsaved changes. Are you sure you want to cancel?",
+        button: [
+          { text: "Yes", action: () => router.back() },
+          { text: "No", action: () => setAlert(null) },
+        ],
+      });
     }
   }
 
@@ -232,23 +233,7 @@ export default function EditProfileScreen() {
           </View>
         </View>
       </View>
-      <Alert visible={dialogVisiable}>
-        <AlertTitle>Unsaved changes</AlertTitle>
-        <AlertDescription>
-          You have unsaved changes. Are you sure you want to cancel?
-        </AlertDescription>
-        <AlertFooter>
-          <AlertFooterButton
-            textStyle={{ fontWeight: "500", color: "#60a5fa" }}
-            onPress={() => router.back()}
-          >
-            Yes
-          </AlertFooterButton>
-          <AlertFooterButton onPress={() => setDailogVisiable(false)}>
-            No
-          </AlertFooterButton>
-        </AlertFooter>
-      </Alert>
+      <Alert />
     </View>
   );
 }

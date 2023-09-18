@@ -1,57 +1,49 @@
 import { useEffect, useState } from "react";
 import { User } from "@/types";
 import { router } from "expo-router";
-import {
-  createUserWithEmailAndPassword,
-  User as FirebaseUser,
-  sendEmailVerification,
-  updateEmail,
-  updateProfile,
-} from "firebase/auth";
-import { Pressable, StatusBar } from "react-native";
+import { updateProfile } from "firebase/auth";
 
+import { useAlert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import {
-  Alert,
-  AlertDescription,
-  AlertFooter,
-  AlertFooterButton,
-  AlertTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { IconButton } from "@/components/ui/icon-button";
+import { Input, InputProps } from "@/components/ui/input";
 import { STATUSBAR_HEIGHT } from "@/components/header";
-import { Icons } from "@/components/icons";
+import { Spinner } from "@/components/spinner";
 import { Text, View } from "@/components/themed";
-import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
 import { useAuth } from "@/context/auth";
-import { FIREBASE_AUTH } from "@/firebase/config";
-import { createUser } from "@/firebase/database";
+import { useTheme } from "@/context/theme";
+import { signUp } from "@/firebase/auth";
+import { createUser } from "@/firebase/db";
 import { handleFirebaseError } from "@/firebase/error-handler";
-import { isValidEmail, isValidUsername } from "@/lib/utils";
+import { isValidEmail, isValidPassword, isValidUsername } from "@/lib/utils";
 
 interface FormStep {
   title: string;
   description?: string;
   validate: () => boolean;
   errorMessage: string;
-  input: JSX.Element;
+  inputProps: InputProps;
 }
 
 function Step({
   title,
   description,
   errorMessage,
-  input,
+  inputProps,
   onPress,
+  isFinalStep,
+  loading,
 }: {
   title: string;
   description: string | undefined;
   errorMessage: string | null;
-  input: JSX.Element;
+  inputProps: InputProps;
   onPress: () => void;
+  isFinalStep: boolean;
+  loading: boolean;
 }) {
-  const { mutedForeground } = useThemedColors();
+  const { mutedForeground } = useTheme();
   const { padding } = getStyles();
   return (
     <View style={{ paddingHorizontal: padding, gap: padding * 1.75 }}>
@@ -62,65 +54,63 @@ function Step({
         )}
       </View>
       <View style={{ gap: padding }}>
-        {input}
+        <Input {...inputProps} />
         {errorMessage && <Text style={{ color: "red" }}>{errorMessage}</Text>}
       </View>
-      <Button onPress={onPress}>Next</Button>
+      <Button onPress={onPress} disabled={loading}>
+        {loading ? <Spinner /> : isFinalStep ? "Create" : "Next"}
+      </Button>
     </View>
   );
 }
 
 export default function SignUpScreen() {
-  const { user } = useAuth();
-  const { background, foreground, mutedForeground } = useThemedColors();
   const { padding } = getStyles();
 
-  const [error, setError] = useState<string | null>(null);
-  const [alert, setAlert] = useState<{
-    title: string;
-    description?: string;
-    button: { text: string; action: () => void }[];
-  } | null>(null);
+  const { user } = useAuth();
+  if (user) {
+    router.replace("/verify-email");
+  }
 
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     fullName: "",
     password: "",
     username: "",
-    email: user?.email || "",
+    email: "",
   });
+  const { Alert, setAlert } = useAlert();
 
   const formSteps: FormStep[] = [
     {
       title: "What's your name?",
       validate: () => formData.fullName.length >= 3,
       errorMessage: "Must be at least 3 letters.",
-      input: (
-        <Input
-          placeholder="Name"
-          autoCapitalize="words"
-          autoFocus={true}
-          value={formData.fullName}
-          onChangeText={(text) => setFormData({ ...formData, fullName: text })}
-        />
-      ),
+      inputProps: {
+        placeholder: "Name",
+        autoCapitalize: "words",
+        autoFocus: true,
+        value: formData.fullName,
+        onChangeText: (text) => setFormData({ ...formData, fullName: text }),
+      },
     },
     {
       title: "Create a password",
       description:
         "Create a password with a least 8 letters or numbers. It should be something others can't guess.",
-      validate: () => formData.password.length >= 8,
+      validate: () =>
+        formData.password.length >= 8 && isValidPassword(formData.password),
       errorMessage: "Password must be at least 8 letters.",
-      input: (
-        <Input
-          placeholder="Password"
-          autoCapitalize="none"
-          autoCorrect={false}
-          secureTextEntry={true}
-          textContentType="password"
-          value={formData.password}
-          onChangeText={(text) => setFormData({ ...formData, password: text })}
-        />
-      ),
+      inputProps: {
+        placeholder: "Password",
+        autoCapitalize: "none",
+        autoCorrect: false,
+        secureTextEntry: true,
+        textContentType: "password",
+        value: formData.password,
+        onChangeText: (text) => setFormData({ ...formData, password: text }),
+      },
     },
     {
       title: "Create a username",
@@ -129,115 +119,80 @@ export default function SignUpScreen() {
       validate: () =>
         formData.username.length >= 3 && isValidUsername(formData.username),
       errorMessage: "Must be a valid username.",
-      input: (
-        <Input
-          placeholder="Username"
-          autoCapitalize="none"
-          autoCorrect={false}
-          value={formData.username}
-          onChangeText={(text) => setFormData({ ...formData, username: text })}
-        />
-      ),
+      inputProps: {
+        placeholder: "Username",
+        autoCapitalize: "none",
+        autoCorrect: false,
+        value: formData.username,
+        onChangeText: (text) => setFormData({ ...formData, username: text }),
+      },
     },
     {
-      title: user ? "Verify your email" : "What's your email?",
+      title: "What's your email?",
       description:
         "Enter the email where you can be contacted. No one will see this on your profile.",
       validate: () => isValidEmail(formData.email),
       errorMessage: "Must be a valid email.",
-      input: (
-        <Input
-          placeholder="Email"
-          autoCapitalize="none"
-          keyboardType="email-address"
-          textContentType="emailAddress"
-          value={formData.email}
-          onChangeText={(text) => setFormData({ ...formData, email: text })}
-        />
-      ),
+      inputProps: {
+        placeholder: "Email",
+        autoCapitalize: "none",
+        keyboardType: "email-address",
+        textContentType: "emailAddress",
+        value: formData.email,
+        onChangeText: (text) => setFormData({ ...formData, email: text }),
+      },
     },
   ];
 
-  const [step, setStep] = useState(user ? formSteps.length - 1 : 0);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
   useEffect(() => {
     setError(null);
-  }, [step]);
+  }, [currentStepIndex]);
 
   const onPressBack = () => {
-    if (step === 0 || user) {
+    if (currentStepIndex === 0 || user) {
       router.push("/signin");
     } else {
-      setStep(step - 1);
+      setCurrentStepIndex(currentStepIndex - 1);
     }
   };
 
-  async function verificationEmail(user: FirebaseUser) {
+  async function onPressNext() {
     try {
-      await sendEmailVerification(user);
-      setAlert({
-        title: "Verify Email",
-        description: `Verification email sent to ${user.email}.`,
-        button: [
-          {
-            text: "Ok",
-            action: () => setAlert(null),
-          },
-        ],
-      });
-    } catch (err) {
-      handleFirebaseError(err);
-    }
-  }
-
-  async function updateVerificationEmail(user: FirebaseUser, email: string) {
-    try {
-      await updateEmail(user, email);
-      await verificationEmail(user);
-    } catch (err) {
-      handleFirebaseError(err);
-    }
-  }
-
-  const onPressNext = async () => {
-    try {
-      const currentFormStep = formSteps[step];
+      const currentFormStep = formSteps[currentStepIndex];
       if (currentFormStep.validate()) {
-        if (step === formSteps.length - 1) {
-          if (user) {
-            if (formData.email !== user.email) {
-              updateVerificationEmail(user, formData.email);
-            } else {
-              await verificationEmail(user);
-            }
-          } else {
-            const userCredential = await createUserWithEmailAndPassword(
-              FIREBASE_AUTH,
-              formData.email,
-              formData.password
-            );
+        // final formstep creat user
+        if (currentStepIndex === formSteps.length - 1) {
+          setLoading(true);
 
-            const newUser = userCredential.user;
+          const userCredential = await signUp(
+            formData.email,
+            formData.password
+          );
 
-            // Update profile on firebase auth
-            await updateProfile(newUser, {
-              displayName: formData.fullName,
-            });
+          const newUser = userCredential.user;
 
-            const createUserData: User = {
-              id: newUser.uid,
-              name: formData.fullName,
-              username: formData.username,
-              email: formData.email,
-              verified: false,
-              bio: null,
-              avatar: null,
-            };
+          // Update user's name on firebase auth
+          await updateProfile(newUser, {
+            displayName: formData.fullName,
+          });
 
-            await createUser(createUserData, newUser.uid);
-          }
+          const createUserData: User = {
+            id: newUser.uid,
+            name: formData.fullName,
+            username: formData.username,
+            email: formData.email,
+            verified: false,
+            bio: null,
+            avatar: null,
+          };
+
+          await createUser(createUserData, newUser.uid);
+
+          setLoading(false);
         } else {
-          setStep(step + 1);
+          setCurrentStepIndex(currentStepIndex + 1);
         }
         setError(null);
       } else {
@@ -246,26 +201,23 @@ export default function SignUpScreen() {
     } catch (err) {
       handleFirebaseError(err);
     }
-  };
+  }
 
   return (
     <View style={{ flex: 1 }}>
-      <StatusBar backgroundColor={background} />
       <View style={{ marginTop: STATUSBAR_HEIGHT, flex: 1 }}>
         <View style={{ padding: padding }}>
-          <Pressable onPress={onPressBack}>
-            {({ pressed }) => (
-              <Icons.arrowLeft color={pressed ? foreground : mutedForeground} />
-            )}
-          </Pressable>
+          <IconButton icon="arrowLeft" onPress={onPressBack} />
         </View>
         <View style={{ justifyContent: "space-between", flex: 1 }}>
           <Step
-            title={formSteps[step].title}
-            description={formSteps[step].description}
+            title={formSteps[currentStepIndex].title}
+            description={formSteps[currentStepIndex].description}
             errorMessage={error}
-            input={formSteps[step].input}
+            inputProps={formSteps[currentStepIndex].inputProps}
             onPress={onPressNext}
+            isFinalStep={currentStepIndex === formSteps.length - 1}
+            loading={loading}
           />
           <View style={{ alignItems: "center", padding: padding * 2 }}>
             <Button
@@ -292,23 +244,7 @@ export default function SignUpScreen() {
           </View>
         </View>
       </View>
-      <Alert visible={!!alert}>
-        <AlertTitle>{alert?.title}</AlertTitle>
-        {alert?.description && (
-          <AlertDescription>{alert?.description}</AlertDescription>
-        )}
-        <AlertFooter>
-          {alert?.button.map((btn, i) => (
-            <AlertFooterButton
-              key={i}
-              textStyle={{ fontWeight: "500", color: "#60a5fa" }}
-              onPress={btn.action}
-            >
-              {btn.text}
-            </AlertFooterButton>
-          ))}
-        </AlertFooter>
-      </Alert>
+      <Alert />
     </View>
   );
 }

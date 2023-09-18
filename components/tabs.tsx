@@ -2,8 +2,8 @@ import { TabBar } from "@/types";
 import { router, usePathname } from "expo-router";
 import { ViewProps } from "react-native";
 
-import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
+import { useTheme } from "@/context/theme";
 
 import { View } from "./themed";
 import { IconButton } from "./ui/icon-button";
@@ -15,7 +15,7 @@ interface Props extends ViewProps {
 }
 
 export function Tabs({ tabItems, style, ...props }: Props) {
-  const { border, mutedForeground, foreground } = useThemedColors();
+  const { border, mutedForeground, foreground } = useTheme();
   const { borderWidthSmall } = getStyles();
   const pathname = usePathname();
 

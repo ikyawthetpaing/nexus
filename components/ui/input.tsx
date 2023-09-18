@@ -1,18 +1,18 @@
 import { forwardRef } from "react";
 import { StyleSheet, TextInput, TextInputProps } from "react-native";
 
-import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
+import { useTheme } from "@/context/theme";
 
-type Variant = "default" | "underline";
+type Variant = "default" | "underline" | "ghost";
 
-interface Props extends TextInputProps {
+export interface InputProps extends TextInputProps {
   variant?: Variant;
 }
 
-export const Input = forwardRef<TextInput, Props>(
+export const Input = forwardRef<TextInput, InputProps>(
   ({ style, variant = "default", ...props }, ref) => {
-    const { mutedForeground } = useThemedColors();
+    const { mutedForeground } = useTheme();
     const { padding } = getStyles();
 
     const themedStyles = useThemedStyles({ variant });
@@ -35,7 +35,7 @@ export const Input = forwardRef<TextInput, Props>(
 );
 
 const useThemedStyles = ({ variant }: { variant: Variant }) => {
-  const { foreground, accent, background, border } = useThemedColors();
+  const { foreground, accent, background, border } = useTheme();
   const { padding } = getStyles();
 
   const styles = StyleSheet.create({
@@ -55,6 +55,7 @@ const useThemedStyles = ({ variant }: { variant: Variant }) => {
       borderBottomColor: border,
       paddingBottom: padding / 2,
     },
+    ghost: {},
   });
 
   const variantStyles =
@@ -62,6 +63,8 @@ const useThemedStyles = ({ variant }: { variant: Variant }) => {
       ? styles.default
       : variant === "underline"
       ? styles.underline
+      : variant === "ghost"
+      ? styles.ghost
       : {};
 
   const themedStyles = { ...styles.common, ...variantStyles };

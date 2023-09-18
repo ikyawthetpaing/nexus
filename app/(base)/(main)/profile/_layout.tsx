@@ -14,12 +14,12 @@ import { Header } from "@/components/header";
 import { ProfileHeader } from "@/components/profile-header";
 import { View } from "@/components/themed";
 import { appConfig } from "@/config/app";
-import { useThemedColors } from "@/constants/colors";
 import { getStyles } from "@/constants/style";
 import { useCurrentUser } from "@/context/current-user";
+import { useTheme } from "@/context/theme";
 
 export default function ProfileLayout() {
-  const { background } = useThemedColors();
+  const { background } = useTheme();
   const { padding } = getStyles();
 
   const { user } = useCurrentUser();
