@@ -6,13 +6,17 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { AddPost, CreatePost, UploadedImage } from "@/types";
+import { AddPost, Post, UploadedImage } from "@/types";
+import { router } from "expo-router";
+import { Timestamp } from "firebase/firestore";
 
-import { LoadingScreen } from "@/components/loading-screen";
 import { StoragePath } from "@/firebase/config";
 import { createPost } from "@/firebase/db";
 import { handleFirebaseError } from "@/firebase/error-handler";
 import { uploadFileToFirebase } from "@/firebase/storage";
+import { getUniqueString } from "@/lib/utils";
+
+import { useCurrentUser } from "./current-user";
 
 type UploadType = {
   posts: AddPost[];
@@ -45,6 +49,7 @@ interface Props {
 export function UploaderContextProvider({ children }: Props) {
   const [loading, setLoading] = useState(false);
   const [upload, setUpload] = useState<UploadType | null>(null);
+  const { user } = useCurrentUser();
 
   async function performUpload(posts: AddPost[], replyToId?: string) {
     setLoading(true);
@@ -60,13 +65,16 @@ export function UploaderContextProvider({ children }: Props) {
           })
         );
 
-        const createPostData: CreatePost = {
+        const postData: Post = {
           replyToId: replyToId || null,
           content: post.content,
           images: uploadedImages,
+          authorId: user.id,
+          createdAt: Timestamp.now(),
+          id: getUniqueString(),
         };
 
-        const res = await createPost(createPostData);
+        const res = await createPost(postData);
         replyToId = res.id;
       }
     } catch (error) {
@@ -75,6 +83,12 @@ export function UploaderContextProvider({ children }: Props) {
     } finally {
       setLoading(false);
       setUpload(null);
+
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.push("/");
+      }
     }
   }
 
@@ -91,7 +105,8 @@ export function UploaderContextProvider({ children }: Props) {
 
   return (
     <UploaderContext.Provider value={uploaderContext}>
-      {loading ? <LoadingScreen /> : children}
+      {/* {loading ? <LoadingScreen /> : children} */}
+      {children}
     </UploaderContext.Provider>
   );
 }

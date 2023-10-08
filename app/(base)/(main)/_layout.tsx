@@ -59,20 +59,3 @@ export default function TabLayout() {
     </Tabs>
   );
 }
-
-// import { Stack } from "expo-router";
-
-// import { TAB_HEIGHT, Tabs } from "@/components/tabs";
-// import { View } from "@/components/themed";
-// import { appConfig } from "@/config/app";
-
-// export default function MainLayout() {
-//   return (
-//     <View style={{ flex: 1, backgroundColor: }}>
-//       <View style={{ paddingBottom: TAB_HEIGHT }}>
-//         <Stack screenOptions={{ headerShown: false }} />
-//       </View>
-//       <Tabs tabItems={appConfig.tabBarNavItems} />
-//     </View>
-//   );
-// }

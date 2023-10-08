@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NavItem, User } from "@/types";
+import { Follow, NavItem, User } from "@/types";
 import { router, usePathname } from "expo-router";
 import {
   Animated,
@@ -10,7 +10,9 @@ import {
 } from "react-native";
 
 import { Button } from "@/components/ui/button";
+import { FollowButton } from "@/components/follow-button";
 import { HEADER_HEIGHT, STATUSBAR_HEIGHT } from "@/components/header";
+import { Icons } from "@/components/icons";
 import { Text, View } from "@/components/themed";
 import { getStyles } from "@/constants/style";
 import { useTheme } from "@/context/theme";
@@ -19,6 +21,7 @@ const PROFILE_NAVBAR_HEIGHT = 50;
 
 interface ProfileHeaderProps extends ViewProps {
   user: User;
+  currentUser: User;
   scrollY: Animated.Value;
   getHeight?: (h: number) => void;
   navItems: NavItem[];
@@ -26,10 +29,14 @@ interface ProfileHeaderProps extends ViewProps {
 
 export function ProfileHeader({
   user,
+  currentUser,
   scrollY,
   getHeight,
   navItems,
 }: ProfileHeaderProps) {
+  const isCurrentUser = user.id === currentUser.id;
+  const follow: Follow = { followerId: currentUser.id, followingId: user.id };
+
   const { background, mutedForeground, accent, border } = useTheme();
   const { padding, borderWidthSmall: borderWidth } = getStyles();
 
@@ -101,10 +108,11 @@ export function ProfileHeader({
             height: 80,
             borderRadius: 40,
             backgroundColor: accent,
-            overflow: "hidden",
+            // overflow: "hidden",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            position: "relative",
           }}
         >
           {user.avatar && (
@@ -115,67 +123,102 @@ export function ProfileHeader({
                 width: "100%",
                 height: "100%",
                 resizeMode: "cover",
+                borderRadius: 9999,
               }}
             />
+          )}
+          {user.verified && (
+            <View
+              style={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                zIndex: 10,
+                borderRadius: 9999,
+              }}
+            >
+              <Icons.verified size={24} color="#60a5fa" />
+            </View>
           )}
         </View>
       </View>
       <View style={{ flexDirection: "row", gap: padding, padding: padding }}>
-        <Button
-          variant="outline"
-          size="sm"
-          style={{ flex: 1 }}
-          onPress={() => router.push("/edit-profile")}
-        >
-          Edit profile
-        </Button>
-        <Button variant="outline" size="sm" style={{ flex: 1 }}>
-          Share profile
-        </Button>
+        {isCurrentUser ? (
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              style={{ flex: 1 }}
+              onPress={() => router.push("/edit-profile")}
+            >
+              Edit profile
+            </Button>
+            <Button variant="outline" size="sm" style={{ flex: 1 }}>
+              Share profile
+            </Button>
+          </>
+        ) : (
+          <>
+            <FollowButton size="sm" style={{ flex: 1 }} follow={follow} />
+            <Button
+              variant="outline"
+              size="sm"
+              style={{ flex: 1 }}
+              onPress={() => router.push(`/(base)/(modal)/chat/${user.id}`)}
+            >
+              Message
+            </Button>
+          </>
+        )}
       </View>
       <View
         style={{
           flexDirection: "row",
         }}
       >
-        {navItems.map((navItem, index) => (
-          <Pressable
-            key={index}
-            onPress={() => router.push(navItem.slug)}
-            style={{
-              flex: 1,
-            }}
-          >
-            {({ pressed }) => (
-              <View
-                style={[
-                  {
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: PROFILE_NAVBAR_HEIGHT,
-                  },
-                  pressed && { backgroundColor: accent },
-                  pathname === navItem.slug && {
-                    borderBottomWidth: 1,
-                    borderBottomColor: "black",
-                  },
-                ]}
-              >
-                <Text
+        {navItems.map((navItem, index) => {
+          const baseSlug = isCurrentUser ? "/profile" : `/user/${user.id}`;
+          const href = `${baseSlug}${navItem.slug ? `/${navItem.slug}` : ""}`;
+
+          const isActive = pathname === href;
+
+          return (
+            <Pressable
+              key={index}
+              onPress={() => router.push(href)}
+              style={{
+                flex: 1,
+              }}
+            >
+              {({ pressed }) => (
+                <View
                   style={[
                     {
-                      fontWeight: "500",
-                      fontSize: 16,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: PROFILE_NAVBAR_HEIGHT,
+                      backgroundColor: pressed ? accent : "transparent",
+                      borderBottomWidth: isActive ? 1 : 0,
+                      borderBottomColor: isActive ? "black" : "transparent",
                     },
-                    pathname !== navItem.slug && { color: mutedForeground },
                   ]}
                 >
-                  {navItem.title}
-                </Text>
-              </View>
-            )}
-          </Pressable>
-        ))}
+                  <Text
+                    style={[
+                      {
+                        fontWeight: "500",
+                        fontSize: 16,
+                      },
+                      !isActive && { color: mutedForeground },
+                    ]}
+                  >
+                    {navItem.title}
+                  </Text>
+                </View>
+              )}
+            </Pressable>
+          );
+        })}
       </View>
     </Animated.View>
   );

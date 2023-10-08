@@ -3,8 +3,9 @@ const styles = {
   borderRadius: 8,
   borderWidthSmall: 0.55,
   borderWidthLarge: 2,
-  avatarSizeSmall: 40,
-  avatarSizeLarge: 80,
+  avatarSizeSm: 40,
+  avatarSizeMd: 50,
+  avatarSizeLg: 80,
 };
 
 export function getStyles() {

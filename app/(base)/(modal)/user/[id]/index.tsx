@@ -1,33 +1,34 @@
 import { useLocalSearchParams } from "expo-router";
-import { StyleSheet } from "react-native";
 
-import EditScreenInfo from "@/components/edit-screen-info";
+import PostItem from "@/components/post-item";
 import { Text, View } from "@/components/themed";
+import { useUserPostsSnapshot } from "@/hooks/snapshots";
+import { useTheme } from "@/context/theme";
 
-export default function UserProfileScreen() {
+export default function ProfileIndexScreen() {
+  const { mutedForeground } = useTheme();
+
   const { id } = useLocalSearchParams();
+  const userId = typeof id === "string" ? id : "";
+
+  const { posts } = useUserPostsSnapshot(userId);
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>User id: {id}</Text>
-      <View style={styles.separator} />
-      <EditScreenInfo path="app/modal.tsx" />
+    <View>
+      {posts.length > 0 ? (
+        posts.map((post, i) => <PostItem key={i} post={post} />)
+      ) : (
+        <Text
+          style={{
+            marginTop: 32,
+            textAlign: "center",
+            fontSize: 16,
+            color: mutedForeground,
+          }}
+        >
+          No posts yet
+        </Text>
+      )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: "80%",
-  },
-});

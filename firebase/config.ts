@@ -31,4 +31,6 @@ export enum DBCollections {
   Users = "users",
   Posts = "posts",
   Likes = "likes",
+  Follows = "follows",
+  Messages = "messages",
 }

@@ -9,11 +9,11 @@ import { useUploader } from "@/context/uploader";
 import { isPostsHasEmptyContent } from "@/lib/utils";
 
 export default function PostReplyScreen() {
-  const { postId } = useLocalSearchParams();
+  const { id } = useLocalSearchParams();
   const { setUpload } = useUploader();
   const { Alert, setAlert } = useAlert();
 
-  const replyToId = typeof postId === "string" ? postId : undefined;
+  const replyToPostId = typeof id === "string" ? id : undefined;
 
   const [posts, setPosts] = useState<AddPost[]>([
     {
@@ -23,12 +23,7 @@ export default function PostReplyScreen() {
   ]);
 
   function onSubmit() {
-    setUpload({ posts, replyToId });
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.push("/");
-    }
+    setUpload({ posts, replyToId: replyToPostId });
   }
 
   function onCancel() {
@@ -43,7 +38,11 @@ export default function PostReplyScreen() {
         ],
       });
     } else {
-      router.back();
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.push("/");
+      }
     }
   }
 
@@ -53,7 +52,7 @@ export default function PostReplyScreen() {
         posts={posts}
         setPosts={setPosts}
         action="reply"
-        replyToPostId={replyToId}
+        replyToPostId={replyToPostId}
         onCancel={onCancel}
         onSubmit={onSubmit}
       />

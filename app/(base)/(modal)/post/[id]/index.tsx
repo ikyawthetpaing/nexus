@@ -5,8 +5,8 @@ import { router, useLocalSearchParams } from "expo-router";
 import { Dimensions, Pressable, ScrollView, View } from "react-native";
 import ImageView from "react-native-image-viewing";
 
-import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
+import { FollowButton } from "@/components/follow-button";
 import { HEADER_HEIGHT, STATUSBAR_HEIGHT } from "@/components/header";
 import { ImagesList } from "@/components/images-list";
 import { LoadingScreen } from "@/components/loading-screen";
@@ -30,11 +30,15 @@ import { formatCount, formatDate, formatHour } from "@/lib/utils";
 
 export default function UserPostDetailScreen() {
   const { background, mutedForeground, accent, muted, border } = useTheme();
-  const { padding, avatarSizeSmall, borderWidthSmall } = getStyles();
+  const {
+    padding,
+    avatarSizeSm: avatarSizeSmall,
+    borderWidthSmall,
+  } = getStyles();
 
-  const { user } = useCurrentUser();
-  const { postId: _postId } = useLocalSearchParams();
-  const postId = typeof _postId === "string" ? _postId : "";
+  const { user: currentUser } = useCurrentUser();
+  const { id } = useLocalSearchParams();
+  const postId = typeof id === "string" ? id : "";
 
   const footerHeight = HEADER_HEIGHT - STATUSBAR_HEIGHT;
 
@@ -46,7 +50,7 @@ export default function UserPostDetailScreen() {
   );
   const { likeCount } = usePostLikeCountSnapshot(postId);
   const { replyCount } = usePostReplyCountSnapshot(postId);
-  const { liked } = useUserLikedSnapshot(postId, user?.id || "");
+  const { liked } = useUserLikedSnapshot(postId, currentUser?.id || "");
   const { replies } = usePostRepliesSnapshot(postId);
 
   const [imageViewingVisible, setImageViewingVisible] = useState(false);
@@ -60,8 +64,8 @@ export default function UserPostDetailScreen() {
 
   async function onLike() {
     try {
-      if (post && user) {
-        await toggleLike({ postId: post.id, userId: user.id });
+      if (post && currentUser) {
+        await toggleLike({ postId: post.id, userId: currentUser.id });
       }
     } catch (error) {
       handleFirebaseError(error);
@@ -169,7 +173,13 @@ export default function UserPostDetailScreen() {
                 alignItems: "center",
               }}
             >
-              <Button size="sm">Follow</Button>
+              <FollowButton
+                size="sm"
+                follow={{
+                  followerId: currentUser?.id || "",
+                  followingId: post.authorId,
+                }}
+              />
               <IconButton icon="menuDots" iconProps={{ size: 24 }} />
             </View>
           </View>
@@ -252,9 +262,7 @@ export default function UserPostDetailScreen() {
                 <Text style={{ color: mutedForeground }}>Replies</Text>
               </View>
               <View style={{ flexDirection: "row", gap: 4 }}>
-                <Text style={{ fontWeight: "500" }}>
-                  {formatCount(post.repostsCount)}
-                </Text>
+                <Text style={{ fontWeight: "500" }}>0</Text>
                 <Text style={{ color: mutedForeground }}>Reposts</Text>
               </View>
             </View>
@@ -277,9 +285,7 @@ export default function UserPostDetailScreen() {
               <IconButton
                 icon="comment"
                 iconProps={{ size: 18 }}
-                onPress={() =>
-                  router.push(`/user/${post.authorId}/${post.id}/reply`)
-                }
+                onPress={() => router.push(`/post/${post.id}/reply`)}
               />
               <IconButton icon="squareShare" iconProps={{ size: 18 }} />
               <IconButton icon="share" iconProps={{ size: 18 }} />
@@ -307,7 +313,7 @@ export default function UserPostDetailScreen() {
       >
         <Pressable
           style={{ flex: 1 }}
-          onPress={() => router.push(`/user/${post.authorId}/${post.id}/reply`)}
+          onPress={() => router.push(`/post/${post.id}/reply`)}
         >
           {({ pressed }) => (
             <View
@@ -334,9 +340,9 @@ export default function UserPostDetailScreen() {
                   overflow: "hidden",
                 }}
               >
-                {user?.avatar && (
+                {currentUser?.avatar && (
                   <Image
-                    source={{ uri: user.avatar.uri }}
+                    source={{ uri: currentUser.avatar.uri }}
                     style={{
                       width: "100%",
                       height: "100%",

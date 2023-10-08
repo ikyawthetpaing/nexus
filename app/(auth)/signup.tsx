@@ -188,7 +188,7 @@ export default function SignUpScreen() {
             avatar: null,
           };
 
-          await createUser(createUserData, newUser.uid);
+          await createUser(createUserData);
 
           setLoading(false);
         } else {

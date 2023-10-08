@@ -21,10 +21,11 @@ export const Input = forwardRef<TextInput, InputProps>(
         ref={ref}
         style={[
           themedStyles,
-          props.multiline && {
-            textAlignVertical: "top",
-            paddingTop: padding / 2,
-          },
+          props.multiline &&
+            variant === "underline" && {
+              textAlignVertical: "top",
+              paddingTop: padding / 2,
+            },
           style,
         ]}
         placeholderTextColor={mutedForeground}

@@ -1,4 +1,6 @@
-module.exports = {
+import { ExpoConfig } from "expo/config";
+
+const config: ExpoConfig = {
   name: "Nexus",
   slug: "nexus",
   version: "1.0.0",
@@ -40,3 +42,5 @@ module.exports = {
     },
   },
 };
+
+export default config;

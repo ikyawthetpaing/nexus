@@ -333,7 +333,7 @@ interface ReplyToItemProps {
 }
 
 function ReplyTotem({ post, author }: ReplyToItemProps) {
-  const { padding, avatarSizeSmall } = getStyles();
+  const { padding, avatarSizeSm: avatarSizeSmall } = getStyles();
   const paddingLeft = avatarSizeSmall + padding * 2;
 
   const [imageViewingVisible, setImageViewingVisible] = useState(false);
@@ -350,7 +350,10 @@ function ReplyTotem({ post, author }: ReplyToItemProps) {
         }}
       >
         <View style={{ padding: padding }}>
-          <AvatarImage size={avatarSizeSmall} uri={author.avatar?.uri ?? ""} />
+          <AvatarImage
+            uri={author.avatar?.uri || null}
+            style={{ width: avatarSizeSmall }}
+          />
         </View>
         <View style={{ flex: 1, alignItems: "center" }}>
           <Separator orientation="vertical" size={2} />
@@ -419,7 +422,11 @@ const PostEditorItem = forwardRef<TextInput, PostEditorItemProps>(
     },
     ref
   ) => {
-    const { padding, avatarSizeSmall, borderWidthLarge } = getStyles();
+    const {
+      padding,
+      avatarSizeSm: avatarSizeSmall,
+      borderWidthLarge,
+    } = getStyles();
     const paddingLeft = avatarSizeSmall + padding * 2;
 
     const [imageViewingVisible, setImageViewingVisible] = useState(false);
@@ -436,7 +443,10 @@ const PostEditorItem = forwardRef<TextInput, PostEditorItemProps>(
           }}
         >
           <View style={{ padding: padding }}>
-            <AvatarImage size={avatarSizeSmall} uri={user.avatar?.uri || ""} />
+            <AvatarImage
+              uri={user.avatar?.uri || null}
+              style={{ width: avatarSizeSmall }}
+            />
           </View>
           {!lastChild && (
             <View style={{ flex: 1, alignItems: "center" }}>
@@ -449,6 +459,7 @@ const PostEditorItem = forwardRef<TextInput, PostEditorItemProps>(
             <Text style={{ fontWeight: "500" }}>@{user.username}</Text>
             <Input
               ref={ref}
+              autoFocus
               onFocus={onFocus}
               placeholder="What's happening?"
               multiline={true}

@@ -52,7 +52,7 @@ export default function SearchScreen() {
               bottom: padding,
               position: "absolute",
               borderRadius: borderRadius,
-              paddingLeft: padding * 4,
+              paddingLeft: padding * 3.5,
             }}
           />
         </View>

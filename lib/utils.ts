@@ -1,4 +1,5 @@
 import { AddPost } from "@/types";
+import cuid from "cuid";
 import { Timestamp } from "firebase/firestore";
 
 export function timeAgo(createdAt: Timestamp): string {
@@ -14,20 +15,36 @@ export function timeAgo(createdAt: Timestamp): string {
   const months = Math.floor(days / 30); // Rough estimation
   const years = Math.floor(days / 365);
 
+  // if (years >= 1) {
+  //   return years === 1 ? "1 year ago" : `${years} years ago`;
+  // } else if (months >= 1) {
+  //   return months === 1 ? "1 month ago" : `${months} months ago`;
+  // } else if (weeks >= 1) {
+  //   return weeks === 1 ? "1 week ago" : `${weeks} weeks ago`;
+  // } else if (days >= 1) {
+  //   return days === 1 ? "1 day ago" : `${days} days ago`;
+  // } else if (hours >= 1) {
+  //   return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
+  // } else if (minutes >= 1) {
+  //   return minutes === 1 ? "1 minute ago" : `${minutes} minutes ago`;
+  // } else {
+  //   return seconds <= 1 ? "just now" : `${seconds} seconds ago`;
+  // }
+
   if (years >= 1) {
-    return years === 1 ? "1 year ago" : `${years} years ago`;
+    return `${years}y`;
   } else if (months >= 1) {
-    return months === 1 ? "1 month ago" : `${months} months ago`;
+    return `${months}m`;
   } else if (weeks >= 1) {
-    return weeks === 1 ? "1 week ago" : `${weeks} weeks ago`;
+    return `${weeks}w`;
   } else if (days >= 1) {
-    return days === 1 ? "1 day ago" : `${days} days ago`;
+    return `${days}d`;
   } else if (hours >= 1) {
-    return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
+    return `${hours}h`;
   } else if (minutes >= 1) {
-    return minutes === 1 ? "1 minute ago" : `${minutes} minutes ago`;
+    return `${minutes}m`;
   } else {
-    return seconds <= 1 ? "just now" : `${seconds} seconds ago`;
+    return `${seconds}s`;
   }
 }
 
@@ -80,23 +97,29 @@ export function isValidPassword(password: string): boolean {
   return passwordRegex.test(password);
 }
 
-// export function isImageUrlValid(url: string) {
-//   return new Promise((resolve) => {
-//     const img = new Image();
-//     img.onload = function () {
-//       resolve(true);
-//     };
-//     img.onerror = function () {
-//       resolve(false);
-//     };
-//     img.src = url;
-//   });
-// }
-
 export function isPostsHasEmptyContent(posts: AddPost[]): boolean {
   const isEmptyPost = (post: AddPost): boolean => {
     return !post.content && post.images.length === 0;
   };
 
   return posts.some((post) => isEmptyPost(post));
+}
+
+/**
+ * Combines two strings with a hyphen in between.
+ * @param prefix - The first part of the merged string.
+ * @param suffix - The second part of the merged string.
+ * @returns The merged string with a hyphen in between the prefix and suffix.
+ */
+export function mergeStrings(prefix: string, suffix: string): string {
+  return `${prefix}-${suffix}`;
+}
+
+/**
+ * Generates a unique slug using the cuid library.
+ * @returns {string} Unique slug string.
+ */
+export function getUniqueString() {
+  const uniqueSlug = cuid();
+  return uniqueSlug;
 }

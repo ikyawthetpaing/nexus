@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Post, User } from "@/types";
+import { ChatMessage, Follow, Post, User } from "@/types";
 import {
   and,
   collection,
@@ -7,12 +7,17 @@ import {
   limit,
   onSnapshot,
   query,
+  QueryCompositeFilterConstraint,
+  QueryNonFilterConstraint,
   where,
 } from "firebase/firestore";
 
 import { DBCollections, FIREBASE_DB } from "@/firebase/config";
 import {
+  chatMessageConverter,
+  followConverter,
   likeConverter,
+  mergeFollowId,
   mergeLikeId,
   postConverter,
   userConverter,
@@ -302,4 +307,88 @@ export function usePostRepliesSnapshot(postId: string) {
   }, [postId]);
 
   return { replies, loading, error };
+}
+
+export function useUserFollowedSnapshot({ followerId, followingId }: Follow) {
+  const [followed, setFollowed] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    const followUnsubscribe = onSnapshot(
+      doc(
+        FIREBASE_DB,
+        DBCollections.Follows,
+        mergeFollowId({ followerId, followingId })
+      ).withConverter(followConverter),
+      (doc) => {
+        if (doc.exists()) {
+          setFollowed(true);
+          setLoading(false);
+        } else {
+          setFollowed(false);
+          setLoading(false);
+        }
+      },
+      (err) => {
+        setError(err);
+        setLoading(false);
+      }
+    );
+
+    return () => {
+      followUnsubscribe();
+    };
+  }, []);
+
+  return { followed, loading, error };
+}
+
+/**
+ * Custom React hook to retrieve chat messages between a sender and a receiver.
+ * @param {Object} params - Object containing receiverId and senderId.
+ * @returns {Object} - An object containing messages, loading state, and potential error.
+ */
+export function useChatMessageSnapshot(
+  compositeFilter: QueryCompositeFilterConstraint,
+  ...queryConstraints: QueryNonFilterConstraint[]
+) {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    const messagesQuery = query(
+      collection(FIREBASE_DB, DBCollections.Messages),
+      compositeFilter,
+      ...queryConstraints
+    ).withConverter(chatMessageConverter);
+
+    const messagesUnsubscribe = onSnapshot(
+      messagesQuery,
+      (querySnapshot) => {
+        const fetchedMessages: ChatMessage[] = [];
+        querySnapshot.forEach((doc) => {
+          fetchedMessages.push(doc.data());
+        });
+
+        setMessages(fetchedMessages);
+        setLoading(false);
+      },
+      (err) => {
+        setError(err);
+        setLoading(false);
+      }
+    );
+
+    return () => {
+      messagesUnsubscribe();
+    };
+  }, []);
+
+  return { messages, loading, error };
 }

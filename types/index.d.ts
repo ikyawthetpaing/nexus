@@ -1,25 +1,15 @@
-import { Href } from "expo-router";
-
-import { Icons } from "@/components/icons";
-
 export type AppConfig = {
   name: string;
   url: string;
   authors: { name: string; url: string }[];
   creator: string;
 
-  tabBarNavItems: TabBar[];
   profileNavItems: NavItem[];
 };
 
 export type NavItem = {
   title: string;
-  slug: Href;
-};
-
-export type TabBar = {
-  icon: keyof typeof Icons;
-  slug: Href;
+  slug: string;
 };
 
 export type FirebaseUploadedFile = {
@@ -60,15 +50,25 @@ export type Post = {
   authorId: string;
   content: string | null;
   images: UploadedImage[] | null;
-  repliesCount: number;
-  likesCount: number;
-  repostsCount: number;
   createdAt: Timestamp;
 };
-export type EditablePost = Pick<Post, "content" | "images">;
-export type CreatePost = Pick<Post, "replyToId" | "content" | "images">;
 
 export type Like = {
   postId: string;
   userId: string;
 };
+
+export type Follow = {
+  followerId: string;
+  followingId: string;
+};
+
+export type ChatMessage = {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  content: string;
+  createdAt: Timestamp;
+};
+
+export type SendingChatMessage = Pick<ChatMessage, "id" | "content">;

@@ -1,12 +1,14 @@
 import React, { createContext, useContext, useMemo } from "react";
 import { Post, User } from "@/types";
 
+import { LoadingScreen } from "@/components/loading-screen";
 import { useUserPostsSnapshot, useUserSnapshot } from "@/hooks/snapshots";
 import { getAuthUser } from "@/firebase/auth";
 
 interface CurrentUserContextType {
-  user: User | null;
+  user: User;
   posts: Post[];
+  loading: boolean;
 }
 
 const CurrentUserContext = createContext<CurrentUserContextType | undefined>(
@@ -30,12 +32,17 @@ interface Props {
 export function CurrentUserContextProvider({ children }: Props) {
   const authUserId = useMemo(() => getAuthUser()?.uid || "", []);
 
-  const { user } = useUserSnapshot(authUserId);
+  const { user, loading: userFetching } = useUserSnapshot(authUserId);
   const { posts } = useUserPostsSnapshot(authUserId);
+
+  if (!user) {
+    return <LoadingScreen />;
+  }
 
   const userContext: CurrentUserContextType = {
     user,
     posts,
+    loading: userFetching,
   };
 
   return (

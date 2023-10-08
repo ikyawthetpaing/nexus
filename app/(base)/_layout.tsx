@@ -9,7 +9,7 @@ export default function BaseLayout() {
     <CurrentUserContextProvider>
       <FeedContextProvider>
         <UploaderContextProvider>
-          <Stack screenOptions={{ headerShown: false }} />
+          <Stack screenOptions={{ headerShown: false, animation: "none" }} />
         </UploaderContextProvider>
       </FeedContextProvider>
     </CurrentUserContextProvider>

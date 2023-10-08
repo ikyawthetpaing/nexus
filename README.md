@@ -71,10 +71,6 @@ If you want to contribute to this project, please follow these steps:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Acknowledgments
-
-Mention any libraries, tutorials, or resources you used or were inspired by during the development of this app.
-
 ## Contact
 
 If you have any questions or suggestions, feel free to contact the project owner:

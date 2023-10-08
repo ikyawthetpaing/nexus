@@ -2,8 +2,8 @@ import { Pressable, PressableProps, Text, View } from "react-native";
 
 import { useTheme } from "@/context/theme";
 
-interface ButtonProps extends PressableProps {
-  children: React.ReactNode;
+export interface ButtonProps extends PressableProps {
+  children?: React.ReactNode;
   variant?: "default" | "outline" | "ghost";
   size?: "default" | "sm" | "xs";
 }

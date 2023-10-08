@@ -5,7 +5,7 @@ export default function ModalLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
-        animation: "slide_from_bottom",
+        animation: "none",
         presentation: "modal",
       }}
     />

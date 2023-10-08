@@ -6,7 +6,6 @@ import { Dimensions, Pressable, View } from "react-native";
 import ImageView from "react-native-image-viewing";
 
 import { AvatarImage } from "@/components/ui/avatar-image";
-import { Separator } from "@/components/ui/separator";
 import { Icons } from "@/components/icons";
 import { ImagesList } from "@/components/images-list";
 import { Text } from "@/components/themed";
@@ -31,8 +30,11 @@ interface PostItemProps {
 
 export default function PostItem({ post, isReplyTo }: PostItemProps) {
   const { border, accent, mutedForeground, background } = useTheme();
-  const { padding, borderWidthSmall, borderWidthLarge, avatarSizeSmall } =
-    getStyles();
+  const {
+    padding,
+    borderWidthSmall,
+    avatarSizeSm: avatarSizeSmall,
+  } = getStyles();
 
   const authUserId = useMemo(() => getAuthUser()?.uid || "", []);
   const { user: author } = useUserSnapshot(post.authorId);
@@ -57,11 +59,7 @@ export default function PostItem({ post, isReplyTo }: PostItemProps) {
 
   return (
     <View>
-      <Pressable
-        onPress={() =>
-          router.push(`/(base)/(modal)/user/${post.authorId}/${post.id}`)
-        }
-      >
+      <Pressable onPress={() => router.push(`/(base)/(modal)/post/${post.id}`)}>
         {({ pressed }) => (
           <View
             style={[
@@ -86,13 +84,13 @@ export default function PostItem({ post, isReplyTo }: PostItemProps) {
                 bottom: 0,
               }}
             >
-              <UserLink userId={post.authorId}>
-                <AvatarImage
-                  size={avatarSizeSmall}
-                  uri={author?.avatar?.uri || ""}
-                />
-              </UserLink>
-              {post.repliesCount > 0 ||
+              {/* <UserLink userId={post.authorId}> */}
+              <AvatarImage
+                uri={author?.avatar?.uri || null}
+                style={{ width: avatarSizeSmall }}
+              />
+              {/* </UserLink> */}
+              {/* {post.repliesCount > 0 ||
                 (isReplyTo && (
                   <>
                     <View
@@ -107,9 +105,9 @@ export default function PostItem({ post, isReplyTo }: PostItemProps) {
                         orientation="vertical"
                       />
                     </View>
-                    {/* <RepliesReference replies={replies} /> */}
+                    <RepliesReference replies={replies} />
                   </>
-                ))}
+                ))} */}
             </View>
 
             {/* header */}
@@ -210,9 +208,7 @@ export default function PostItem({ post, isReplyTo }: PostItemProps) {
               </Pressable>
               <Pressable
                 style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
-                onPress={() =>
-                  router.push(`/user/${post.authorId}/${post.id}/reply`)
-                }
+                onPress={() => router.push(`/post/${post.id}/reply`)}
               >
                 <Icons.comment size={18} color={mutedForeground} />
                 <Text style={{ color: "gray" }}>{formatCount(replyCount)}</Text>
@@ -221,9 +217,7 @@ export default function PostItem({ post, isReplyTo }: PostItemProps) {
                 style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
               >
                 <Icons.squareShare size={18} color={mutedForeground} />
-                <Text style={{ color: "gray" }}>
-                  {formatCount(post.repliesCount)}
-                </Text>
+                <Text style={{ color: "gray" }}>0</Text>
               </Pressable>
               <Pressable>
                 <Icons.share size={18} color={mutedForeground} />
