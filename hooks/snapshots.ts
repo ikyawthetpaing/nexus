@@ -12,7 +12,7 @@ import {
   where,
 } from "firebase/firestore";
 
-import { DBCollections, FIREBASE_DB } from "@/firebase/config";
+import { FIREBASE_DB, FIRESTORE_COLLECTIONS } from "@/firebase/config";
 import {
   chatMessageConverter,
   followConverter,
@@ -21,7 +21,7 @@ import {
   mergeLikeId,
   postConverter,
   userConverter,
-} from "@/firebase/db";
+} from "@/firebase/firestore";
 
 export function usePostsFeedSnapshot() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -32,7 +32,7 @@ export function usePostsFeedSnapshot() {
     setLoading(true);
     setError(null);
     const q = query(
-      collection(FIREBASE_DB, DBCollections.Posts),
+      collection(FIREBASE_DB, FIRESTORE_COLLECTIONS.POSTS),
       where("replyToId", "==", null),
       limit(25)
     ).withConverter(postConverter);
@@ -73,7 +73,7 @@ export function useUserSnapshot(userId: string) {
       setError(null);
       const userRef = doc(
         FIREBASE_DB,
-        DBCollections.Users,
+        FIRESTORE_COLLECTIONS.USERS,
         userId
       ).withConverter(userConverter);
 
@@ -107,7 +107,7 @@ export function useUserPostsSnapshot(userId: string) {
     setLoading(true);
     setError(null);
     const postsQuery = query(
-      collection(FIREBASE_DB, DBCollections.Posts),
+      collection(FIREBASE_DB, FIRESTORE_COLLECTIONS.POSTS),
       and(where("authorId", "==", userId), where("replyToId", "==", null))
     ).withConverter(postConverter);
 
@@ -147,7 +147,7 @@ export function useUserLikedSnapshot(postId: string, userId: string) {
     const likedUnsubscribe = onSnapshot(
       doc(
         FIREBASE_DB,
-        DBCollections.Likes,
+        FIRESTORE_COLLECTIONS.LIKES,
         mergeLikeId({ postId, userId })
       ).withConverter(likeConverter),
       (doc) => {
@@ -182,9 +182,11 @@ export function usePostSnapshot(postId: string) {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    const userRef = doc(FIREBASE_DB, DBCollections.Posts, postId).withConverter(
-      postConverter
-    );
+    const userRef = doc(
+      FIREBASE_DB,
+      FIRESTORE_COLLECTIONS.POSTS,
+      postId
+    ).withConverter(postConverter);
 
     const userUnsubscribe = onSnapshot(
       userRef,
@@ -215,7 +217,7 @@ export function usePostLikeCountSnapshot(postId: string) {
     setLoading(true);
     setError(null);
     const likeCountQuery = query(
-      collection(FIREBASE_DB, DBCollections.Likes),
+      collection(FIREBASE_DB, FIRESTORE_COLLECTIONS.LIKES),
       where("postId", "==", postId)
     ).withConverter(likeConverter);
 
@@ -248,7 +250,7 @@ export function usePostReplyCountSnapshot(postId: string) {
     setLoading(true);
     setError(null);
     const replyCountQuery = query(
-      collection(FIREBASE_DB, DBCollections.Posts),
+      collection(FIREBASE_DB, FIRESTORE_COLLECTIONS.POSTS),
       where("replyToId", "==", postId)
     ).withConverter(likeConverter);
 
@@ -281,7 +283,7 @@ export function usePostRepliesSnapshot(postId: string) {
     setLoading(true);
     setError(null);
     const repliesQuery = query(
-      collection(FIREBASE_DB, DBCollections.Posts),
+      collection(FIREBASE_DB, FIRESTORE_COLLECTIONS.POSTS),
       where("replyToId", "==", postId)
     ).withConverter(postConverter);
     const repliesUnsubscribe = onSnapshot(
@@ -309,6 +311,73 @@ export function usePostRepliesSnapshot(postId: string) {
   return { replies, loading, error };
 }
 
+// follow
+export function useUserFollowersCountSnapshot(userId: string) {
+  const [followersCount, setFollowersCount] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    const followersCountQuery = query(
+      collection(FIREBASE_DB, FIRESTORE_COLLECTIONS.FOLLOWS),
+      where("followingId", "==", userId)
+    ).withConverter(followConverter);
+
+    const likeCountUnsubscribe = onSnapshot(
+      followersCountQuery,
+      (querySnapshot) => {
+        setFollowersCount(querySnapshot.size);
+        setLoading(false);
+      },
+      (err) => {
+        setError(err);
+        setLoading(false);
+      }
+    );
+
+    return () => {
+      likeCountUnsubscribe();
+    };
+  }, [userId]);
+
+  return { followersCount, loading, error };
+}
+
+export function useUserFollowingCountSnapshot(userId: string) {
+  const [followingCount, setFollowingCount] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    const followersCountQuery = query(
+      collection(FIREBASE_DB, FIRESTORE_COLLECTIONS.FOLLOWS),
+      where("followerId", "==", userId)
+    ).withConverter(followConverter);
+
+    const likeCountUnsubscribe = onSnapshot(
+      followersCountQuery,
+      (querySnapshot) => {
+        setFollowingCount(querySnapshot.size);
+        setLoading(false);
+      },
+      (err) => {
+        setError(err);
+        setLoading(false);
+      }
+    );
+
+    return () => {
+      likeCountUnsubscribe();
+    };
+  }, [userId]);
+
+  return { followingCount, loading, error };
+}
+
 export function useUserFollowedSnapshot({ followerId, followingId }: Follow) {
   const [followed, setFollowed] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -320,7 +389,7 @@ export function useUserFollowedSnapshot({ followerId, followingId }: Follow) {
     const followUnsubscribe = onSnapshot(
       doc(
         FIREBASE_DB,
-        DBCollections.Follows,
+        FIRESTORE_COLLECTIONS.FOLLOWS,
         mergeFollowId({ followerId, followingId })
       ).withConverter(followConverter),
       (doc) => {
@@ -363,7 +432,7 @@ export function useChatMessageSnapshot(
     setLoading(true);
     setError(null);
     const messagesQuery = query(
-      collection(FIREBASE_DB, DBCollections.Messages),
+      collection(FIREBASE_DB, FIRESTORE_COLLECTIONS.MESSAGES),
       compositeFilter,
       ...queryConstraints
     ).withConverter(chatMessageConverter);

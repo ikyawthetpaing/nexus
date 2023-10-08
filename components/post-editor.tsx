@@ -35,7 +35,7 @@ import { Text } from "@/components/themed";
 import { getStyles } from "@/constants/style";
 import { useCurrentUser } from "@/context/current-user";
 import { useTheme } from "@/context/theme";
-import { getPost, getUser } from "@/firebase/db";
+import { getPost, getUser } from "@/firebase/firestore";
 import { isPostsHasEmptyContent } from "@/lib/utils";
 
 interface PostEditorProps {

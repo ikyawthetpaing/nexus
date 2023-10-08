@@ -19,8 +19,8 @@ import {
 } from "@/hooks/snapshots";
 import { useTheme } from "@/context/theme";
 import { getAuthUser } from "@/firebase/auth";
-import { toggleLike } from "@/firebase/db";
 import { handleFirebaseError } from "@/firebase/error-handler";
+import { toggleLike } from "@/firebase/firestore";
 import { formatCount, timeAgo } from "@/lib/utils";
 
 interface PostItemProps {

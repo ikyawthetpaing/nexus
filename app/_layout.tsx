@@ -44,7 +44,7 @@ export default function RootLayout() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <Stack screenOptions={{ headerShown: false }} />
+        <Stack screenOptions={{ headerShown: false, animation: "none" }} />
         <StatusBar />
       </AuthProvider>
     </ThemeProvider>

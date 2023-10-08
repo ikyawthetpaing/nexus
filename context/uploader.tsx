@@ -10,9 +10,9 @@ import { AddPost, Post, UploadedImage } from "@/types";
 import { router } from "expo-router";
 import { Timestamp } from "firebase/firestore";
 
-import { StoragePath } from "@/firebase/config";
-import { createPost } from "@/firebase/db";
+import { STORAGE_PATH } from "@/firebase/config";
 import { handleFirebaseError } from "@/firebase/error-handler";
+import { createPost } from "@/firebase/firestore";
 import { uploadFileToFirebase } from "@/firebase/storage";
 import { getUniqueString } from "@/lib/utils";
 
@@ -59,7 +59,7 @@ export function UploaderContextProvider({ children }: Props) {
           post.images.map(async (image) => {
             const res = await uploadFileToFirebase({
               localFilePath: image.uri,
-              storagePath: StoragePath.Posts,
+              storagePath: STORAGE_PATH.POSTS,
             });
             return { ...res, width: image.width, height: image.height };
           })

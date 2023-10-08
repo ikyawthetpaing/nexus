@@ -20,18 +20,12 @@ import { useTheme } from "@/context/theme";
 
 export default function ProfileLayout() {
   const { background } = useTheme();
+  const { user: currentUser } = useCurrentUser();
   const { padding } = getStyles();
-
-  const { user } = useCurrentUser();
 
   const [profileHeaderHeight, setProfileHeaderHeight] = useState(0);
 
-  if (!user) {
-    return null;
-  }
-
   const scrollY = new Animated.Value(0);
-
   const handleScroll = Animated.event<NativeSyntheticEvent<NativeScrollEvent>>(
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
     { useNativeDriver: false }
@@ -58,8 +52,8 @@ export default function ProfileLayout() {
         </View>
       </Header>
       <ProfileHeader
-        user={user}
-        currentUser={user}
+        user={currentUser}
+        currentUserId={currentUser.id}
         scrollY={scrollY}
         getHeight={(h) => setProfileHeaderHeight(h)}
         navItems={appConfig.profileNavItems}

@@ -25,8 +25,8 @@ export default function MessageScreen() {
 
   const { messages } = useChatMessageSnapshot(
     or(
-      where("receiverId", "==", currentUser?.id),
-      where("senderId", "==", currentUser?.id)
+      where("receiverId", "==", currentUser.id),
+      where("senderId", "==", currentUser.id)
     )
   );
 
@@ -74,7 +74,7 @@ export default function MessageScreen() {
                 overflow: "hidden",
               }}
             >
-              {currentUser?.avatar && (
+              {currentUser.avatar && (
                 <Image
                   source={{ uri: currentUser.avatar.uri }}
                   style={{
@@ -183,7 +183,12 @@ function ChatItem({
             </Text>
             <Text style={{ color: mutedForeground }}>1m</Text>
           </View>
-          <Text style={{ color: mutedForeground }}>
+          <Text
+            style={{
+              color: mutedForeground,
+            }}
+            numberOfLines={1}
+          >
             {latestMessage.content}
           </Text>
         </View>

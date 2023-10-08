@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, router } from "expo-router";
+import { Dimensions } from "react-native";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +20,7 @@ export default function SignInScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const screen = Dimensions.get("screen");
 
   const handleLogin = async () => {
     setLoading(true);
@@ -33,7 +35,7 @@ export default function SignInScreen() {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ height: screen.height }}>
       <View
         style={{
           paddingVertical: 80,

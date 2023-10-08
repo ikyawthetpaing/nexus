@@ -37,10 +37,6 @@ export default function ProfileLayout() {
     { useNativeDriver: false }
   );
 
-  if (!currentUser) {
-    return router.replace("/(auth)/signin");
-  }
-
   if (!user) {
     return <LoadingScreen />;
   }
@@ -64,7 +60,7 @@ export default function ProfileLayout() {
       </Header>
       <ProfileHeader
         user={user}
-        currentUser={currentUser}
+        currentUserId={currentUser.id}
         scrollY={scrollY}
         getHeight={(h) => setProfileHeaderHeight(h)}
         navItems={appConfig.profileNavItems}

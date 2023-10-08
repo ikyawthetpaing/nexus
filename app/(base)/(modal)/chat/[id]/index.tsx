@@ -16,7 +16,7 @@ import { getStyles } from "@/constants/style";
 import { useChatMessageSnapshot, useUserSnapshot } from "@/hooks/snapshots";
 import { useCurrentUser } from "@/context/current-user";
 import { useTheme } from "@/context/theme";
-import { createChatMessage } from "@/firebase/db";
+import { createChatMessage } from "@/firebase/firestore";
 import { getUniqueString } from "@/lib/utils";
 
 export default function ChatGroupScreen() {
@@ -33,11 +33,11 @@ export default function ChatGroupScreen() {
     or(
       and(
         where("receiverId", "==", receiverId),
-        where("senderId", "==", currentUser?.id)
+        where("senderId", "==", currentUser.id)
       ),
       and(
         where("senderId", "==", receiverId),
-        where("receiverId", "==", currentUser?.id)
+        where("receiverId", "==", currentUser.id)
       )
     )
   );
@@ -91,7 +91,7 @@ export default function ChatGroupScreen() {
     }
   }, [sendingMessages, uploading]);
 
-  if (!receiver || !currentUser) {
+  if (!receiver) {
     return null;
   }
 
@@ -132,9 +132,10 @@ export default function ChatGroupScreen() {
                 <Text style={{ fontWeight: "500", fontSize: 16 }}>
                   {receiver.name}
                 </Text>
-                {true && <Icons.verified size={16} color="#60a5fa" />}
+                {receiver.verified && (
+                  <Icons.verified size={16} color="#60a5fa" />
+                )}
               </View>
-              {/* <Text>{receiver.name}</Text> */}
               <Text style={{ color: mutedForeground }}>
                 @{receiver.username}
               </Text>
@@ -161,13 +162,14 @@ export default function ChatGroupScreen() {
                 flexDirection: "row",
                 gap: 2,
                 alignItems: "center",
-                // justifyContent: "center",
               }}
             >
               <Text style={{ fontWeight: "500", fontSize: 16 }}>
                 {receiver.name}
               </Text>
-              {true && <Icons.verified size={16} color="#60a5fa" />}
+              {receiver.verified && (
+                <Icons.verified size={16} color="#60a5fa" />
+              )}
             </View>
             <Text style={{ color: mutedForeground }}>@{receiver.username}</Text>
             {receiver.bio && (

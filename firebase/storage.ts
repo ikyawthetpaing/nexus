@@ -7,12 +7,12 @@ import {
 } from "firebase/storage";
 
 import { appConfig } from "@/config/app";
-import { FIREBASE_STORAGE, StoragePath } from "@/firebase/config";
+import { FIREBASE_STORAGE, STORAGE_PATH } from "@/firebase/config";
 import { getUniqueString } from "@/lib/utils";
 
 type UploadFileToFirebaseType = {
   localFilePath: string;
-  storagePath: StoragePath;
+  storagePath: STORAGE_PATH;
 };
 
 export const uploadFileToFirebase = async ({

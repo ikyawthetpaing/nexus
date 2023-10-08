@@ -24,9 +24,10 @@ import {
 } from "@/hooks/snapshots";
 import { useCurrentUser } from "@/context/current-user";
 import { useTheme } from "@/context/theme";
-import { getRepliesToParent, toggleLike } from "@/firebase/db";
 import { handleFirebaseError } from "@/firebase/error-handler";
+import { getRepliesToParent, toggleLike } from "@/firebase/firestore";
 import { formatCount, formatDate, formatHour } from "@/lib/utils";
+import NotFoundScreen from "@/app/[...missing]";
 
 export default function UserPostDetailScreen() {
   const { background, mutedForeground, accent, muted, border } = useTheme();
@@ -50,7 +51,7 @@ export default function UserPostDetailScreen() {
   );
   const { likeCount } = usePostLikeCountSnapshot(postId);
   const { replyCount } = usePostReplyCountSnapshot(postId);
-  const { liked } = useUserLikedSnapshot(postId, currentUser?.id || "");
+  const { liked } = useUserLikedSnapshot(postId, currentUser.id);
   const { replies } = usePostRepliesSnapshot(postId);
 
   const [imageViewingVisible, setImageViewingVisible] = useState(false);
@@ -64,7 +65,7 @@ export default function UserPostDetailScreen() {
 
   async function onLike() {
     try {
-      if (post && currentUser) {
+      if (post) {
         await toggleLike({ postId: post.id, userId: currentUser.id });
       }
     } catch (error) {
@@ -77,7 +78,7 @@ export default function UserPostDetailScreen() {
   }
 
   if (!post || !author) {
-    return null; // not found
+    return <NotFoundScreen />;
   }
 
   return (

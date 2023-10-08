@@ -15,13 +15,18 @@ import { HEADER_HEIGHT, STATUSBAR_HEIGHT } from "@/components/header";
 import { Icons } from "@/components/icons";
 import { Text, View } from "@/components/themed";
 import { getStyles } from "@/constants/style";
+import {
+  useUserFollowersCountSnapshot,
+  useUserFollowingCountSnapshot,
+} from "@/hooks/snapshots";
 import { useTheme } from "@/context/theme";
+import { formatCount } from "@/lib/utils";
 
 const PROFILE_NAVBAR_HEIGHT = 50;
 
 interface ProfileHeaderProps extends ViewProps {
   user: User;
-  currentUser: User;
+  currentUserId: string;
   scrollY: Animated.Value;
   getHeight?: (h: number) => void;
   navItems: NavItem[];
@@ -29,16 +34,19 @@ interface ProfileHeaderProps extends ViewProps {
 
 export function ProfileHeader({
   user,
-  currentUser,
+  currentUserId,
   scrollY,
   getHeight,
   navItems,
 }: ProfileHeaderProps) {
-  const isCurrentUser = user.id === currentUser.id;
-  const follow: Follow = { followerId: currentUser.id, followingId: user.id };
+  const isCurrentUser = user.id === currentUserId;
+  const follow: Follow = { followerId: currentUserId, followingId: user.id };
 
   const { background, mutedForeground, accent, border } = useTheme();
   const { padding, borderWidthSmall: borderWidth } = getStyles();
+
+  const { followersCount } = useUserFollowersCountSnapshot(user.id);
+  const { followingCount } = useUserFollowingCountSnapshot(user.id);
 
   const pathname = usePathname();
   const [headerHeight, setHeaderHeight] = useState(0);
@@ -93,11 +101,17 @@ export function ProfileHeader({
           {user.bio && <Text>{user.bio}</Text>}
           <View style={{ flexDirection: "row", gap: padding }}>
             <View style={{ flexDirection: "row", gap: 4 }}>
-              <Text style={{ fontWeight: "bold" }}>155k</Text>
-              <Text style={{ color: mutedForeground }}>Followers</Text>
+              <Text style={{ fontWeight: "bold" }}>
+                {formatCount(followersCount)}
+              </Text>
+              <Text style={{ color: mutedForeground }}>
+                {followersCount > 1 ? "Followers" : "Follower"}
+              </Text>
             </View>
             <View style={{ flexDirection: "row", gap: 4 }}>
-              <Text style={{ fontWeight: "bold" }}>45</Text>
+              <Text style={{ fontWeight: "bold" }}>
+                {formatCount(followingCount)}
+              </Text>
               <Text style={{ color: mutedForeground }}>Following</Text>
             </View>
           </View>

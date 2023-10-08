@@ -14,8 +14,8 @@ import { getStyles } from "@/constants/style";
 import { useAuth } from "@/context/auth";
 import { useTheme } from "@/context/theme";
 import { signUp } from "@/firebase/auth";
-import { createUser } from "@/firebase/db";
 import { handleFirebaseError } from "@/firebase/error-handler";
+import { createUser } from "@/firebase/firestore";
 import { isValidEmail, isValidPassword, isValidUsername } from "@/lib/utils";
 
 interface FormStep {
@@ -101,7 +101,8 @@ export default function SignUpScreen() {
         "Create a password with a least 8 letters or numbers. It should be something others can't guess.",
       validate: () =>
         formData.password.length >= 8 && isValidPassword(formData.password),
-      errorMessage: "Password must be at least 8 letters.",
+      errorMessage:
+        "Minimum eight characters, at least one letter and one number.",
       inputProps: {
         placeholder: "Password",
         autoCapitalize: "none",
@@ -109,7 +110,8 @@ export default function SignUpScreen() {
         secureTextEntry: true,
         textContentType: "password",
         value: formData.password,
-        onChangeText: (text) => setFormData({ ...formData, password: text }),
+        onChangeText: (text) =>
+          setFormData({ ...formData, password: text.trim() }),
       },
     },
     {
@@ -124,7 +126,8 @@ export default function SignUpScreen() {
         autoCapitalize: "none",
         autoCorrect: false,
         value: formData.username,
-        onChangeText: (text) => setFormData({ ...formData, username: text }),
+        onChangeText: (text) =>
+          setFormData({ ...formData, username: text.trim() }),
       },
     },
     {
@@ -139,7 +142,8 @@ export default function SignUpScreen() {
         keyboardType: "email-address",
         textContentType: "emailAddress",
         value: formData.email,
-        onChangeText: (text) => setFormData({ ...formData, email: text }),
+        onChangeText: (text) =>
+          setFormData({ ...formData, email: text.trim() }),
       },
     },
   ];

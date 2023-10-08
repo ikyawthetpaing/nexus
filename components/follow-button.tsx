@@ -2,7 +2,7 @@ import { Follow } from "@/types";
 
 import { Button, ButtonProps } from "@/components/ui/button";
 import { useUserFollowedSnapshot } from "@/hooks/snapshots";
-import { toggleFollow } from "@/firebase/db";
+import { toggleFollow } from "@/firebase/firestore";
 
 interface Props extends ButtonProps {
   follow: Follow;

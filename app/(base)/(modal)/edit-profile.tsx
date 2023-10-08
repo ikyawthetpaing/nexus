@@ -14,9 +14,9 @@ import { Text, View } from "@/components/themed";
 import { getStyles } from "@/constants/style";
 import { useCurrentUser } from "@/context/current-user";
 import { useTheme } from "@/context/theme";
-import { StoragePath } from "@/firebase/config";
-import { updateUser } from "@/firebase/db";
+import { STORAGE_PATH } from "@/firebase/config";
 import { handleFirebaseError } from "@/firebase/error-handler";
+import { updateUser } from "@/firebase/firestore";
 import {
   deleteFileFromFirebase,
   uploadFileToFirebase,
@@ -112,7 +112,7 @@ export default function EditProfileScreen() {
           }
           uploadedFile = await uploadFileToFirebase({
             localFilePath: selectedImage,
-            storagePath: StoragePath.Avatars,
+            storagePath: STORAGE_PATH.AVATARS,
           });
         }
         if (user && formData) {

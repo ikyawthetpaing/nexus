@@ -22,15 +22,15 @@ export const FIREBASE_AUTH = initializeAuth(FIREBASE_APP, {
 export const FIREBASE_DB = getFirestore(FIREBASE_APP);
 export const FIREBASE_STORAGE = getStorage(FIREBASE_APP);
 
-export enum StoragePath {
-  Avatars = "avatars",
-  Posts = "posts",
+export enum STORAGE_PATH {
+  AVATARS = "avatars",
+  POSTS = "posts",
 }
 
-export enum DBCollections {
-  Users = "users",
-  Posts = "posts",
-  Likes = "likes",
-  Follows = "follows",
-  Messages = "messages",
+export enum FIRESTORE_COLLECTIONS {
+  USERS = "users",
+  POSTS = "posts",
+  LIKES = "likes",
+  FOLLOWS = "follows",
+  MESSAGES = "messages",
 }
