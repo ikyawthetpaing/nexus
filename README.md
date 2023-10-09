@@ -1,6 +1,18 @@
-# Nexus: The Social Media App
+<div align="center">
+    <img src="./assets/images/icon.png" width="128" height="128" style="display: block; margin: 0 auto"/>
+    <h1>Nexus: The Social Media App</h1>
+    <p>Nexus is a social media application that allows users to connect, share thoughts, and engage with others in real-time, similar to Twitter. This project is built using Expo, a popular framework for building cross-platform mobile apps, and Firebase, a powerful platform for developing web and mobile applications. With Nexus, users can post updates, follow others, and stay up-to-date with the latest trends and discussions.</p>
+</div>
 
-Nexus is a social media application that allows users to connect, share thoughts, and engage with others in real-time, similar to Twitter. This project is built using Expo, a popular framework for building cross-platform mobile apps, and Firebase, a powerful platform for developing web and mobile applications. With Nexus, users can post updates, follow others, and stay up-to-date with the latest trends and discussions.
+<p  align="center">
+  <img src="./assets/screenshots/home-screen.jpg" width="49%" />
+  <img src="./assets/screenshots/post-screen.jpg" width="49%" />
+</p>
+<p align="center">
+  <img src="./assets/screenshots/message-screen.jpg" width="32.5%" />
+  <img src="./assets/screenshots/chat-room-screen.jpg" width="32.5%" />
+  <img src="./assets/screenshots/profile-screen.jpg" width="32.5%" />
+</p>
 
 ## Features
 
@@ -56,13 +68,15 @@ Follow these steps to get started with the Nexus app:
    - Scan the QR code with the Expo Go app on your iOS or Android device.
    - Alternatively, press a to run the app on an Android emulator or i to run it on an iOS simulator.
 
-## Usage
+## Installation
 
-Describe how users can use your app, including any important instructions or features they should be aware of.
+[<img src="https://raw.githubusercontent.com/ismartcoding/plain-app/main/assets/get-it-on-github.png"
+    alt="Get it on GitHub"
+    height="80">](https://github.com/ikyawthetpaing/nexus/releases/latest)
 
-## Screenshots
+## Acknowledgments
 
-Include screenshots or GIFs of your app in action (if available).
+- Vectors and icons created by [Solar Icons](https://www.svgrepo.com/author/Solar%20Icons/) listed on [SVG Repo](https://www.svgrepo.com/).
 
 ## Contributing
 

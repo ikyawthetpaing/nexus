@@ -14,9 +14,9 @@ export default function ProfileIndexScreen() {
       ) : (
         <Text
           style={{
-            marginTop: 32,
+            marginTop: 64,
             textAlign: "center",
-            fontSize: 64,
+            fontSize: 16,
             color: mutedForeground,
           }}
         >
