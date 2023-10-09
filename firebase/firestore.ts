@@ -129,6 +129,10 @@ export function mergeFollowId({ followerId, followingId }: Follow) {
 }
 
 export async function toggleFollow({ followerId, followingId }: Follow) {
+  if (followerId === followingId) {
+    return;
+  }
+
   const followId = mergeFollowId({ followerId, followingId });
   const followRef = doc(FIREBASE_DB, FIRESTORE_COLLECTIONS.FOLLOWS, followId);
 

@@ -1,24 +1,26 @@
-# Nexus - Your Social Media App
+# Nexus: The Social Media App
 
-Nexus is a social media app built with React Native and Firebase that allows users to connect and share their moments with friends and followers.
+Nexus is a social media application that allows users to connect, share thoughts, and engage with others in real-time, similar to Twitter. This project is built using Expo, a popular framework for building cross-platform mobile apps, and Firebase, a powerful platform for developing web and mobile applications. With Nexus, users can post updates, follow others, and stay up-to-date with the latest trends and discussions.
 
 ## Features
 
-- User Authentication: Sign up, login, and password reset functionalities using Firebase Authentication.
-- Profile Management: Edit profile details, change profile picture, and view your posts.
-- News Feed: Scroll through posts from friends and followers.
-- Create Posts: Share text and images with your network.
-- Like and Comment: Engage with posts by liking and commenting.
-- Real-time Updates: Stay up-to-date with real-time notifications.
+- User Authentication: Users can create accounts, login, and password reset functionalities using Firebase Authentication.
+- Profile Management: Users can edit profile details, change profile picture, and view users' posts.
+- Create Posts: Users can post text-based updates, photos, and links, sharing their thoughts and experiences with followers.
+- News Feed: Users can scroll through posts from friends and followers.
+- Like and Comment: Users can engage with posts by liking and commenting.
+- Follow and Unfollow: Users can follow and unfollow other users, enabling them to customize their feed based on their interests.
+- Real-time Updates: Nexus provides real-time updates, ensuring users can instantly see new posts, likes, and comments without refreshing the app.
+<!-- - Notifications: Users receive notifications for new followers, likes, comments, and mentions, enhancing their engagement with the app. -->
 
 ## Technologies Used
 
+- Expo: Expo is an open-source platform for building native iOS, Android, and web applications using JavaScript and React. It simplifies the app development process, allowing developers to focus on writing code without worrying about the complexities of native development.
 - React Native: A JavaScript framework for building native mobile applications.
 - Firebase: A cloud-based platform for developing mobile and web applications.
   - Firebase Authentication: User authentication and authorization.
   - Firebase Firestore: Real-time NoSQL database for storing posts and user data.
   - Firebase Storage: Store and retrieve user images.
-- Other libraries and dependencies as needed (mention them here).
 
 ## Getting Started
 
@@ -33,6 +35,7 @@ Follow these steps to get started with the Nexus app:
 2. Install dependencies:
 
    ```
+   cd nexus
    npm install
    ```
 
@@ -42,13 +45,16 @@ Follow these steps to get started with the Nexus app:
    - Configure Firebase Authentication and Firestore.
    - Update Firebase configuration in the app.
 
-4. Run the app:
+4. Start the Development Server:
 
    ```
    npm start
    ```
 
-5. Open the app on your mobile device using Expo or your preferred emulator.
+5. Run the App:
+
+   - Scan the QR code with the Expo Go app on your iOS or Android device.
+   - Alternatively, press a to run the app on an Android emulator or i to run it on an iOS simulator.
 
 ## Usage
 

@@ -17,7 +17,7 @@ import { useTheme } from "@/context/theme";
 import { mergeStrings } from "@/lib/utils";
 
 export default function MessageScreen() {
-  const { accent, foreground } = useTheme();
+  const { accent, foreground, mutedForeground } = useTheme();
   const { user: currentUser } = useCurrentUser();
   const layout = useWindowDimensions();
 
@@ -100,6 +100,7 @@ export default function MessageScreen() {
               </Pressable>
               <TextInput
                 placeholder="Search"
+                placeholderTextColor={mutedForeground}
                 style={{
                   position: "absolute",
                   backgroundColor: accent,

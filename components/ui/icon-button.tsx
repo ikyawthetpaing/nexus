@@ -12,6 +12,7 @@ export function IconButton({ icon, iconProps, ...props }: IconButtonProps) {
   const { mutedForeground, foreground } = useTheme();
   const { size, color, strokeWidth, filled }: IconProps = {
     ...defaultIconProps,
+    color: undefined,
     ...iconProps,
   };
   const Icon = Icons[icon];

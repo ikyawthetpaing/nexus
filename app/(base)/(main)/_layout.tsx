@@ -4,7 +4,7 @@ import { Tabs } from "expo-router";
 import { Icons } from "@/components/icons";
 import { useTheme } from "@/context/theme";
 
-export default function TabLayout() {
+export default function MainLayout() {
   const { primary, background, border } = useTheme();
 
   return (

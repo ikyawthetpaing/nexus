@@ -42,8 +42,8 @@ export function ProfileHeader({
   const isCurrentUser = user.id === currentUserId;
   const follow: Follow = { followerId: currentUserId, followingId: user.id };
 
-  const { background, mutedForeground, accent, border } = useTheme();
-  const { padding, borderWidthSmall: borderWidth } = getStyles();
+  const { background, mutedForeground, accent, border, primary } = useTheme();
+  const { padding, borderWidthSmall, borderWidthLarge } = getStyles();
 
   const { followersCount } = useUserFollowersCountSnapshot(user.id);
   const { followingCount } = useUserFollowingCountSnapshot(user.id);
@@ -77,7 +77,7 @@ export function ProfileHeader({
         zIndex: 10,
         elevation: 1000,
         transform: [{ translateY: headerY }],
-        borderBottomWidth: borderWidth,
+        borderBottomWidth: borderWidthSmall,
         borderBottomColor: border,
         backgroundColor: background,
         paddingTop: HEADER_HEIGHT,
@@ -212,8 +212,8 @@ export function ProfileHeader({
                       alignItems: "center",
                       height: PROFILE_NAVBAR_HEIGHT,
                       backgroundColor: pressed ? accent : "transparent",
-                      borderBottomWidth: isActive ? 1 : 0,
-                      borderBottomColor: isActive ? "black" : "transparent",
+                      borderBottomWidth: borderWidthLarge,
+                      borderBottomColor: isActive ? primary : "transparent",
                     },
                   ]}
                 >

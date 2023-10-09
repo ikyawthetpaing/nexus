@@ -14,7 +14,7 @@ import { getStyles } from "@/constants/style";
 import { useTheme } from "@/context/theme";
 
 export default function SearchScreen() {
-  const { background, accent, foreground } = useTheme();
+  const { background, accent, foreground, mutedForeground } = useTheme();
   const { padding, borderRadius } = getStyles();
 
   const scrollY = new Animated.Value(0);
@@ -54,6 +54,7 @@ export default function SearchScreen() {
               borderRadius: borderRadius,
               paddingLeft: padding * 3.5,
             }}
+            placeholderTextColor={mutedForeground}
           />
         </View>
       </Header>

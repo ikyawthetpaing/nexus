@@ -29,7 +29,7 @@ import { getRepliesToParent, toggleLike } from "@/firebase/firestore";
 import { formatCount, formatDate, formatHour } from "@/lib/utils";
 import NotFoundScreen from "@/app/[...missing]";
 
-export default function UserPostDetailScreen() {
+export default function PostScreen() {
   const { background, mutedForeground, accent, muted, border } = useTheme();
   const {
     padding,
@@ -174,13 +174,15 @@ export default function UserPostDetailScreen() {
                 alignItems: "center",
               }}
             >
-              <FollowButton
-                size="sm"
-                follow={{
-                  followerId: currentUser?.id || "",
-                  followingId: post.authorId,
-                }}
-              />
+              {post.authorId !== currentUser.id && (
+                <FollowButton
+                  size="sm"
+                  follow={{
+                    followerId: currentUser.id,
+                    followingId: post.authorId,
+                  }}
+                />
+              )}
               <IconButton icon="menuDots" iconProps={{ size: 24 }} />
             </View>
           </View>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Post } from "@/types";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -6,6 +6,7 @@ import { Dimensions, Pressable, View } from "react-native";
 import ImageView from "react-native-image-viewing";
 
 import { AvatarImage } from "@/components/ui/avatar-image";
+import { Separator } from "@/components/ui/separator";
 import { Icons } from "@/components/icons";
 import { ImagesList } from "@/components/images-list";
 import { Text } from "@/components/themed";
@@ -17,8 +18,8 @@ import {
   useUserLikedSnapshot,
   useUserSnapshot,
 } from "@/hooks/snapshots";
+import { useCurrentUser } from "@/context/current-user";
 import { useTheme } from "@/context/theme";
-import { getAuthUser } from "@/firebase/auth";
 import { handleFirebaseError } from "@/firebase/error-handler";
 import { toggleLike } from "@/firebase/firestore";
 import { formatCount, timeAgo } from "@/lib/utils";
@@ -33,23 +34,22 @@ export default function PostItem({ post, isReplyTo }: PostItemProps) {
   const {
     padding,
     borderWidthSmall,
+    borderWidthLarge,
     avatarSizeSm: avatarSizeSmall,
   } = getStyles();
 
-  const authUserId = useMemo(() => getAuthUser()?.uid || "", []);
+  const { user: currentUser } = useCurrentUser();
   const { user: author } = useUserSnapshot(post.authorId);
   const { likeCount } = usePostLikeCountSnapshot(post.id);
   const { replyCount } = usePostReplyCountSnapshot(post.id);
-  const { liked } = useUserLikedSnapshot(post.id, authUserId);
+  const { liked } = useUserLikedSnapshot(post.id, currentUser.id);
 
   const [imageViewingVisible, setImageViewingVisible] = useState(false);
   const [viewImage, setViewImage] = useState(0);
 
   async function onLike() {
     try {
-      if (authUserId) {
-        await toggleLike({ postId: post.id, userId: authUserId });
-      }
+      await toggleLike({ postId: post.id, userId: currentUser.id });
     } catch (error) {
       handleFirebaseError(error);
     }
@@ -59,7 +59,14 @@ export default function PostItem({ post, isReplyTo }: PostItemProps) {
 
   return (
     <View>
-      <Pressable onPress={() => router.push(`/(base)/(modal)/post/${post.id}`)}>
+      <Pressable
+        onPress={() =>
+          router.push({
+            pathname: "/(base)/(modal)/post/[id]/",
+            params: { id: post.id },
+          })
+        }
+      >
         {({ pressed }) => (
           <View
             style={[
@@ -84,30 +91,28 @@ export default function PostItem({ post, isReplyTo }: PostItemProps) {
                 bottom: 0,
               }}
             >
-              {/* <UserLink userId={post.authorId}> */}
-              <AvatarImage
-                uri={author?.avatar?.uri || null}
-                style={{ width: avatarSizeSmall }}
-              />
-              {/* </UserLink> */}
+              <UserLink userId={post.authorId}>
+                <AvatarImage
+                  uri={author?.avatar?.uri || null}
+                  style={{ width: avatarSizeSmall }}
+                />
+              </UserLink>
               {/* {post.repliesCount > 0 ||
-                (isReplyTo && (
-                  <>
-                    <View
-                      style={{
-                        flex: 1,
-                        alignItems: "center",
-                        marginTop: padding,
-                      }}
-                    >
-                      <Separator
-                        size={borderWidthLarge}
-                        orientation="vertical"
-                      />
-                    </View>
-                    <RepliesReference replies={replies} />
-                  </>
-                ))} */}
+                ()} */}
+              {isReplyTo && (
+                <>
+                  <View
+                    style={{
+                      flex: 1,
+                      alignItems: "center",
+                      marginTop: padding,
+                    }}
+                  >
+                    <Separator size={borderWidthLarge} orientation="vertical" />
+                  </View>
+                  {/* <RepliesReference replies={replies} /> */}
+                </>
+              )}
             </View>
 
             {/* header */}
@@ -146,8 +151,14 @@ export default function PostItem({ post, isReplyTo }: PostItemProps) {
               <View
                 style={{ flexDirection: "row", alignItems: "center", gap: 10 }}
               >
-                <Text style={{ color: "gray" }}>{timeAgo(post.createdAt)}</Text>
-                <Feather name="more-horizontal" size={14} color="gray" />
+                <Text style={{ color: mutedForeground }}>
+                  {timeAgo(post.createdAt)}
+                </Text>
+                <Feather
+                  name="more-horizontal"
+                  size={18}
+                  color={mutedForeground}
+                />
               </View>
             </View>
 
@@ -204,20 +215,24 @@ export default function PostItem({ post, isReplyTo }: PostItemProps) {
                   color={liked ? "red" : mutedForeground}
                   filled={liked}
                 />
-                <Text style={{ color: "gray" }}>{formatCount(likeCount)}</Text>
+                <Text style={{ color: mutedForeground }}>
+                  {formatCount(likeCount)}
+                </Text>
               </Pressable>
               <Pressable
                 style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
                 onPress={() => router.push(`/post/${post.id}/reply`)}
               >
                 <Icons.comment size={18} color={mutedForeground} />
-                <Text style={{ color: "gray" }}>{formatCount(replyCount)}</Text>
+                <Text style={{ color: mutedForeground }}>
+                  {formatCount(replyCount)}
+                </Text>
               </Pressable>
               <Pressable
                 style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
               >
                 <Icons.squareShare size={18} color={mutedForeground} />
-                <Text style={{ color: "gray" }}>0</Text>
+                <Text style={{ color: mutedForeground }}>0</Text>
               </Pressable>
               <Pressable>
                 <Icons.share size={18} color={mutedForeground} />

@@ -5,7 +5,7 @@ import { Text, View } from "@/components/themed";
 import { useUserPostsSnapshot } from "@/hooks/snapshots";
 import { useTheme } from "@/context/theme";
 
-export default function ProfileIndexScreen() {
+export default function UserProfileHomeScreen() {
   const { mutedForeground } = useTheme();
 
   const { id } = useLocalSearchParams();

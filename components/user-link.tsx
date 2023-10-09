@@ -1,4 +1,5 @@
-import { Link } from "expo-router";
+import { router } from "expo-router";
+import { Pressable } from "react-native";
 
 import { useCurrentUser } from "@/context/current-user";
 
@@ -12,19 +13,19 @@ export function UserLink({ userId, children }: Props) {
   const isCurrentUser = user?.id === userId;
 
   return (
-    <Link
-      href={
-        isCurrentUser
-          ? {
-              pathname: "/(base)/(main)/profile/",
-            }
-          : {
-              pathname: "/(base)/(modal)/user/[id]/",
-              params: { id: userId },
-            }
-      }
+    <Pressable
+      onPress={() => {
+        if (isCurrentUser) {
+          router.push("/(base)/(main)/profile");
+        } else {
+          router.push({
+            pathname: "/(base)/(modal)/user/[id]/",
+            params: { id: userId },
+          });
+        }
+      }}
     >
       {children}
-    </Link>
+    </Pressable>
   );
 }

@@ -19,7 +19,7 @@ import { useTheme } from "@/context/theme";
 import { createChatMessage } from "@/firebase/firestore";
 import { getUniqueString } from "@/lib/utils";
 
-export default function ChatGroupScreen() {
+export default function ChatRoomScreen() {
   const { mutedForeground, accent, border } = useTheme();
   const { padding, avatarSizeLg, avatarSizeSm, borderWidthSmall } = getStyles();
   const { id } = useLocalSearchParams();
@@ -191,15 +191,20 @@ export default function ChatGroupScreen() {
           {messages.map((message, i) => (
             <View
               key={i}
-              style={
-                message.senderId === currentUser.id
-                  ? { alignItems: "flex-end" }
-                  : {}
-              }
+              style={{
+                alignItems:
+                  message.senderId === currentUser.id
+                    ? "flex-end"
+                    : "flex-start",
+              }}
             >
               <View
                 style={[
-                  { padding: padding, borderRadius: padding, maxWidth: "75%" },
+                  {
+                    padding: padding,
+                    borderRadius: padding,
+                    maxWidth: "75%",
+                  },
                   message.senderId === currentUser.id
                     ? { backgroundColor: "skyblue", borderBottomRightRadius: 0 }
                     : { backgroundColor: accent, borderBottomLeftRadius: 0 },

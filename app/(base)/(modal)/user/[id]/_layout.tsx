@@ -20,7 +20,7 @@ import { useUserSnapshot } from "@/hooks/snapshots";
 import { useCurrentUser } from "@/context/current-user";
 import { useTheme } from "@/context/theme";
 
-export default function ProfileLayout() {
+export default function UserProfileLayout() {
   const { id } = useLocalSearchParams();
 
   const userId = typeof id === "string" ? id : "";
