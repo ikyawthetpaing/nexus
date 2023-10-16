@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Toasts } from "@backpackapp-io/react-native-toast";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
@@ -48,6 +49,7 @@ export default function RootLayout() {
         <AuthProvider>
           <Stack screenOptions={{ headerShown: false, animation: "none" }} />
           <StatusBar />
+          <Toasts />
         </AuthProvider>
       </AlertContextProvider>
     </ThemeProvider>

@@ -7,16 +7,16 @@ import React, {
   useState,
 } from "react";
 import { AddPost, Post, UploadedImage } from "@/types";
+import { toast, ToastPosition } from "@backpackapp-io/react-native-toast";
 import { router } from "expo-router";
 import { Timestamp } from "firebase/firestore";
 
+import { useCurrentUser } from "@/context/current-user";
 import { STORAGE_PATH } from "@/firebase/config";
 import { handleFirebaseError } from "@/firebase/error-handler";
 import { createPost } from "@/firebase/firestore";
 import { uploadFileToFirebase } from "@/firebase/storage";
 import { getUniqueString } from "@/lib/utils";
-
-import { useCurrentUser } from "./current-user";
 
 type UploadType = {
   posts: AddPost[];
@@ -83,18 +83,27 @@ export function UploaderContextProvider({ children }: Props) {
     } finally {
       setLoading(false);
       setUpload(null);
-
-      if (router.canGoBack()) {
-        router.back();
-      } else {
-        router.push("/");
-      }
     }
   }
 
   useEffect(() => {
     if (upload) {
-      performUpload(upload.posts, upload.replyToId);
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.push("/");
+      }
+      toast.promise(
+        performUpload(upload.posts, upload.replyToId),
+        {
+          loading: "Posting...",
+          success: () => "Posted",
+          error: () => "Failed",
+        },
+        {
+          position: ToastPosition.BOTTOM,
+        }
+      );
     }
   }, [upload]);
 

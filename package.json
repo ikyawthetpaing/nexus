@@ -18,6 +18,7 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@backpackapp-io/react-native-toast": "^0.10.0",
     "@expo/vector-icons": "^13.0.0",
     "@gorhom/bottom-sheet": "^4.4.7",
     "@react-native-async-storage/async-storage": "1.18.2",
