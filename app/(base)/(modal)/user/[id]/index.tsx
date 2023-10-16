@@ -14,7 +14,7 @@ export default function UserProfileHomeScreen() {
   const { posts } = useUserPostsSnapshot(userId);
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       {posts.length > 0 ? (
         posts.map((post, i) => <PostItem key={i} post={post} />)
       ) : (

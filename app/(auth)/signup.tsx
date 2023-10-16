@@ -3,7 +3,6 @@ import { User } from "@/types";
 import { router } from "expo-router";
 import { updateProfile } from "firebase/auth";
 
-import { useAlert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { Input, InputProps } from "@/components/ui/input";
@@ -11,6 +10,7 @@ import { STATUSBAR_HEIGHT } from "@/components/header";
 import { Spinner } from "@/components/spinner";
 import { Text, View } from "@/components/themed";
 import { getStyles } from "@/constants/style";
+import { useAlert } from "@/context/alert";
 import { useAuth } from "@/context/auth";
 import { useTheme } from "@/context/theme";
 import { signUp } from "@/firebase/auth";
@@ -80,7 +80,7 @@ export default function SignUpScreen() {
     username: "",
     email: "",
   });
-  const { Alert, setAlert } = useAlert();
+  const { setAlert } = useAlert();
 
   const formSteps: FormStep[] = [
     {
@@ -237,7 +237,10 @@ export default function SignUpScreen() {
                     },
                     {
                       text: "Login",
-                      action: () => router.push("/signin"),
+                      action: () => {
+                        setAlert(null);
+                        router.push("/signin");
+                      },
                     },
                   ],
                 })
@@ -248,7 +251,6 @@ export default function SignUpScreen() {
           </View>
         </View>
       </View>
-      <Alert />
     </View>
   );
 }

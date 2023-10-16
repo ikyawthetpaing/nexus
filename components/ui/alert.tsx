@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   Modal,
@@ -124,47 +123,4 @@ function AlertFooterButton({
   );
 }
 
-function useAlert() {
-  const [alert, setAlert] = useState<{
-    title: string;
-    description?: string;
-    button: { text: string; action: () => void }[];
-  } | null>(null);
-
-  const AlertDialog = () => {
-    if (!alert) {
-      return null; // Return null if there's no alert to show
-    }
-
-    return (
-      <Alert visible={true}>
-        <AlertTitle>{alert.title}</AlertTitle>
-        {alert.description && (
-          <AlertDescription>{alert.description}</AlertDescription>
-        )}
-        <AlertFooter>
-          {alert.button.map((btn, i) => (
-            <AlertFooterButton
-              key={i}
-              textStyle={{ fontWeight: "500", color: "#60a5fa" }}
-              onPress={btn.action}
-            >
-              {btn.text}
-            </AlertFooterButton>
-          ))}
-        </AlertFooter>
-      </Alert>
-    );
-  };
-
-  return { Alert: AlertDialog, setAlert };
-}
-
-export {
-  Alert,
-  AlertTitle,
-  AlertDescription,
-  AlertFooter,
-  AlertFooterButton,
-  useAlert,
-};
+export { Alert, AlertTitle, AlertDescription, AlertFooter, AlertFooterButton };

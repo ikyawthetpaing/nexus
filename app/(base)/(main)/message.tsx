@@ -3,10 +3,9 @@ import { ChatMessage } from "@/types";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { or, where } from "firebase/firestore";
-import { Pressable, TextInput, useWindowDimensions } from "react-native";
+import { Pressable, TextInput } from "react-native";
 
 import { AvatarImage } from "@/components/ui/avatar-image";
-import { HEADER_HEIGHT } from "@/components/header";
 import { Icons } from "@/components/icons";
 import { Text, View } from "@/components/themed";
 import { ScrollViewWithHeader } from "@/components/view-with-header";
@@ -19,7 +18,6 @@ import { mergeStrings } from "@/lib/utils";
 export default function MessageScreen() {
   const { accent, foreground, mutedForeground } = useTheme();
   const { user: currentUser } = useCurrentUser();
-  const layout = useWindowDimensions();
 
   const { padding } = getStyles();
 
@@ -51,7 +49,7 @@ export default function MessageScreen() {
   }, [messages]);
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <ScrollViewWithHeader
         headerChildren={
           <View
@@ -115,9 +113,9 @@ export default function MessageScreen() {
             </View>
           </View>
         }
-        contentContainerStyle={{
-          minHeight: layout.height + HEADER_HEIGHT,
-        }}
+        // contentContainerStyle={{
+        //   minHeight: layout.height + HEADER_HEIGHT,
+        // }}
       >
         {latestMessages.map((message, i) => (
           <ChatItem

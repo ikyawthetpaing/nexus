@@ -3,15 +3,15 @@ import { AddPost } from "@/types";
 import { router, useLocalSearchParams } from "expo-router";
 import { View } from "react-native";
 
-import { useAlert } from "@/components/ui/alert";
 import { PostEditor } from "@/components/post-editor";
+import { useAlert } from "@/context/alert";
 import { useUploader } from "@/context/uploader";
 import { isPostsHasEmptyContent } from "@/lib/utils";
 
 export default function PostReplyScreen() {
   const { id } = useLocalSearchParams();
   const { setUpload } = useUploader();
-  const { Alert, setAlert } = useAlert();
+  const { setAlert } = useAlert();
 
   const replyToPostId = typeof id === "string" ? id : undefined;
 
@@ -33,7 +33,13 @@ export default function PostReplyScreen() {
         description:
           "You have unsaved changes. Are you sure you want to cancel?",
         button: [
-          { text: "Yes", action: () => router.back() },
+          {
+            text: "Yes",
+            action: () => {
+              setAlert(null);
+              router.back();
+            },
+          },
           { text: "No", action: () => setAlert(null) },
         ],
       });
@@ -56,7 +62,6 @@ export default function PostReplyScreen() {
         onCancel={onCancel}
         onSubmit={onSubmit}
       />
-      <Alert />
     </View>
   );
 }

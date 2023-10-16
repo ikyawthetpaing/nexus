@@ -4,7 +4,6 @@ import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { Image } from "react-native";
 
-import { useAlert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
@@ -12,11 +11,13 @@ import { Header, HEADER_HEIGHT } from "@/components/header";
 import { LoadingScreen } from "@/components/loading-screen";
 import { Text, View } from "@/components/themed";
 import { getStyles } from "@/constants/style";
+import { useDebounce } from "@/hooks/use-debounce";
+import { useAlert } from "@/context/alert";
 import { useCurrentUser } from "@/context/current-user";
 import { useTheme } from "@/context/theme";
 import { STORAGE_PATH } from "@/firebase/config";
 import { handleFirebaseError } from "@/firebase/error-handler";
-import { updateUser } from "@/firebase/firestore";
+import { checkUsername, updateUser } from "@/firebase/firestore";
 import {
   deleteFileFromFirebase,
   uploadFileToFirebase,
@@ -34,25 +35,29 @@ function hasDataChanged(
 }
 
 export default function EditProfileScreen() {
-  const { user } = useCurrentUser();
-  const { Alert, setAlert } = useAlert();
-  const { accent, mutedForeground } = useTheme();
+  const { user: currentUser } = useCurrentUser();
+  const { setAlert } = useAlert();
+  const { accent, mutedForeground, destructive } = useTheme();
   const { padding } = getStyles();
 
   const [selectedImage, setSelectedImage] = useState<string>();
   const [previewImage, setPreviewImage] = useState<string>();
 
-  const [originalData, setOriginalData] = useState<EditableUser | null>(user);
-  const [formData, setFormData] = useState<EditableUser | null>(user);
+  const [originalData, setOriginalData] = useState<EditableUser | null>(
+    currentUser
+  );
   const [uploading, setUploading] = useState(false);
   const [isDataChanged, setIsDataChanged] = useState(false);
+  const [formData, setFormData] = useState<EditableUser | null>(currentUser);
+  const debouncedUsername = useDebounce(formData?.username, 500);
+  const [isValidUsername, setIsValidUsername] = useState(true);
 
   useEffect(() => {
-    setOriginalData(user);
-    setFormData(user);
-    setPreviewImage(user?.avatar?.uri);
+    setOriginalData(currentUser);
+    setFormData(currentUser);
+    setPreviewImage(currentUser?.avatar?.uri);
     setSelectedImage(undefined);
-  }, [user]);
+  }, [currentUser]);
 
   useEffect(() => {
     if (originalData && formData) {
@@ -81,6 +86,17 @@ export default function EditProfileScreen() {
     }
   };
 
+  useEffect(() => {
+    const fetch = async () => {
+      if (debouncedUsername) {
+        const res = await checkUsername(debouncedUsername, currentUser.id);
+        setIsValidUsername(res);
+      }
+    };
+    fetch();
+    console.log("Debounced username:", debouncedUsername);
+  }, [debouncedUsername]);
+
   function onPressBack() {
     if (!isDataChanged) {
       router.back();
@@ -90,7 +106,13 @@ export default function EditProfileScreen() {
         description:
           "You have unsaved changes. Are you sure you want to cancel?",
         button: [
-          { text: "Yes", action: () => router.back() },
+          {
+            text: "Yes",
+            action: () => {
+              setAlert(null);
+              router.back();
+            },
+          },
           { text: "No", action: () => setAlert(null) },
         ],
       });
@@ -101,26 +123,29 @@ export default function EditProfileScreen() {
     if (
       originalData &&
       formData &&
-      (hasDataChanged(originalData, formData) || selectedImage)
+      (hasDataChanged(originalData, formData) || selectedImage) &&
+      isValidUsername
     ) {
       setUploading(true);
       try {
-        let uploadedFile = user?.avatar || null;
+        let uploadedFile = currentUser?.avatar || null;
         if (selectedImage) {
-          if (user?.avatar) {
-            await deleteFileFromFirebase({ cloudPath: user.avatar.path });
+          if (currentUser?.avatar) {
+            await deleteFileFromFirebase({
+              cloudPath: currentUser.avatar.path,
+            });
           }
           uploadedFile = await uploadFileToFirebase({
             localFilePath: selectedImage,
             storagePath: STORAGE_PATH.AVATARS,
           });
         }
-        if (user && formData) {
+        if (currentUser && formData) {
           const uploadData: EditableUser = {
             ...formData,
             avatar: uploadedFile,
           };
-          await updateUser(uploadData, user.id);
+          await updateUser(uploadData, currentUser.id);
         }
       } catch (error) {
         handleFirebaseError(error);
@@ -130,7 +155,7 @@ export default function EditProfileScreen() {
     }
   }
 
-  if (!user || !originalData || !formData) {
+  if (!currentUser || !originalData || !formData) {
     return null; // not found
   }
 
@@ -155,7 +180,11 @@ export default function EditProfileScreen() {
             onPress={onPressBack}
             iconProps={{ size: 24 }}
           />
-          <Button size="sm" onPress={onPressSave} disabled={!isDataChanged}>
+          <Button
+            size="sm"
+            onPress={onPressSave}
+            disabled={!isDataChanged || !isValidUsername}
+          >
             Save
           </Button>
         </View>
@@ -216,9 +245,14 @@ export default function EditProfileScreen() {
               autoCorrect={false}
               value={formData.username}
               onChangeText={(text) =>
-                setFormData({ ...formData, username: text })
+                setFormData({ ...formData, username: text.toLowerCase() })
               }
             />
+            {!isValidUsername && (
+              <Text style={{ color: destructive }}>
+                Username is already taken
+              </Text>
+            )}
           </View>
           <View>
             <Text style={{ color: mutedForeground }}>Bio</Text>
@@ -233,7 +267,6 @@ export default function EditProfileScreen() {
           </View>
         </View>
       </View>
-      <Alert />
     </View>
   );
 }

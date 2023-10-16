@@ -22,7 +22,15 @@ export function IconButton({ icon, iconProps, ...props }: IconButtonProps) {
       {({ pressed }) => (
         <Icon
           size={size}
-          color={pressed ? mutedForeground : color ? color : foreground}
+          color={
+            props.disabled
+              ? mutedForeground
+              : pressed
+              ? mutedForeground
+              : color
+              ? color
+              : foreground
+          }
           strokeWidth={strokeWidth}
           filled={filled}
         />

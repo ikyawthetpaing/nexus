@@ -4,6 +4,7 @@ import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 
 import { StatusBar } from "@/components/status-bar";
+import { AlertContextProvider } from "@/context/alert";
 import { AuthProvider } from "@/context/auth";
 import { ThemeProvider } from "@/context/theme";
 
@@ -43,10 +44,12 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <Stack screenOptions={{ headerShown: false, animation: "none" }} />
-        <StatusBar />
-      </AuthProvider>
+      <AlertContextProvider>
+        <AuthProvider>
+          <Stack screenOptions={{ headerShown: false, animation: "none" }} />
+          <StatusBar />
+        </AuthProvider>
+      </AlertContextProvider>
     </ThemeProvider>
   );
 }

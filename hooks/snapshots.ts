@@ -128,6 +128,8 @@ export function useUserPostsSnapshot(userId: string) {
       }
     );
 
+    console.log("fetch user posts");
+
     return () => {
       postsUnsubscribe();
     };

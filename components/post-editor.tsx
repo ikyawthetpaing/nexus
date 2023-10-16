@@ -22,6 +22,7 @@ import {
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import ImageView from "react-native-image-viewing";
+import ProgressCircle from "react-native-progress-circle";
 
 import { AvatarImage } from "@/components/ui/avatar-image";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,7 @@ import { HEADER_HEIGHT, STATUSBAR_HEIGHT } from "@/components/header";
 import { Icons } from "@/components/icons";
 import { ImagesList } from "@/components/images-list";
 import { Text } from "@/components/themed";
+import { MAX_POST_CHARACTERS_COUNT } from "@/constants/post";
 import { getStyles } from "@/constants/style";
 import { useCurrentUser } from "@/context/current-user";
 import { useTheme } from "@/context/theme";
@@ -72,6 +74,12 @@ export function PostEditor({
     post: Post;
     author: User;
   } | null>(null);
+  const [currentPostCharsCount, setCurrentPostCharsCount] = useState(0);
+
+  useEffect(
+    () => setCurrentPostCharsCount(posts[currentEditIndex].content.length),
+    [currentEditIndex, posts]
+  );
 
   useEffect(() => {
     async function fetchData() {
@@ -242,13 +250,15 @@ export function PostEditor({
               onFocus={() => setCurrentEditIndex(i)}
               ref={currentEditIndex === i ? inputRef : undefined}
               onChangeText={(text) => {
-                const newValues = [...posts];
-                const newValue: AddPost = {
-                  content: text,
-                  images: newValues[i].images,
-                };
-                newValues.splice(i, 1, newValue);
-                setPosts(newValues);
+                if (text.length <= MAX_POST_CHARACTERS_COUNT) {
+                  const newValues = [...posts];
+                  const newValue: AddPost = {
+                    content: text,
+                    images: newValues[i].images,
+                  };
+                  newValues.splice(i, 1, newValue);
+                  setPosts(newValues);
+                }
               }}
               removePost={() => onPressRemovePost(i)}
               removeImage={(imageIndex) => removeImage(i, imageIndex)}
@@ -292,13 +302,30 @@ export function PostEditor({
           >
             <View style={{ flexDirection: "row", gap: padding }}>
               <IconButton icon="photo" onPress={pickImageAsync} />
-              <IconButton icon="videoFramePlay" />
-              <IconButton icon="checklist" />
-              <IconButton icon="mapPoint" />
+              <IconButton icon="videoFramePlay" disabled={true} />
+              <IconButton icon="checklist" disabled={true} />
+              <IconButton icon="mapPoint" disabled={true} />
             </View>
             <View style={{ flexDirection: "row", gap: padding }}>
-              <IconButton icon="addCircle" />
+              <View style={{ justifyContent: "center" }}>
+                <ProgressCircle
+                  percent={
+                    (currentPostCharsCount / MAX_POST_CHARACTERS_COUNT) * 100
+                  }
+                  radius={12}
+                  borderWidth={3}
+                  color={foreground}
+                  bgColor={background}
+                >
+                  {MAX_POST_CHARACTERS_COUNT - currentPostCharsCount < 100 && (
+                    <Text style={{ fontSize: 10 }}>
+                      {MAX_POST_CHARACTERS_COUNT - currentPostCharsCount}
+                    </Text>
+                  )}
+                </ProgressCircle>
+              </View>
               <View style={{ width: 1, backgroundColor: border }} />
+              {/* <Separator orientation="vertical" /> */}
               <IconButton icon="addCircle" onPress={onPressAddReplies} />
             </View>
           </View>

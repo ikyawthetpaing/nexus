@@ -4,7 +4,7 @@ import { View, ViewProps } from "react-native";
 import { useTheme } from "@/context/theme";
 
 interface Props extends ViewProps {
-  uri: string | null;
+  uri: string | null | undefined;
 }
 
 export function AvatarImage({ uri, style, ...props }: Props) {

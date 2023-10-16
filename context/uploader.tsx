@@ -105,7 +105,6 @@ export function UploaderContextProvider({ children }: Props) {
 
   return (
     <UploaderContext.Provider value={uploaderContext}>
-      {/* {loading ? <LoadingScreen /> : children} */}
       {children}
     </UploaderContext.Provider>
   );

@@ -3,14 +3,14 @@ import { AddPost } from "@/types";
 import { router } from "expo-router";
 import { View } from "react-native";
 
-import { useAlert } from "@/components/ui/alert";
 import { PostEditor } from "@/components/post-editor";
+import { useAlert } from "@/context/alert";
 import { useUploader } from "@/context/uploader";
 import { isPostsHasEmptyContent } from "@/lib/utils";
 
 export default function AddPostScreen() {
   const { setUpload } = useUploader();
-  const { Alert, setAlert } = useAlert();
+  const { setAlert } = useAlert();
 
   const [posts, setPosts] = useState<AddPost[]>([{ content: "", images: [] }]);
 
@@ -25,7 +25,13 @@ export default function AddPostScreen() {
         description:
           "You have unsaved changes. Are you sure you want to cancel?",
         button: [
-          { text: "Yes", action: () => router.back() },
+          {
+            text: "Yes",
+            action: () => {
+              setAlert(null);
+              router.back();
+            },
+          },
           { text: "No", action: () => setAlert(null) },
         ],
       });
@@ -47,7 +53,6 @@ export default function AddPostScreen() {
         onSubmit={onSubmit}
         onCancel={onCancel}
       />
-      <Alert />
     </View>
   );
 }

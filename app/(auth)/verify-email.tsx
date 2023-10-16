@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { router } from "expo-router";
 import { sendEmailVerification, updateEmail } from "firebase/auth";
 
-import { useAlert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +9,7 @@ import { STATUSBAR_HEIGHT } from "@/components/header";
 import { Spinner } from "@/components/spinner";
 import { Text, View } from "@/components/themed";
 import { getStyles } from "@/constants/style";
+import { useAlert } from "@/context/alert";
 import { useAuth } from "@/context/auth";
 import { useTheme } from "@/context/theme";
 import { handleFirebaseError } from "@/firebase/error-handler";
@@ -27,7 +27,7 @@ export default function VerifyEmailScreen() {
   const [loading, setLoading] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const { Alert, setAlert } = useAlert();
+  const { setAlert } = useAlert();
 
   useEffect(() => {
     setEmail(user?.email || "");
@@ -127,7 +127,6 @@ export default function VerifyEmailScreen() {
           </View>
         </View>
       </View>
-      <Alert />
     </View>
   );
 }

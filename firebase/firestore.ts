@@ -1,13 +1,17 @@
 import { ChatMessage, EditableUser, Follow, Like, Post, User } from "@/types";
 import {
+  and,
   collection,
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
+  query,
   QueryDocumentSnapshot,
   setDoc,
   SnapshotOptions,
   updateDoc,
+  where,
 } from "firebase/firestore";
 
 import { FIREBASE_DB, FIRESTORE_COLLECTIONS } from "@/firebase/config";
@@ -62,6 +66,45 @@ export const getUser = async (userId: string) => {
     return null;
   }
 };
+
+export async function checkUsername(username: string, currentUserId: string) {
+  const q = query(
+    collection(FIREBASE_DB, FIRESTORE_COLLECTIONS.USERS).withConverter(
+      userConverter
+    ),
+    and(where("username", "==", username), where("id", "!=", currentUserId))
+  );
+  const querySnapshot = await getDocs(q);
+  if (querySnapshot.empty) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+export async function searchUsers(_query: string, currentUserId: string) {
+  const lowercaseQuery = _query.trim().toLowerCase();
+
+  const q = query(
+    collection(FIREBASE_DB, FIRESTORE_COLLECTIONS.USERS),
+    where("username", ">=", lowercaseQuery)
+  );
+
+  const querySnapshot = await getDocs(q);
+  const users: User[] = [];
+
+  querySnapshot.forEach((doc) => {
+    const user = doc.data() as User;
+    if (
+      user.id !== currentUserId &&
+      user.username.toLowerCase().includes(lowercaseQuery)
+    ) {
+      users.push(user);
+    }
+  });
+
+  return users;
+}
 
 // post
 export async function createPost(data: Post) {

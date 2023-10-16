@@ -4,7 +4,7 @@ import { useTheme } from "@/context/theme";
 export default function UserProfileRepostsScreen() {
   const { mutedForeground } = useTheme();
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <Text
         style={{
           marginTop: 64,

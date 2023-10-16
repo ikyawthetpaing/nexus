@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { router, Slot, useLocalSearchParams } from "expo-router";
+import { router, Stack, useLocalSearchParams } from "expo-router";
 import {
   Animated,
   Dimensions,
@@ -76,7 +76,7 @@ export default function UserProfileLayout() {
           minHeight: Dimensions.get("screen").height + profileHeaderHeight,
         }}
       >
-        <Slot />
+        <Stack screenOptions={{ headerShown: false }} />
       </Animated.ScrollView>
     </SafeAreaView>
   );
